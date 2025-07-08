@@ -81,28 +81,15 @@ ADroppedItem* UGSBGameInstance::SpawnDroppedItem(const FItemStack& ItemStack)
 	return nullptr;
 }
 
-AFacilityBuilder* UGSBGameInstance::SpawnGeneralFacilityBuilder()
+AFacilityBuilder* UGSBGameInstance::SpawnFacilityBuilder()
 {
-	if (DefaultGeneralFacilityBuilderClass)
+	if (DefaultFacilityBuilderClass)
 	{
-		return GetWorld()->SpawnActor<AFacilityBuilder>(DefaultGeneralFacilityBuilderClass);
+		return GetWorld()->SpawnActor<AFacilityBuilder>(DefaultFacilityBuilderClass);
 	}
 	else
 	{
-		TRACE_SCREEN_LOG(TEXT("DefaultGeneralFacilityBuilderClass가 nullptr 입니다."));
-	}
-	return nullptr;
-}
-
-AFacilityBuilder* UGSBGameInstance::SpawnMiningFacilityBuilder()
-{
-	if (DefaultMiningFacilityBuilderClass)
-	{
-		return GetWorld()->SpawnActor<AFacilityBuilder>(DefaultMiningFacilityBuilderClass);
-	}
-	else
-	{
-		TRACE_SCREEN_LOG(TEXT("DefaultMiningFacilityBuilderClass가 nullptr 입니다."));
+		TRACE_SCREEN_LOG(TEXT("DefaultFacilityBuilderClass가 nullptr 입니다."));
 	}
 	return nullptr;
 }

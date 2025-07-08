@@ -32,9 +32,7 @@ public:
 	
 	ADroppedItem* SpawnDroppedItem(const FItemStack& ItemStack);
 
-	AFacilityBuilder* SpawnGeneralFacilityBuilder();
-
-	AFacilityBuilder* SpawnMiningFacilityBuilder();
+	AFacilityBuilder* SpawnFacilityBuilder();
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "UGSBGameInstance|Actor Classes")
@@ -44,10 +42,7 @@ protected:
 	TSubclassOf<ADroppedItem> DefaultDroppedItemClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "UGSBGameInstance|Actor Classes")
-	TSubclassOf<AFacilityBuilder> DefaultGeneralFacilityBuilderClass;
-
-	UPROPERTY(EditDefaultsOnly, Category = "UGSBGameInstance|Actor Classes")
-	TSubclassOf<AFacilityBuilder> DefaultMiningFacilityBuilderClass;
+	TSubclassOf<AFacilityBuilder> DefaultFacilityBuilderClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "UGSBGameInstance|Materials")
 	UMaterialInterface* ValidPlacementDecal;
@@ -67,14 +62,6 @@ public:
 	FORCEINLINE void AddPowerDistributor(AFacility* PowerDistributor)
 	{
 		AllPowerDistributor.Add(PowerDistributor);
-	}
-	FORCEINLINE TSubclassOf<AFacilityBuilder> GetDefaultGeneralFacilityBuilderClass() const
-	{
-		return DefaultGeneralFacilityBuilderClass;
-	}
-	FORCEINLINE TSubclassOf<AFacilityBuilder> GetDefaultMiningFacilityBuilderClass() const
-	{
-		return DefaultMiningFacilityBuilderClass;
 	}
 	FORCEINLINE UMaterialInterface* GetValidPlacementDecal() const
 	{

@@ -100,20 +100,12 @@ private:
 	// 건설 모드
 	///////////////////////////////////////////////////////////
 private:
-	bool IsPreviewingFacility() const;
-
 	void UpdateFacilityBuilderLocation();
-
-	void ReplaceFacilityBuilder(AFacilityBuilder* InFacilityBuilder);
-
-	void PreviewGeneralFacility(const FName& FacilityName);
-
-	void PreviewMiningFacility(const FName& FacilityName);
 
 	UPROPERTY(EditAnywhere, Category = "GSBPlayer|Build Mode")
 	TArray<TSubclassOf<AConstructibleFacility>> TestFacilityClasses;
 
-	AFacilityBuilder* FacilityBuilder = nullptr;
+	AFacilityBuilder* FacilityBuilder;
 
 	///////////////////////////////////////////////////////////
 	// Interaction

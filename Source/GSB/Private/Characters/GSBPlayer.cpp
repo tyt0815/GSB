@@ -38,10 +38,7 @@ void AGSBPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (IsPreviewingFacility())
-	{
-		UpdateFacilityBuilderLocation();
-	}
+	UpdateFacilityBuilderLocation();
 
 	if (!IsUIMode())
 	{
@@ -110,6 +107,20 @@ void AGSBPlayer::BeginPlay()
 	else
 	{
 		TRACE_SCREEN_LOG(TEXT("HUD 캐스팅 실패"));
+	}
+
+	if (UGSBGameInstance* GameInst = Cast<UGSBGameInstance>(GetGameInstance()))
+	{
+		FacilityBuilder = GameInst->SpawnFacilityBuilder();
+		if (!FacilityBuilder)
+		{
+			FacilityBuilder = GetWorld()->SpawnActor<AFacilityBuilder>();
+			TRACE_SCREEN_LOG(TEXT("FacilityBuilder 스폰 실패"));
+		}
+	}
+	else
+	{
+		TRACE_SCREEN_LOG(TEXT("UGSBGameInstance 캐스팅 실패"));
 	}
 }
 
@@ -231,37 +242,27 @@ void AGSBPlayer::HideWindow()
 
 void AGSBPlayer::ConfirmFacilityPlacement()
 {
-	if (IsPreviewingFacility())
-	{
-		FacilityBuilder->ConfirmFacilityPlacement();
-	}
+	FacilityBuilder->ConfirmFacilityPlacement();
 }
 
 void AGSBPlayer::CancelFacilityPreview()
 {
-	if (IsPreviewingFacility())
-	{
-		FacilityBuilder->Destroy();
-	}
-	FacilityBuilder = nullptr;
+	FacilityBuilder->CancelPreview();
 }
 
 void AGSBPlayer::PreviewConveyorBelt()
 {
-	if (UGSBGameInstance* GameInst = Cast<UGSBGameInstance>(GetGameInstance()))
-	{
-		// SpawnFacilityBuilder(GameInst->get)
-	}
+	FacilityBuilder->PreviewConveyorBelt();
 }
 
 void AGSBPlayer::PreviewExtensionHub()
 {
-	PreviewGeneralFacility(TEXT("ExtensionHub"));
+	FacilityBuilder->PreviewGeneralFacility(TEXT("ExtensionHub"));
 }
 
 void AGSBPlayer::PreviewMiningFacility()
 {
-	PreviewMiningFacility(TEXT("MiningFacility"));
+	FacilityBuilder->PreviewMiningFacility();
 }
 
 void AGSBPlayer::SetGamePlayMode(EGamePlayMode NewGamePlayMode)
@@ -304,11 +305,6 @@ void AGSBPlayer::SetGamePlayMode_Build()
 	{
 		PlayerController->ActivateBuildInputContext();
 	}
-}
-
-bool AGSBPlayer::IsPreviewingFacility() const
-{
-	return IsValid(FacilityBuilder);
 }
 
 void AGSBPlayer::UpdateFacilityBuilderLocation()
@@ -363,43 +359,6 @@ void AGSBPlayer::UpdateFacilityBuilderLocation()
 	}
 
 	FacilityBuilder->SetActorLocation(FacilityBuilderLocation);
-}
-
-void AGSBPlayer::ReplaceFacilityBuilder(AFacilityBuilder* InFacilityBuilder)
-{
-	if (IsValid(InFacilityBuilder))
-	{
-		if (IsValid(FacilityBuilder))
-		{
-			FacilityBuilder->Destroy();
-		}
-
-		FacilityBuilder = InFacilityBuilder;
-	}
-}
-
-void AGSBPlayer::PreviewGeneralFacility(const FName& FacilityName)
-{
-	if (UGSBGameInstance* GameInst = Cast<UGSBGameInstance>(GetGameInstance()))
-	{
-		ReplaceFacilityBuilder(GameInst->SpawnGeneralFacilityBuilder());
-		if (IsValid(FacilityBuilder))
-		{
-			FacilityBuilder->PreviewFacility(FacilityName);
-		}
-	}
-}
-
-void AGSBPlayer::PreviewMiningFacility(const FName& FacilityName)
-{
-	if (UGSBGameInstance* GameInst = Cast<UGSBGameInstance>(GetGameInstance()))
-	{
-		ReplaceFacilityBuilder(GameInst->SpawnMiningFacilityBuilder ());
-		if (IsValid(FacilityBuilder))
-		{
-			FacilityBuilder->PreviewFacility(FacilityName);
-		}
-	}
 }
 
 void AGSBPlayer::UpdateInteractableActor(AActor* Candidate)

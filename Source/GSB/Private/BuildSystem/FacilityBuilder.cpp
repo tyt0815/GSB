@@ -4,32 +4,46 @@
 #include "BuildSystem/FacilityBuilder.h"
 #include "BuildSystem/FacilityGhostActor.h"
 #include "Facility/ConstructibleFacility.h"
+#include "Facility/MiningPoint.h"
 #include "GSBGameInstance.h"
 #include "DebugHeader.h"
 
 AFacilityBuilder::AFacilityBuilder()
 {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 }
 
-void AFacilityBuilder::EndPlay(const EEndPlayReason::Type EndPlayReason)
+void AFacilityBuilder::Tick(float DeltaSeconds)
 {
-	if (UGSBGameInstance* GameInst = Cast<UGSBGameInstance>(GetGameInstance()))
+	Super::Tick(DeltaSeconds);
+
+	switch (BuildMode)
 	{
-		GameInst->SetPowerInfluenceVisibility(false);
+	case EBuildMode::EBT_GeneralFacility:
+		Tick_GeneralFacilityBuildMode(DeltaSeconds);
+		break;
+	case EBuildMode::EBT_MiningFacility:
+		Tick_MiningFacilityBuildMode(DeltaSeconds);
+		break;
+	case EBuildMode::EBT_ConveyorBelt:
+		Tick_ConveyorBeltBuildMode(DeltaSeconds);
+		break; 
+	case EBuildMode::EBT_None:
+	default:
+		break;
 	}
-	Super::EndPlay(EndPlayReason);
 }
 
-void AFacilityBuilder::PreviewFacility(const FName& FacilityName)
+void AFacilityBuilder::PreviewGeneralFacility(const FName& FacilityName)
 {
-	if (FacilityClasses.Contains(FacilityName))
+	if (GeneralFacilityClasses.Contains(FacilityName))
 	{
-		const TSubclassOf<AConstructibleFacility>& FacilityClass = *FacilityClasses.Find(FacilityName);
+		const TSubclassOf<AConstructibleFacility>& FacilityClass = *GeneralFacilityClasses.Find(FacilityName);
 		if (FacilityClass)
 		{
-			CurrentPreviewingFacilityClass = FacilityClass;
-			PreviewFacility_Internal(FacilityClass);
+			CurrentGeneralFacilityClass = FacilityClass;
+			FacilityGhost = SpawnFacilityGhost(CurrentGeneralFacilityClass, true);
+			BuildMode = EBuildMode::EBT_GeneralFacility;
 		}
 		else
 		{
@@ -40,6 +54,153 @@ void AFacilityBuilder::PreviewFacility(const FName& FacilityName)
 	{
 		TRACE_SCREEN_LOG(FacilityName.ToString() + TEXT("가 존재하지 않습니다."));
 	}
+}
+
+void AFacilityBuilder::PreviewMiningFacility()
+{
+	if (MiningFacilityClass)
+	{
+		FacilityGhost = SpawnFacilityGhost(MiningFacilityClass, true);
+		BuildMode = EBuildMode::EBT_MiningFacility;
+	}
+}
+
+void AFacilityBuilder::PreviewConveyorBelt()
+{
+	// TODO
+}
+
+void AFacilityBuilder::ConfirmFacilityPlacement()
+{
+	switch (BuildMode)
+	{
+	case EBuildMode::EBT_GeneralFacility:
+		ConfirmPlacement_GeneralFacilityBuildMode();
+		break;
+	case EBuildMode::EBT_MiningFacility:
+		ConfirmPlacement_MiningFacilityBuildMode();
+		break;
+	case EBuildMode::EBT_ConveyorBelt:
+		ConfirmPlacement_ConveyorBeltBuildMode();
+		break;
+	case EBuildMode::EBT_None:
+	default:
+		break;
+	}
+}
+
+void AFacilityBuilder::CancelPreview()
+{
+	switch (BuildMode)
+	{
+	case EBuildMode::EBT_GeneralFacility:
+	case EBuildMode::EBT_MiningFacility:
+		CancelPreview_GeneralAndMiningFacilityBuildMode();
+		break;
+	case EBuildMode::EBT_ConveyorBelt:
+		CancelPreview_ConveyorBeltBuildMode();
+		break;
+	case EBuildMode::EBT_None:
+	default:
+		break;
+	}
+}
+
+AConstructibleFacility* AFacilityBuilder::BuildFacility(TSubclassOf<AConstructibleFacility> FacilityClass, FVector Location)
+{
+	if (AConstructibleFacility* Facility = GetWorld()->SpawnActor<AConstructibleFacility>(FacilityClass))
+	{
+		Facility->SetActorLocation(Location);
+		Facility->BeginConstruction();
+
+		return Facility;
+	}
+	return nullptr;	
+}
+
+void AFacilityBuilder::Tick_GeneralFacilityBuildMode(float DeltaSeconds)
+{
+	if (IsValid(FacilityGhost))
+	{
+		FacilityGhost->SnapActorToGrid(GetActorLocation());
+		FacilityGhost->UpdatePlacementDecal(IsValidGeneralFacilityPlace(FacilityGhost));
+	}
+}
+
+void AFacilityBuilder::Tick_MiningFacilityBuildMode(float DeltaSeconds)
+{
+	if (IsValid(FacilityGhost))
+	{
+		FacilityGhost->SnapActorToGrid(GetActorLocation());
+		FacilityGhost->UpdatePlacementDecal(IsValidMiningFacilityPlace(FacilityGhost));
+	}
+}
+
+void AFacilityBuilder::Tick_ConveyorBeltBuildMode(float DeltaSeconds)
+{
+	// TODO
+}
+
+void AFacilityBuilder::ConfirmPlacement_GeneralFacilityBuildMode()
+{
+	if (FacilityGhost && IsValidGeneralFacilityPlace(FacilityGhost))
+	{
+		BuildFacility(CurrentGeneralFacilityClass, FacilityGhost->GetActorLocation());
+	}
+}
+
+void AFacilityBuilder::ConfirmPlacement_MiningFacilityBuildMode()
+{
+	if (FacilityGhost && IsValidMiningFacilityPlace(FacilityGhost))
+	{
+		BuildFacility(MiningFacilityClass, FacilityGhost->GetActorLocation());
+	}
+}
+
+void AFacilityBuilder::ConfirmPlacement_ConveyorBeltBuildMode()
+{
+	// TODO
+}
+
+void AFacilityBuilder::CancelPreview_GeneralAndMiningFacilityBuildMode()
+{
+	if (IsValid(FacilityGhost))
+	{
+		FacilityGhost->Destroy();
+	}
+
+	if (UGSBGameInstance* GameInst = Cast<UGSBGameInstance>(GetGameInstance()))
+	{
+		GameInst->SetPowerInfluenceVisibility(false);
+	}
+}
+
+void AFacilityBuilder::CancelPreview_ConveyorBeltBuildMode()
+{
+	// TODO
+}
+
+bool AFacilityBuilder::IsValidGeneralFacilityPlace(AFacilityGhostActor* Ghost)
+{
+	FHitResult HitResult;
+	TraceGridBoundsInGhostGridBounds(Ghost, HitResult);
+
+	return !IsValid(HitResult.GetActor());
+}
+
+bool AFacilityBuilder::IsValidMiningFacilityPlace(AFacilityGhostActor* Ghost)
+{
+	FHitResult HitResult;
+	TraceGridBoundsInGhostGridBounds(Ghost, HitResult);
+
+	if (AMiningPoint* MiningPoint = Cast<AMiningPoint>(HitResult.GetActor()))
+	{
+		FVector GhostXYPlaneLocation = Ghost->GetLocationOnXYPlane();
+		FVector MiningPointXYPlaneLocation = MiningPoint->GetLocationOnXYPlane();
+		return GhostXYPlaneLocation.Equals(MiningPointXYPlaneLocation, 0.001);
+	}
+
+	return false;
 }
 
 AFacilityGhostActor* AFacilityBuilder::SpawnFacilityGhost(const TSubclassOf<AConstructibleFacility>& FacilityClass, bool bVisiblePowerInfluenceArea)
