@@ -6,6 +6,7 @@
 #include "Facility/ConstructibleFacility.h"
 #include "Facility/MiningPoint.h"
 #include "GSBGameInstance.h"
+#include "GSBDefines.h"
 #include "DebugHeader.h"
 
 AFacilityBuilder::AFacilityBuilder()
@@ -36,6 +37,7 @@ void AFacilityBuilder::Tick(float DeltaSeconds)
 
 void AFacilityBuilder::PreviewGeneralFacility(const FName& FacilityName)
 {
+	CancelPreview();
 	if (GeneralFacilityClasses.Contains(FacilityName))
 	{
 		const TSubclassOf<AConstructibleFacility>& FacilityClass = *GeneralFacilityClasses.Find(FacilityName);
@@ -58,6 +60,7 @@ void AFacilityBuilder::PreviewGeneralFacility(const FName& FacilityName)
 
 void AFacilityBuilder::PreviewMiningFacility()
 {
+	CancelPreview();
 	if (MiningFacilityClass)
 	{
 		FacilityGhost = SpawnFacilityGhost(MiningFacilityClass, true);
@@ -67,7 +70,16 @@ void AFacilityBuilder::PreviewMiningFacility()
 
 void AFacilityBuilder::PreviewConveyorBelt()
 {
-	// TODO
+	CancelPreview();
+	if (ConveyorBeltForwardClass && ConveyorBeltLeftClass && ConveyorBeltRightClass)
+	{
+		FacilityGhost = SpawnFacilityGhost(ConveyorBeltForwardClass, false);
+		BuildMode = EBuildMode::EBT_ConveyorBelt;
+	}
+	else
+	{
+		TRACE_SCREEN_LOG(TEXT("ConveyorBeltClasses가 nullptr입니다."));
+	}
 }
 
 void AFacilityBuilder::ConfirmFacilityPlacement()
@@ -91,79 +103,6 @@ void AFacilityBuilder::ConfirmFacilityPlacement()
 
 void AFacilityBuilder::CancelPreview()
 {
-	switch (BuildMode)
-	{
-	case EBuildMode::EBT_GeneralFacility:
-	case EBuildMode::EBT_MiningFacility:
-		CancelPreview_GeneralAndMiningFacilityBuildMode();
-		break;
-	case EBuildMode::EBT_ConveyorBelt:
-		CancelPreview_ConveyorBeltBuildMode();
-		break;
-	case EBuildMode::EBT_None:
-	default:
-		break;
-	}
-}
-
-AConstructibleFacility* AFacilityBuilder::BuildFacility(TSubclassOf<AConstructibleFacility> FacilityClass, FVector Location)
-{
-	if (AConstructibleFacility* Facility = GetWorld()->SpawnActor<AConstructibleFacility>(FacilityClass))
-	{
-		Facility->SetActorLocation(Location);
-		Facility->BeginConstruction();
-
-		return Facility;
-	}
-	return nullptr;	
-}
-
-void AFacilityBuilder::Tick_GeneralFacilityBuildMode(float DeltaSeconds)
-{
-	if (IsValid(FacilityGhost))
-	{
-		FacilityGhost->SnapActorToGrid(GetActorLocation());
-		FacilityGhost->UpdatePlacementDecal(IsValidGeneralFacilityPlace(FacilityGhost));
-	}
-}
-
-void AFacilityBuilder::Tick_MiningFacilityBuildMode(float DeltaSeconds)
-{
-	if (IsValid(FacilityGhost))
-	{
-		FacilityGhost->SnapActorToGrid(GetActorLocation());
-		FacilityGhost->UpdatePlacementDecal(IsValidMiningFacilityPlace(FacilityGhost));
-	}
-}
-
-void AFacilityBuilder::Tick_ConveyorBeltBuildMode(float DeltaSeconds)
-{
-	// TODO
-}
-
-void AFacilityBuilder::ConfirmPlacement_GeneralFacilityBuildMode()
-{
-	if (FacilityGhost && IsValidGeneralFacilityPlace(FacilityGhost))
-	{
-		BuildFacility(CurrentGeneralFacilityClass, FacilityGhost->GetActorLocation());
-	}
-}
-
-void AFacilityBuilder::ConfirmPlacement_MiningFacilityBuildMode()
-{
-	if (FacilityGhost && IsValidMiningFacilityPlace(FacilityGhost))
-	{
-		BuildFacility(MiningFacilityClass, FacilityGhost->GetActorLocation());
-	}
-}
-
-void AFacilityBuilder::ConfirmPlacement_ConveyorBeltBuildMode()
-{
-	// TODO
-}
-
-void AFacilityBuilder::CancelPreview_GeneralAndMiningFacilityBuildMode()
-{
 	if (IsValid(FacilityGhost))
 	{
 		FacilityGhost->Destroy();
@@ -173,11 +112,192 @@ void AFacilityBuilder::CancelPreview_GeneralAndMiningFacilityBuildMode()
 	{
 		GameInst->SetPowerInfluenceVisibility(false);
 	}
+
+	DestroyAllConveyorBeltGhosts();
+
+	BuildMode = EBuildMode::EBT_None;
 }
 
-void AFacilityBuilder::CancelPreview_ConveyorBeltBuildMode()
+void AFacilityBuilder::RotatePreview()
+{
+	if (IsValid(FacilityGhost))
+	{
+		FacilityGhost->AddActorWorldRotation(FRotator(0, 90, 0));
+	}
+}
+
+AConstructibleFacility* AFacilityBuilder::BuildFacility(TSubclassOf<AConstructibleFacility> FacilityClass, const FTransform& Transform)
+{
+	if (AConstructibleFacility* Facility = GetWorld()->SpawnActor<AConstructibleFacility>(FacilityClass, Transform))
+	{
+		Facility->BeginConstruction();
+		return Facility;
+	}
+	return nullptr;	
+}
+
+void AFacilityBuilder::Tick_GeneralFacilityBuildMode(float DeltaSeconds)
+{
+	FacilityGhost->SnapActorToGrid(GetActorLocation());
+	FacilityGhost->UpdatePlacementDecal(IsValidGeneralFacilityPlace(FacilityGhost));
+}
+
+void AFacilityBuilder::Tick_MiningFacilityBuildMode(float DeltaSeconds)
+{
+	FacilityGhost->SnapActorToGrid(GetActorLocation());
+	FacilityGhost->UpdatePlacementDecal(IsValidMiningFacilityPlace(FacilityGhost));
+}
+
+void AFacilityBuilder::Tick_ConveyorBeltBuildMode(float DeltaSeconds)
+{
+	if (IsValid(FacilityGhost))
+	{
+		FacilityGhost->SnapActorToGrid(GetActorLocation());
+		FacilityGhost->UpdatePlacementDecal(IsValidGeneralFacilityPlace(FacilityGhost));
+	}
+	else if (!ConveyorBeltGhosts.IsEmpty())
+	{
+		// 방향 평가
+		FVector StartForward = ConveyorBeltGhosts[0]->GetActorForwardVector();
+		FVector StartToEndVector = GetActorLocation() - ConveyorBeltGhosts[0]->GetLocationOnXYPlane();
+		FVector EndDirection = StartToEndVector;
+		EndDirection.Normalize();
+		double SFoED = StartForward.Dot(EndDirection);
+		EChainBuildDirection ChainBuildDirection;
+		if (SFoED > 0.5)
+		{
+			ChainBuildDirection = EChainBuildDirection::ECBD_Forward;
+		}
+		else if (SFoED < -0.5)
+		{
+			ChainBuildDirection = EChainBuildDirection::ECBD_Backward;
+		}
+		else
+		{
+			FVector StartRight = ConveyorBeltGhosts[0]->GetActorRightVector();
+			double SRoED = StartRight.Dot(EndDirection);
+			if (SRoED > 0.5f)
+			{
+				ChainBuildDirection = EChainBuildDirection::ECBD_Right;
+			}
+			else
+			{
+				ChainBuildDirection = EChainBuildDirection::ECBD_Left;
+			}
+		}
+
+		// Preview 초기화 및 재생성
+		if (ChainBuildDirection != ChainBuildDirection_LastTick)
+		{
+			FTransform StartTransform = ConveyorBeltGhosts[0]->GetActorTransform();
+			DestroyAllConveyorBeltGhosts();
+			switch (ChainBuildDirection)
+			{
+			case AFacilityBuilder::EChainBuildDirection::ECBD_Forward:
+			case AFacilityBuilder::EChainBuildDirection::ECBD_Backward:
+			{
+				AFacilityGhostActor* Ghost = SpawnFacilityGhost(ConveyorBeltForwardClass, false);
+				ConveyorBeltGhosts.Add(Ghost);
+				Ghost->SetActorTransform(StartTransform);
+
+				break;
+			}
+			case AFacilityBuilder::EChainBuildDirection::ECBD_Right:
+			{
+				AFacilityGhostActor* Ghost = SpawnFacilityGhost(ConveyorBeltRightClass, false);
+				ConveyorBeltGhosts.Add(Ghost);
+				Ghost->SetActorTransform(StartTransform);
+
+				break;
+			}
+			case AFacilityBuilder::EChainBuildDirection::ECBD_Left:
+			{
+				AFacilityGhostActor* Ghost = SpawnFacilityGhost(ConveyorBeltLeftClass, false);
+				ConveyorBeltGhosts.Add(Ghost);
+				Ghost->SetActorTransform(StartTransform);
+
+				break;
+			}
+			default:
+				break;
+			}
+		}
+
+		// ChainPreview 생성
+		double ChainLength = StartToEndVector.Length();
+		int GhostsNum = (ChainLength - GRID_CELL_SIZE / 2) / GRID_CELL_SIZE + 1;
+		GhostsNum = FMath::Max(1, GhostsNum);
+		FVector ChainConveyorBeltLocationOffset;
+		FRotator ChainConveyorBeltsRotation;
+		switch (ChainBuildDirection)
+		{
+		case AFacilityBuilder::EChainBuildDirection::ECBD_Forward:
+			ChainConveyorBeltLocationOffset = ConveyorBeltGhosts[0]->GetActorForwardVector() * GRID_CELL_SIZE;
+			ChainConveyorBeltsRotation = ConveyorBeltGhosts[0]->GetActorRotation();
+			break;
+		case AFacilityBuilder::EChainBuildDirection::ECBD_Right:
+			ChainConveyorBeltLocationOffset = ConveyorBeltGhosts[0]->GetActorRightVector() * GRID_CELL_SIZE;
+			ChainConveyorBeltsRotation = ConveyorBeltGhosts[0]->GetActorRotation() + FRotator(0, 90, 0);
+			break;
+		case AFacilityBuilder::EChainBuildDirection::ECBD_Left:
+			ChainConveyorBeltLocationOffset = -ConveyorBeltGhosts[0]->GetActorRightVector() * GRID_CELL_SIZE;
+			ChainConveyorBeltsRotation = ConveyorBeltGhosts[0]->GetActorRotation() + FRotator(0, -90, 0);
+			break;
+		case AFacilityBuilder::EChainBuildDirection::ECBD_Backward:
+		default:
+			ChainConveyorBeltLocationOffset = FVector();
+			ChainConveyorBeltsRotation = FRotator();
+			GhostsNum = 1;
+			break;
+		}
+
+		for (int i = ConveyorBeltGhosts.Num() - 1; i >= GhostsNum; --i)
+		{
+			ConveyorBeltGhosts[i]->Destroy();
+			ConveyorBeltGhosts.RemoveAt(i);
+		}
+
+		for (int i = ConveyorBeltGhosts.Num(); i < GhostsNum; ++i)
+		{
+			AFacilityGhostActor* Ghost = SpawnFacilityGhost(ConveyorBeltForwardClass, false);
+			Ghost->SetActorLocation(ConveyorBeltGhosts[i - 1]->GetActorLocation() + ChainConveyorBeltLocationOffset);
+			Ghost->SetActorRotation(ChainConveyorBeltsRotation);
+			ConveyorBeltGhosts.Add(Ghost);
+		}
+		
+
+		ChainBuildDirection_LastTick = ChainBuildDirection;
+	}
+	else
+	{
+		CancelPreview();
+	}
+}
+
+void AFacilityBuilder::ConfirmPlacement_GeneralFacilityBuildMode()
+{
+	if (FacilityGhost && IsValidGeneralFacilityPlace(FacilityGhost))
+	{
+		BuildFacility(CurrentGeneralFacilityClass, FacilityGhost->GetTransform());
+	}
+}
+
+void AFacilityBuilder::ConfirmPlacement_MiningFacilityBuildMode()
+{
+	if (FacilityGhost && IsValidMiningFacilityPlace(FacilityGhost))
+	{
+		BuildFacility(MiningFacilityClass, FacilityGhost->GetTransform());
+	}
+}
+
+void AFacilityBuilder::ConfirmPlacement_ConveyorBeltBuildMode()
 {
 	// TODO
+	if (IsValid(FacilityGhost))
+	{
+		ConveyorBeltGhosts.Add(FacilityGhost);
+		FacilityGhost = nullptr;
+	}
 }
 
 bool AFacilityBuilder::IsValidGeneralFacilityPlace(AFacilityGhostActor* Ghost)
@@ -236,4 +356,13 @@ void AFacilityBuilder::TraceGridBoundsInGhostGridBounds(AFacilityGhostActor* Gho
 	TArray<AActor*> ActorsToIgnore;
 	ActorsToIgnore.Add(Ghost);
 	Ghost->BoxTraceSingleFromGridBoundsForObjects(ObjectTypes, ActorsToIgnore, HitResult, 50);
+}
+
+void AFacilityBuilder::DestroyAllConveyorBeltGhosts()
+{
+	for (AFacilityGhostActor* Ghost : ConveyorBeltGhosts)
+	{
+		Ghost->Destroy();
+	}
+	ConveyorBeltGhosts.Empty();
 }

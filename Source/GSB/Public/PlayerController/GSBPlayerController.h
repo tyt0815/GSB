@@ -6,100 +6,9 @@
 #include "GameFramework/PlayerController.h"
 #include "GSBPlayerController.generated.h"
 
-class UInputMappingContext;
-class UInputAction;
 class UWidget;
-
-USTRUCT()
-struct FGSBPlayerDefaultInputSet
-{
-	GENERATED_BODY()
-public:
-	UPROPERTY(EditDefaultsOnly)
-	UInputMappingContext* InputMapping;
-
-	UPROPERTY(EditDefaultsOnly)
-	UInputAction* MoveInputAction;
-
-	UPROPERTY(EditDefaultsOnly)
-	UInputAction* LookInputAction;
-
-	UPROPERTY(EditDefaultsOnly)
-	UInputAction* JumpInputAction;
-
-	UPROPERTY(EditDefaultsOnly)
-	UInputAction* ToggleCombatAndBuildModeInputAction;
-
-	UPROPERTY(EditDefaultsOnly)
-	UInputAction* InteractionInputAction;
-
-	UPROPERTY(EditDefaultsOnly)
-	UInputAction* SelectInteractionScrollInputAction;
-
-	UPROPERTY(EditDefaultsOnly)
-	UInputAction* ToggleInventoryInputAction;
-
-	UPROPERTY(EditDefaultsOnly)
-	UInputAction* EscInputAction;
-};
-
-USTRUCT()
-struct FGSBPlayerBuildInputSet
-{
-	GENERATED_BODY()
-public:
-	UPROPERTY(EditDefaultsOnly)
-	UInputMappingContext* InputMapping;
-
-	UPROPERTY(EditDefaultsOnly)
-	UInputAction* ConfirmFacilityPlacementInputAction;
-
-	UPROPERTY(EditDefaultsOnly)
-	UInputAction* CancelFacilityPreviewInputAction;
-
-	UPROPERTY(EditDefaultsOnly)
-	UInputAction* PreviewConveyorBeltInputAction;
-
-	UPROPERTY(EditDefaultsOnly)
-	UInputAction* PreviewExtensionHubInputAction;
-
-	UPROPERTY(EditDefaultsOnly)
-	UInputAction* PreviewMiningFacilityInputAction;
-};
-
-USTRUCT()
-struct FGSBPlayerCombatInputSet
-{
-	GENERATED_BODY()
-public:
-	UPROPERTY(EditDefaultsOnly)
-	UInputMappingContext* InputMapping;
-
-	UPROPERTY(EditDefaultsOnly)
-	UInputAction* Ability1InputAction;
-
-	UPROPERTY(EditDefaultsOnly)
-	UInputAction* Ability2InputAction;
-
-	UPROPERTY(EditDefaultsOnly)
-	UInputAction* Ability3InputAction;
-};
-
-USTRUCT()
-struct FGSBPlayerInputSet
-{
-	GENERATED_BODY()
-public:
-
-	UPROPERTY(EditDefaultsOnly)
-	FGSBPlayerDefaultInputSet DefaultInputSet;
-	
-	UPROPERTY(EditDefaultsOnly)
-	FGSBPlayerBuildInputSet BuildInputSet;
-
-	UPROPERTY(EditDefaultsOnly)
-	FGSBPlayerCombatInputSet CombatInputSet;
-};
+class UInputMappingContext;
+class UGSBPlayerInputActionSetDataAsset;
 
 UCLASS()
 class GSB_API AGSBPlayerController : public APlayerController
@@ -123,7 +32,7 @@ public:
 
 protected:
 	UPROPERTY(EditAnywhere)
-	FGSBPlayerInputSet PlayerInputSet;
+	UGSBPlayerInputActionSetDataAsset* PlayerInputSet;
 
 private:
 	void EnterUIControlMode();
@@ -137,8 +46,8 @@ public:
 	{
 		return bUIControlMode;
 	}
-	FORCEINLINE const FGSBPlayerInputSet* GetPlayerInputSet() const
+	FORCEINLINE UGSBPlayerInputActionSetDataAsset* GetPlayerInputSet() const
 	{
-		return &PlayerInputSet;
+		return PlayerInputSet;
 	}
 };

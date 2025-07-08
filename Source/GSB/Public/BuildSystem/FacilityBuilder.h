@@ -37,8 +37,10 @@ public:
 
 	void CancelPreview();
 
+	void RotatePreview();
+
 private:
-	AConstructibleFacility* BuildFacility(TSubclassOf<AConstructibleFacility> FacilityClass, FVector Location);
+	AConstructibleFacility* BuildFacility(TSubclassOf<AConstructibleFacility> FacilityClass, const FTransform& Transform);
 
 	void Tick_GeneralFacilityBuildMode(float DeltaSeconds);
 
@@ -52,10 +54,6 @@ private:
 
 	void ConfirmPlacement_ConveyorBeltBuildMode();
 
-	void CancelPreview_GeneralAndMiningFacilityBuildMode();
-
-	void CancelPreview_ConveyorBeltBuildMode();
-
 	bool IsValidGeneralFacilityPlace(AFacilityGhostActor* Ghost);
 
 	bool IsValidMiningFacilityPlace(AFacilityGhostActor* Ghost);
@@ -64,15 +62,38 @@ private:
 
 	void TraceGridBoundsInGhostGridBounds(AFacilityGhostActor* Ghost, FHitResult& HitResult);
 
+	void DestroyAllConveyorBeltGhosts();
+
 	UPROPERTY(EditDefaultsOnly, Category = "AFacilityBuilder")
 	TMap<FName, TSubclassOf<AConstructibleFacility>> GeneralFacilityClasses;
 
 	UPROPERTY(EditDefaultsOnly, Category = "AFacilityBuilder")
 	TSubclassOf<AConstructibleFacility> MiningFacilityClass;
 
+	UPROPERTY(EditDefaultsOnly, Category = "AFacilityBuilder")
+	TSubclassOf<AConstructibleFacility> ConveyorBeltForwardClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "AFacilityBuilder")
+	TSubclassOf<AConstructibleFacility> ConveyorBeltRightClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "AFacilityBuilder")
+	TSubclassOf<AConstructibleFacility> ConveyorBeltLeftClass;
+
 	TSubclassOf<AConstructibleFacility> CurrentGeneralFacilityClass;
 
 	AFacilityGhostActor* FacilityGhost;
+
+	TArray<AFacilityGhostActor*> ConveyorBeltGhosts;
+
+	// 컨베이어 벨트를 지을 때 첫번째 컨베이어 벨트 기준으로 방향을 규정한다.
+	enum class EChainBuildDirection : uint8
+	{
+		ECBD_Forward,
+		ECBD_Backward,
+		ECBD_Right,
+		ECBD_Left
+	};
+	EChainBuildDirection ChainBuildDirection_LastTick = EChainBuildDirection::ECBD_Forward;
 
 	EBuildMode BuildMode = EBuildMode::EBT_None;
 };

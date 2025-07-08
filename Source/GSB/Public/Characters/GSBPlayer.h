@@ -58,6 +58,7 @@ protected:
 	void ToggleInventory();
 	void Esc_Triggered();
 	void HideWindow();
+	void RotatePreview();
 	void ConfirmFacilityPlacement();
 	void CancelFacilityPreview();
 	void PreviewConveyorBelt();

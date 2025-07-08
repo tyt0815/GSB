@@ -10,6 +10,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/InventoryComponent.h"
 #include "PlayerController/GSBPlayerController.h"
+#include "PlayerController/GSBPlayerInputActionSetDataAsset.h"
 #include "BuildSystem/FacilityBuilder.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "GSBGameInstance.h"
@@ -60,31 +61,29 @@ void AGSBPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
-		const FGSBPlayerInputSet* InputSet = PlayerController->GetPlayerInputSet();
+		const UGSBPlayerInputActionSetDataAsset* InputSet = PlayerController->GetPlayerInputSet();
 		// Default
-		const FGSBPlayerDefaultInputSet& DefaultInputSet = InputSet->DefaultInputSet;
-		EnhancedInputComponent->BindAction(DefaultInputSet.MoveInputAction, ETriggerEvent::Triggered, this, &AGSBPlayer::Move);
-		EnhancedInputComponent->BindAction(DefaultInputSet.LookInputAction, ETriggerEvent::Triggered, this, &AGSBPlayer::Look);
-		EnhancedInputComponent->BindAction(DefaultInputSet.JumpInputAction, ETriggerEvent::Triggered, this, &AGSBPlayer::Jump);
-		EnhancedInputComponent->BindAction(DefaultInputSet.ToggleCombatAndBuildModeInputAction, ETriggerEvent::Started, this, &AGSBPlayer::ToggleCombatAndBuildMode);
-		EnhancedInputComponent->BindAction(DefaultInputSet.InteractionInputAction, ETriggerEvent::Started, this, &AGSBPlayer::Interaction);
-		EnhancedInputComponent->BindAction(DefaultInputSet.SelectInteractionScrollInputAction, ETriggerEvent::Started, this, &AGSBPlayer::SelectInteractionScroll);
-		EnhancedInputComponent->BindAction(DefaultInputSet.ToggleInventoryInputAction, ETriggerEvent::Started, this, &AGSBPlayer::ToggleInventory);
-		EnhancedInputComponent->BindAction(DefaultInputSet.EscInputAction, ETriggerEvent::Started, this, &AGSBPlayer::Esc_Triggered);
+		EnhancedInputComponent->BindAction(InputSet->MoveInputAction, ETriggerEvent::Triggered, this, &AGSBPlayer::Move);
+		EnhancedInputComponent->BindAction(InputSet->LookInputAction, ETriggerEvent::Triggered, this, &AGSBPlayer::Look);
+		EnhancedInputComponent->BindAction(InputSet->JumpInputAction, ETriggerEvent::Triggered, this, &AGSBPlayer::Jump);
+		EnhancedInputComponent->BindAction(InputSet->ToggleCombatAndBuildModeInputAction, ETriggerEvent::Started, this, &AGSBPlayer::ToggleCombatAndBuildMode);
+		EnhancedInputComponent->BindAction(InputSet->InteractionInputAction, ETriggerEvent::Started, this, &AGSBPlayer::Interaction);
+		EnhancedInputComponent->BindAction(InputSet->SelectInteractionScrollInputAction, ETriggerEvent::Started, this, &AGSBPlayer::SelectInteractionScroll);
+		EnhancedInputComponent->BindAction(InputSet->ToggleInventoryInputAction, ETriggerEvent::Started, this, &AGSBPlayer::ToggleInventory);
+		EnhancedInputComponent->BindAction(InputSet->EscInputAction, ETriggerEvent::Started, this, &AGSBPlayer::Esc_Triggered);
 
 		// Build Mode
-		const FGSBPlayerBuildInputSet& BuildInputSet = InputSet->BuildInputSet;
-		EnhancedInputComponent->BindAction(BuildInputSet.ConfirmFacilityPlacementInputAction, ETriggerEvent::Started, this, &AGSBPlayer::ConfirmFacilityPlacement);
-		EnhancedInputComponent->BindAction(BuildInputSet.CancelFacilityPreviewInputAction, ETriggerEvent::Started, this, &AGSBPlayer::CancelFacilityPreview);
-		EnhancedInputComponent->BindAction(BuildInputSet.PreviewConveyorBeltInputAction, ETriggerEvent::Started, this, &AGSBPlayer::PreviewConveyorBelt);
-		EnhancedInputComponent->BindAction(BuildInputSet.PreviewExtensionHubInputAction, ETriggerEvent::Started, this, &AGSBPlayer::PreviewExtensionHub);
-		EnhancedInputComponent->BindAction(BuildInputSet.PreviewMiningFacilityInputAction, ETriggerEvent::Started, this, &AGSBPlayer::PreviewMiningFacility);
+		EnhancedInputComponent->BindAction(InputSet->RotatePreview, ETriggerEvent::Started, this, &AGSBPlayer::RotatePreview);
+		EnhancedInputComponent->BindAction(InputSet->ConfirmFacilityPlacementInputAction, ETriggerEvent::Started, this, &AGSBPlayer::ConfirmFacilityPlacement);
+		EnhancedInputComponent->BindAction(InputSet->CancelFacilityPreviewInputAction, ETriggerEvent::Started, this, &AGSBPlayer::CancelFacilityPreview);
+		EnhancedInputComponent->BindAction(InputSet->PreviewConveyorBeltInputAction, ETriggerEvent::Started, this, &AGSBPlayer::PreviewConveyorBelt);
+		EnhancedInputComponent->BindAction(InputSet->PreviewExtensionHubInputAction, ETriggerEvent::Started, this, &AGSBPlayer::PreviewExtensionHub);
+		EnhancedInputComponent->BindAction(InputSet->PreviewMiningFacilityInputAction, ETriggerEvent::Started, this, &AGSBPlayer::PreviewMiningFacility);
 
 		// Combat Mode
-		const FGSBPlayerCombatInputSet& CombatInputSet = InputSet->CombatInputSet;
-		EnhancedInputComponent->BindAction(CombatInputSet.Ability1InputAction, ETriggerEvent::Started, this, &AGSBPlayer::Ability1_Started);
-		EnhancedInputComponent->BindAction(CombatInputSet.Ability2InputAction, ETriggerEvent::Started, this, &AGSBPlayer::Ability2_Started);
-		EnhancedInputComponent->BindAction(CombatInputSet.Ability3InputAction, ETriggerEvent::Started, this, &AGSBPlayer::Ability3_Started);
+		EnhancedInputComponent->BindAction(InputSet->Ability1InputAction, ETriggerEvent::Started, this, &AGSBPlayer::Ability1_Started);
+		EnhancedInputComponent->BindAction(InputSet->Ability2InputAction, ETriggerEvent::Started, this, &AGSBPlayer::Ability2_Started);
+		EnhancedInputComponent->BindAction(InputSet->Ability3InputAction, ETriggerEvent::Started, this, &AGSBPlayer::Ability3_Started);
 	}
 }
 
@@ -238,6 +237,11 @@ void AGSBPlayer::HideWindow()
 	{
 		GetGameInstance()->GetSubsystem<UGSBWindowSubsystem>()->CloseAllWindows();
 	}
+}
+
+void AGSBPlayer::RotatePreview()
+{
+	FacilityBuilder->RotatePreview();
 }
 
 void AGSBPlayer::ConfirmFacilityPlacement()
