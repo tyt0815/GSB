@@ -11,8 +11,10 @@ class GSB_API AConstructibleFacility : public AFacility
 {
 	GENERATED_BODY()
 
-protected:
+public:
 	AConstructibleFacility();
+
+protected:
 	virtual void BeginPlay() override;
 
 public:

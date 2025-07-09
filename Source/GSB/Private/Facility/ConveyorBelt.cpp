@@ -113,7 +113,7 @@ bool AConveyorBelt::TryAutoConnectToItemSender()
         return false;
     }
     FVector Start = GetActorLocation();
-    FVector End = Start - TransportComponent->GetStartDirection() * 51;
+    FVector End = Start - TransportComponent->GetStartDirection() * 100;
     TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
     ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_GameTraceChannel1));
     ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_GameTraceChannel4));
@@ -127,7 +127,7 @@ bool AConveyorBelt::TryAutoConnectToItemSender()
         ObjectTypes,
         false,
         ActorsToIgnore,
-        EDrawDebugTrace::None,
+        EDrawDebugTrace::ForDuration,
         HitResults,
         true
     );
@@ -149,7 +149,7 @@ bool AConveyorBelt::TryAutoConnectItemReceiver()
         return false;
     }
     FVector Start = GetActorLocation();
-    FVector End = Start + TransportComponent->GetEndDirection() * 51;
+    FVector End = Start + TransportComponent->GetEndDirection() * 100;
     TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
     ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_GameTraceChannel1));
     ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_GameTraceChannel4));
@@ -163,7 +163,7 @@ bool AConveyorBelt::TryAutoConnectItemReceiver()
         ObjectTypes,
         false,
         ActorsToIgnore,
-        EDrawDebugTrace::ForDuration,
+        EDrawDebugTrace::None,
         HitResults,
         true
     );
