@@ -21,6 +21,7 @@ UCLASS()
 class GSB_API AFacilityBuilder : public AActor
 {
 	GENERATED_BODY()
+
 public:
 	AFacilityBuilder();
 
@@ -86,14 +87,17 @@ private:
 	TArray<AFacilityGhostActor*> ConveyorBeltGhosts;
 
 	// 컨베이어 벨트를 지을 때 첫번째 컨베이어 벨트 기준으로 방향을 규정한다.
-	enum class EChainBuildDirection : uint8
+	enum class EChainRelativeDirection : uint8
 	{
-		ECBD_Forward,
-		ECBD_Backward,
-		ECBD_Right,
-		ECBD_Left
+		ECRD_Forward,
+		ECRD_Backward,
+		ECRD_Right,
+		ECRD_Left
 	};
-	EChainBuildDirection ChainBuildDirection_LastTick = EChainBuildDirection::ECBD_Forward;
+
+	void BuildConveyorBeltByChainRelativeDirection(EChainRelativeDirection ChainRelativeDirection, const FTransform& BuildTransform);
+
+	EChainRelativeDirection ChainRelativeDirection_LastTick = EChainRelativeDirection::ECRD_Forward;
 
 	EBuildMode BuildMode = EBuildMode::EBT_None;
 };

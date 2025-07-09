@@ -103,6 +103,13 @@ void AFacilityBuilder::ConfirmFacilityPlacement()
 
 void AFacilityBuilder::CancelPreview()
 {
+	if (BuildMode == EBuildMode::EBT_ConveyorBelt && ConveyorBeltGhosts.IsValidIndex(0))
+	{
+		FTransform BuildTransform = ConveyorBeltGhosts[0]->GetTransform();
+		BuildConveyorBeltByChainRelativeDirection(ChainRelativeDirection_LastTick, BuildTransform);
+	}
+
+
 	if (IsValid(FacilityGhost))
 	{
 		FacilityGhost->Destroy();
@@ -163,14 +170,14 @@ void AFacilityBuilder::Tick_ConveyorBeltBuildMode(float DeltaSeconds)
 		FVector EndDirection = StartToEndVector;
 		EndDirection.Normalize();
 		double SFoED = StartForward.Dot(EndDirection);
-		EChainBuildDirection ChainBuildDirection;
+		EChainRelativeDirection ChainRelativeDirection;
 		if (SFoED > 0.5)
 		{
-			ChainBuildDirection = EChainBuildDirection::ECBD_Forward;
+			ChainRelativeDirection = EChainRelativeDirection::ECRD_Forward;
 		}
 		else if (SFoED < -0.5)
 		{
-			ChainBuildDirection = EChainBuildDirection::ECBD_Backward;
+			ChainRelativeDirection = EChainRelativeDirection::ECRD_Backward;
 		}
 		else
 		{
@@ -178,23 +185,23 @@ void AFacilityBuilder::Tick_ConveyorBeltBuildMode(float DeltaSeconds)
 			double SRoED = StartRight.Dot(EndDirection);
 			if (SRoED > 0.5f)
 			{
-				ChainBuildDirection = EChainBuildDirection::ECBD_Right;
+				ChainRelativeDirection = EChainRelativeDirection::ECRD_Right;
 			}
 			else
 			{
-				ChainBuildDirection = EChainBuildDirection::ECBD_Left;
+				ChainRelativeDirection = EChainRelativeDirection::ECRD_Left;
 			}
 		}
 
 		// Preview 초기화 및 재생성
-		if (ChainBuildDirection != ChainBuildDirection_LastTick)
+		if (ChainRelativeDirection != ChainRelativeDirection_LastTick)
 		{
 			FTransform StartTransform = ConveyorBeltGhosts[0]->GetActorTransform();
 			DestroyAllConveyorBeltGhosts();
-			switch (ChainBuildDirection)
+			switch (ChainRelativeDirection)
 			{
-			case AFacilityBuilder::EChainBuildDirection::ECBD_Forward:
-			case AFacilityBuilder::EChainBuildDirection::ECBD_Backward:
+			case AFacilityBuilder::EChainRelativeDirection::ECRD_Forward:
+			case AFacilityBuilder::EChainRelativeDirection::ECRD_Backward:
 			{
 				AFacilityGhostActor* Ghost = SpawnFacilityGhost(ConveyorBeltForwardClass, false);
 				ConveyorBeltGhosts.Add(Ghost);
@@ -202,7 +209,7 @@ void AFacilityBuilder::Tick_ConveyorBeltBuildMode(float DeltaSeconds)
 
 				break;
 			}
-			case AFacilityBuilder::EChainBuildDirection::ECBD_Right:
+			case AFacilityBuilder::EChainRelativeDirection::ECRD_Right:
 			{
 				AFacilityGhostActor* Ghost = SpawnFacilityGhost(ConveyorBeltRightClass, false);
 				ConveyorBeltGhosts.Add(Ghost);
@@ -210,7 +217,7 @@ void AFacilityBuilder::Tick_ConveyorBeltBuildMode(float DeltaSeconds)
 
 				break;
 			}
-			case AFacilityBuilder::EChainBuildDirection::ECBD_Left:
+			case AFacilityBuilder::EChainRelativeDirection::ECRD_Left:
 			{
 				AFacilityGhostActor* Ghost = SpawnFacilityGhost(ConveyorBeltLeftClass, false);
 				ConveyorBeltGhosts.Add(Ghost);
@@ -229,21 +236,21 @@ void AFacilityBuilder::Tick_ConveyorBeltBuildMode(float DeltaSeconds)
 		GhostsNum = FMath::Max(1, GhostsNum);
 		FVector ChainConveyorBeltLocationOffset;
 		FRotator ChainConveyorBeltsRotation;
-		switch (ChainBuildDirection)
+		switch (ChainRelativeDirection)
 		{
-		case AFacilityBuilder::EChainBuildDirection::ECBD_Forward:
+		case AFacilityBuilder::EChainRelativeDirection::ECRD_Forward:
 			ChainConveyorBeltLocationOffset = ConveyorBeltGhosts[0]->GetActorForwardVector() * GRID_CELL_SIZE;
 			ChainConveyorBeltsRotation = ConveyorBeltGhosts[0]->GetActorRotation();
 			break;
-		case AFacilityBuilder::EChainBuildDirection::ECBD_Right:
+		case AFacilityBuilder::EChainRelativeDirection::ECRD_Right:
 			ChainConveyorBeltLocationOffset = ConveyorBeltGhosts[0]->GetActorRightVector() * GRID_CELL_SIZE;
 			ChainConveyorBeltsRotation = ConveyorBeltGhosts[0]->GetActorRotation() + FRotator(0, 90, 0);
 			break;
-		case AFacilityBuilder::EChainBuildDirection::ECBD_Left:
+		case AFacilityBuilder::EChainRelativeDirection::ECRD_Left:
 			ChainConveyorBeltLocationOffset = -ConveyorBeltGhosts[0]->GetActorRightVector() * GRID_CELL_SIZE;
 			ChainConveyorBeltsRotation = ConveyorBeltGhosts[0]->GetActorRotation() + FRotator(0, -90, 0);
 			break;
-		case AFacilityBuilder::EChainBuildDirection::ECBD_Backward:
+		case AFacilityBuilder::EChainRelativeDirection::ECRD_Backward:
 		default:
 			ChainConveyorBeltLocationOffset = FVector();
 			ChainConveyorBeltsRotation = FRotator();
@@ -264,9 +271,15 @@ void AFacilityBuilder::Tick_ConveyorBeltBuildMode(float DeltaSeconds)
 			Ghost->SetActorRotation(ChainConveyorBeltsRotation);
 			ConveyorBeltGhosts.Add(Ghost);
 		}
+
+		// Place Validation 평가
+		for (AFacilityGhostActor* Ghost : ConveyorBeltGhosts)
+		{
+			Ghost->UpdatePlacementDecal(IsValidGeneralFacilityPlace(Ghost));
+		}
 		
 
-		ChainBuildDirection_LastTick = ChainBuildDirection;
+		ChainRelativeDirection_LastTick = ChainRelativeDirection;
 	}
 	else
 	{
@@ -292,7 +305,24 @@ void AFacilityBuilder::ConfirmPlacement_MiningFacilityBuildMode()
 
 void AFacilityBuilder::ConfirmPlacement_ConveyorBeltBuildMode()
 {
-	// TODO
+	if (ConveyorBeltGhosts.Num() > 0)
+	{
+		BuildConveyorBeltByChainRelativeDirection(ChainRelativeDirection_LastTick, ConveyorBeltGhosts[0]->GetActorTransform());
+		for (int i = 1; i < ConveyorBeltGhosts.Num() - 1; ++i)
+		{
+			BuildFacility(ConveyorBeltForwardClass, ConveyorBeltGhosts[i]->GetActorTransform());
+		}
+		if (ConveyorBeltGhosts.Num() == 1)
+		{
+			PreviewConveyorBelt();
+			return;
+		}
+		FTransform LastGhostTransform = ConveyorBeltGhosts.Last()->GetTransform();
+		PreviewConveyorBelt();
+		FacilityGhost->SetActorTransform(LastGhostTransform);
+	}
+
+
 	if (IsValid(FacilityGhost))
 	{
 		ConveyorBeltGhosts.Add(FacilityGhost);
@@ -355,7 +385,7 @@ void AFacilityBuilder::TraceGridBoundsInGhostGridBounds(AFacilityGhostActor* Gho
 	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_GameTraceChannel1));
 	TArray<AActor*> ActorsToIgnore;
 	ActorsToIgnore.Add(Ghost);
-	Ghost->BoxTraceSingleFromGridBoundsForObjects(ObjectTypes, ActorsToIgnore, HitResult, 50);
+	Ghost->BoxTraceSingleFromGridBoundsForObjects(ObjectTypes, ActorsToIgnore, HitResult, 25);
 }
 
 void AFacilityBuilder::DestroyAllConveyorBeltGhosts()
@@ -365,4 +395,23 @@ void AFacilityBuilder::DestroyAllConveyorBeltGhosts()
 		Ghost->Destroy();
 	}
 	ConveyorBeltGhosts.Empty();
+}
+
+void AFacilityBuilder::BuildConveyorBeltByChainRelativeDirection(EChainRelativeDirection ChainRelativeDirection, const FTransform& BuildTransform)
+{
+	switch (ChainRelativeDirection)
+	{
+	case AFacilityBuilder::EChainRelativeDirection::ECRD_Forward:
+	case AFacilityBuilder::EChainRelativeDirection::ECRD_Backward:
+		BuildFacility(ConveyorBeltForwardClass, BuildTransform);
+		break;
+	case AFacilityBuilder::EChainRelativeDirection::ECRD_Right:
+		BuildFacility(ConveyorBeltRightClass, BuildTransform);
+		break;
+	case AFacilityBuilder::EChainRelativeDirection::ECRD_Left:
+		BuildFacility(ConveyorBeltLeftClass, BuildTransform);
+		break;
+	default:
+		break;
+	}
 }
