@@ -39,8 +39,5 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	AMiningPoint* OccupiedMiningPoint;
 
-	UFUNCTION()
-	void CreatAndSendItemCrate();
-
 	float CurrentMiningTime = 0;
 };
