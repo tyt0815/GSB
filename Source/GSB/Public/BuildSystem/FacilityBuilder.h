@@ -43,6 +43,8 @@ public:
 private:
 	AConstructibleFacility* BuildFacility(TSubclassOf<AConstructibleFacility> FacilityClass, const FTransform& Transform);
 
+	void BuildFirstConveyorBelt();
+
 	void Tick_GeneralFacilityBuildMode(float DeltaSeconds);
 
 	void Tick_MiningFacilityBuildMode(float DeltaSeconds);

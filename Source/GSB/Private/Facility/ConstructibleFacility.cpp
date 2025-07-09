@@ -13,7 +13,7 @@ void AConstructibleFacility::BeginPlay()
 {
 	Super::BeginPlay();
 
-	CompleteConstruction();
+	BeginConstruction();
 }
 
 bool AConstructibleFacility::IsConstructed() const
@@ -28,9 +28,16 @@ float AConstructibleFacility::GetConstructionProgress() const
 
 void AConstructibleFacility::BeginConstruction_Implementation()
 {
-	FTimerDelegate ConstructionDelegate;
-	ConstructionDelegate.BindUFunction(this, TEXT("CompleteConstruction"));
-	GetWorldTimerManager().SetTimer(ConstructionTimer, ConstructionDelegate, ConstructionTime, false);
+	if (ConstructionTime == 0)
+	{
+		CompleteConstruction();
+	}
+	else
+	{
+		FTimerDelegate ConstructionDelegate;
+		ConstructionDelegate.BindUFunction(this, TEXT("CompleteConstruction"));
+		GetWorldTimerManager().SetTimer(ConstructionTimer, ConstructionDelegate, ConstructionTime, false);
+	}
 }
 void AConstructibleFacility::CompleteConstruction_Implementation()
 {

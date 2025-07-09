@@ -103,10 +103,9 @@ void AFacilityBuilder::ConfirmFacilityPlacement()
 
 void AFacilityBuilder::CancelPreview()
 {
-	if (BuildMode == EBuildMode::EBT_ConveyorBelt && ConveyorBeltGhosts.IsValidIndex(0))
+	if (BuildMode == EBuildMode::EBT_ConveyorBelt)
 	{
-		FTransform BuildTransform = ConveyorBeltGhosts[0]->GetTransform();
-		BuildConveyorBeltByChainRelativeDirection(ChainRelativeDirection_LastTick, BuildTransform);
+		BuildFirstConveyorBelt();
 	}
 
 
@@ -141,6 +140,15 @@ AConstructibleFacility* AFacilityBuilder::BuildFacility(TSubclassOf<AConstructib
 		return Facility;
 	}
 	return nullptr;	
+}
+
+void AFacilityBuilder::BuildFirstConveyorBelt()
+{
+	if (ConveyorBeltGhosts.IsValidIndex(0) && IsValidGeneralFacilityPlace(ConveyorBeltGhosts[0]))
+	{
+		FTransform BuildTransform = ConveyorBeltGhosts[0]->GetTransform();
+		BuildConveyorBeltByChainRelativeDirection(ChainRelativeDirection_LastTick, BuildTransform);
+	}
 }
 
 void AFacilityBuilder::Tick_GeneralFacilityBuildMode(float DeltaSeconds)
@@ -307,10 +315,13 @@ void AFacilityBuilder::ConfirmPlacement_ConveyorBeltBuildMode()
 {
 	if (ConveyorBeltGhosts.Num() > 0)
 	{
-		BuildConveyorBeltByChainRelativeDirection(ChainRelativeDirection_LastTick, ConveyorBeltGhosts[0]->GetActorTransform());
+		BuildFirstConveyorBelt();
 		for (int i = 1; i < ConveyorBeltGhosts.Num() - 1; ++i)
 		{
-			BuildFacility(ConveyorBeltForwardClass, ConveyorBeltGhosts[i]->GetActorTransform());
+			if (IsValidGeneralFacilityPlace(ConveyorBeltGhosts[i]))
+			{
+				BuildFacility(ConveyorBeltForwardClass, ConveyorBeltGhosts[i]->GetActorTransform());
+			}
 		}
 		if (ConveyorBeltGhosts.Num() == 1)
 		{
