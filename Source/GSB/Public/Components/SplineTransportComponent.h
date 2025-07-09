@@ -18,6 +18,8 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 public:	
+	// @param Actor 운송할 액터
+	// @param TransportSpeed 운송 스피드. 양수일 경우 정방향, 음수일 경우 역방향.
 	void TransportActor(AActor* Actor, float TransportSpeed);
 
 	FVector GetStartDirection(ESplineCoordinateSpace::Type CoordinateSpace = ESplineCoordinateSpace::World);

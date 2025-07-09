@@ -52,11 +52,11 @@ void USplineTransportComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 
 void USplineTransportComponent::TransportActor(AActor* Actor, float TransportSpeed)
 {
-	if (IsValid(Actor) && TransportSpeed > 0)
+	if (IsValid(Actor) && TransportSpeed != 0)
 	{
 		FTransportState TransportState;
 		TransportState.TransportSpeed = TransportSpeed;
-		TransportState.CurrentDistance = 0;
+		TransportState.CurrentDistance = TransportSpeed > 0 ? 0 : GetSplineLength();
 		ActiveTransports.Add(Actor, TransportState);
 	}
 }
