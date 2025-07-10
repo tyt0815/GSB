@@ -113,7 +113,7 @@ bool AOutputPort::TryCreateAndSendItemCrate(UItemDataAsset* ItemData)
 		{
 			FTransform SpawnTransform = GetActorTransform();
 			SpawnTransform.SetLocation(SpawnTransform.GetLocation() - FVector(0, 0, 50));
-			if (AItemCrate* ItemCrate = World->SpawnActor<AItemCrate>(GameInst->GetDefaultItemCrateClass(), GetActorTransform()))
+			if (AItemCrate* ItemCrate = World->SpawnActor<AItemCrate>(GameInst->GetDefaultItemCrateClass(), SpawnTransform))
 			{
 				ItemCrate->SetItemData(ItemData);
 				ItemSender->SetItemToSend(ItemCrate);
