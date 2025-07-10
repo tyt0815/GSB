@@ -2,6 +2,7 @@
 
 
 #include "Components/ItemReceiveComponent.h"
+#include "DebugHeader.h"
 
 UItemReceiveComponent::UItemReceiveComponent()
 {

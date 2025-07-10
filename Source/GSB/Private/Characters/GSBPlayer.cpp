@@ -92,21 +92,28 @@ void AGSBPlayer::BeginPlay()
 	Super::BeginPlay();
 
 	PlayerController = GetController<AGSBPlayerController>();
-	SetGamePlayMode_Combat();
-
-	HUD = Cast<AGSBPlayerHUD>(PlayerController->GetHUD());
-	if (HUD)
+	if (PlayerController)
 	{
-		OverlayWidget = Cast<UGSBPlayerOverlay>(HUD->GetOverlayWidget());
-		if (!OverlayWidget)
+		SetGamePlayMode_Combat();
+		HUD = Cast<AGSBPlayerHUD>(PlayerController->GetHUD());
+		if (HUD)
 		{
-			TRACE_SCREEN_LOG(TEXT("OverlayWidget 캐스팅 실패"));
+			OverlayWidget = Cast<UGSBPlayerOverlay>(HUD->GetOverlayWidget());
+			if (!OverlayWidget)
+			{
+				TRACE_SCREEN_LOG(TEXT("OverlayWidget 캐스팅 실패"));
+			}
+		}
+		else
+		{
+			TRACE_SCREEN_LOG(TEXT("HUD 캐스팅 실패"));
 		}
 	}
 	else
 	{
-		TRACE_SCREEN_LOG(TEXT("HUD 캐스팅 실패"));
+		TRACE_SCREEN_LOG(TEXT("AGSBPlayerController 캐스팅 실패"));
 	}
+	
 
 	if (UGSBGameInstance* GameInst = Cast<UGSBGameInstance>(GetGameInstance()))
 	{

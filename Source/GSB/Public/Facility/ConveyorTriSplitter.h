@@ -9,7 +9,7 @@
 #include "ConveyorTriSplitter.generated.h"
 
 class URetryPrioritizedActorRequestHandlerComponent;
-class UItemStorageComponent;
+class UItemDataAsset;
 
 UCLASS()
 class GSB_API AConveyorTriSplitter : public AConstructibleFacility, public IInputPortHandler, public IOutputPortHandler
@@ -32,8 +32,13 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	URetryPrioritizedActorRequestHandlerComponent* OutputPortHandler;
 
+	UFUNCTION()
+	void TransportItem(UItemDataAsset* ItemData);
+
+	FTimerHandle TransportTimerHandler;
+
 	UPROPERTY(VisibleAnywhere)
-	UItemStorageComponent* StorageComponent;
+	UItemDataAsset* CurrentTransportedItemData;
 
 private:
 	UFUNCTION()
@@ -41,4 +46,7 @@ private:
 
 	UFUNCTION()
 	bool HandleOutputPort(AActor* Actor);
+
+	UFUNCTION()
+	bool CanReceiveItem(const class AInputPort* InputPort);
 };

@@ -2,6 +2,7 @@
 
 
 #include "Facility/ConstructibleFacility.h"
+#include "Facility/Addon/FacilityAddon.h"
 #include "Interfaces/PowerProviderFacility.h"
 #include "DebugHeader.h"
 
@@ -41,4 +42,8 @@ void AConstructibleFacility::BeginConstruction_Implementation()
 }
 void AConstructibleFacility::CompleteConstruction_Implementation()
 {
+	for (AFacilityAddon* Addon : ConnectedAddons)
+	{
+		Addon->CompleteConstruction();
+	}
 }

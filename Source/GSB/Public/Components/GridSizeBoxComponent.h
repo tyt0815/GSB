@@ -15,6 +15,7 @@ class GSB_API UGridSizeBoxComponent : public UBoxComponent
 	GENERATED_BODY()
 public:
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+
 public:
 	FVector CalcBoxExtentFromGridSize(FVector InGridSize) const;
 
@@ -56,7 +57,7 @@ public:
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "UGridSizeBoxComponent")
-	FUintVector GridSize = FUintVector(1, 1, 1);
+	FUintVector GridSize = FUintVector(0, 0, 0);
 
 public:
 	FORCEINLINE	FUintVector GetGridSize() const

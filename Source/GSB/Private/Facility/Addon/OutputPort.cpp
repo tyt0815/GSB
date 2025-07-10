@@ -60,8 +60,6 @@ void AOutputPort::BeginPlay()
 	Super::BeginPlay();
 
 	ItemSender->SetSendingDirection(GetActorForwardVector());
-
-	AutoConnectItemReceiver();
 }
 
 bool AOutputPort::IsConnectedToReceiver()
@@ -76,8 +74,8 @@ void AOutputPort::AutoConnectItemReceiver()
 		return;
 	}
 
-	FVector Start = GetActorLocation();
-	FVector End = Start + GetActorForwardVector() * (GetGridBoxExtent().X + 50);
+	FVector Start = GetActorLocation() + GetActorForwardVector() * (GetGridBoxExtent().X + 25);
+	FVector End = Start + GetActorForwardVector() * 25;
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_GameTraceChannel1));
 	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_GameTraceChannel4));
