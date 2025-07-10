@@ -1,11 +1,12 @@
 #include "Facility/Facility.h"
-
-#include "GSBDefines.h"
+#include "Facility/Addon/FacilityAddon.h"
 #include "Interfaces/InteractableActor.h"
 #include "Components/InteractionComponent.h"
-#include "Facility/Addon/FacilityAddon.h"
-#include "HUDs/GSBFacilityDetailWidget.h"
 #include "SubSystems/GSBWindowSubsystem.h"
+#include "HUDs/GSBWindowWidget.h"
+#include "HUDs/GSBWindowBody.h"
+#include "HUDs/GSBWindowHead.h"
+#include "GSBDefines.h"
 #include "DebugHeader.h"
 
 AFacility::AFacility()
@@ -47,14 +48,23 @@ void AFacility::ConnectFacilityAddon(AFacilityAddon* Addon)
 
 void AFacility::OnShowDetailInteraction(AActor* Interactor)
 {
-	if (DetailWidgetClass)
+	if (DetailWindowBodyClass)
 	{
-		UGSBWindowSubsystem* WindowManager = GetGameInstance()->GetSubsystem<UGSBWindowSubsystem>();
-		DetailWidget = CreateWidget<UGSBFacilityDetailWidget>(Interactor->GetInstigatorController<APlayerController>(), DetailWidgetClass);
-		WindowManager->OpenWindow(DetailWidget, this);
+		DetailWindowBody = CreateWidget<UGSBWindowBody>(Interactor->GetInstigatorController<APlayerController>(), DetailWindowBodyClass);
 	}
 	else
 	{
-		TRACE_SCREEN_LOG(TEXT("DetailWidgetClass가 nullptr입니다."))
+		TRACE_SCREEN_LOG(TEXT("DetailWindowBodyClass가 nullptr입니다."))
 	}
+	if (DetailWindowHeadClass)
+	{
+		DetailWindowHead = CreateWidget<UGSBWindowHead>(Interactor->GetInstigatorController<APlayerController>(), DetailWindowHeadClass);
+	}
+	else
+	{
+		TRACE_SCREEN_LOG(TEXT("DetailWindowHeadClass가 nullptr입니다."))
+	}
+
+	UGSBWindowSubsystem* WindowManager = GetGameInstance()->GetSubsystem<UGSBWindowSubsystem>();
+	DetailWindow = WindowManager->OpenWindow(this, DetailWindowHead, DetailWindowBody);
 }

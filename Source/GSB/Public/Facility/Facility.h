@@ -5,11 +5,12 @@
 #include "CoreMinimal.h"
 #include "BuildSystem/GridSnapActor.h"
 #include "Interfaces/InteractableActor.h"
+#include "HUDs/GSBWindowBody.h"
+#include "HUDs/GSBWindowHead.h"
 #include "Facility.generated.h"
 
 class AFacilityAddon;
 class UInteractionComponent;
-class UGSBFacilityDetailWidget;
 
 UCLASS()
 class GSB_API AFacility : public AGridSnapActor, public IInteractableActor
@@ -45,9 +46,16 @@ protected:
 	FName FacilityName = FName(TEXT("FacilityName_None"));
 
 	UPROPERTY(EditDefaultsOnly, Category = "AFacility|UI")
-	TSubclassOf<UGSBFacilityDetailWidget> DetailWidgetClass;
+	TSubclassOf<UGSBWindowBody> DetailWindowBodyClass;
 
-	UGSBFacilityDetailWidget* DetailWidget = nullptr;
+	UPROPERTY(EditDefaultsOnly, Category = "AFacility|UI")
+	TSubclassOf<UGSBWindowHead> DetailWindowHeadClass;
+
+	UGSBWindowWidget* DetailWindow = nullptr;
+
+	UGSBWindowBody* DetailWindowBody = nullptr;
+
+	UGSBWindowHead* DetailWindowHead = nullptr;
 
 	TArray<AFacilityAddon*> ConnectedAddons;
 };

@@ -222,7 +222,7 @@ void AGSBPlayer::ToggleInventory()
 			{
 				InventoryWidget->TryLinkStorageComponent(InventoryComponent);
 				InventoryWidget->SetTitle(FText::FromString(TEXT("Inventory")));
-				InventoryWindowWidget = WindowManager->OpenWindow(InventoryWidget, this);
+				InventoryWindowWidget = WindowManager->OpenWindow(this, nullptr, InventoryWidget);
 			}
 		}
 		else

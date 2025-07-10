@@ -4,12 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "HUDs/GSBWindowContent.h"
-#include "GSBWindowBody.generated.h"
+#include "GSBWindowHead.generated.h"
 
 UCLASS()
-class GSB_API UGSBWindowBody : public UGSBWindowContent
+class GSB_API UGSBWindowHead : public UGSBWindowContent
 {
 	GENERATED_BODY()
-	
-protected:
 };

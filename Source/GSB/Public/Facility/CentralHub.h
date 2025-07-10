@@ -75,5 +75,8 @@ protected:
 	bool CanReceiveItem(const AInputPort* InputPort);
 
 private:
+	UPROPERTY(EditAnywhere, Category = "ACentralHub|Power")
 	int PowerCapacity = 500;
+
+	void UpdatePowerStatusWidget();
 };

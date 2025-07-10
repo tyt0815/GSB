@@ -11,6 +11,7 @@
 #include "Items/ItemCrate.h"
 #include "Characters/GSBPlayer.h"
 #include "HUDs/GSBHubDetailWidget.h"
+#include "HUDs/GSBPowerFacilityDetailWindowHead.h"
 #include "GSBGameInstance.h"
 #include "DebugHeader.h"
 
@@ -42,10 +43,11 @@ void ACentralHub::OnShowDetailInteraction(AActor* Interactor)
 {
 	Super::OnShowDetailInteraction(Interactor);
 
-	if (UGSBHubDetailWidget* HubDetailWidget = Cast<UGSBHubDetailWidget>(DetailWidget))
+	if (UGSBHubDetailWidget* HubDetailWidget = Cast<UGSBHubDetailWidget>(DetailWindowBody))
 	{
 		HubDetailWidget->SetHubStorageAndInventory(GetHubStorageComponent(), Interactor->GetComponentByClass<UItemStorageComponent>());
 	}
+	UpdatePowerStatusWidget();
 }
 
 bool ACentralHub::CanProvidePower()
@@ -66,6 +68,7 @@ void ACentralHub::UnlinkPowerConsumerFacility(APowerConsumerFacility* PowerConsu
 void ACentralHub::UpdatePowerUsage(int32 Addition)
 {
 	PowerProviderComponent->UpdatePowerUsage(Addition);
+	UpdatePowerStatusWidget();
 }
 
 void ACentralHub::SetPowerInfluenceAreaVisibility(bool bVisibilty)
@@ -162,4 +165,19 @@ bool ACentralHub::TrySendItemToOutputPort(AActor* Actor)
 bool ACentralHub::CanReceiveItem(const AInputPort* InputPort)
 {
 	return InputPort->HasToken();
+}
+
+void ACentralHub::UpdatePowerStatusWidget()
+{
+	if (UGSBPowerFacilityDetailWindowHead* Head = Cast< UGSBPowerFacilityDetailWindowHead>(DetailWindowHead))
+	{
+		if (CanProvidePower())
+		{
+			Head->SetPowerStatus_Powered();
+		}
+		else
+		{
+			Head->SetPowerStatus_Unpowered();
+		}
+	}
 }
