@@ -42,17 +42,14 @@ bool AConveyorTriSplitter::HandleInputPort(AActor* Actor)
 	AInputPort* InputPort = Cast<AInputPort>(Actor);
 	check(InputPort);
 
-	if (!GetWorldTimerManager().IsTimerActive(TransportTimerHandler) && !CurrentTransportedItemData)
+	InputPort->TryReceiveItem();
+	if (AItemCrate* ItemCrate = Cast<AItemCrate>(InputPort->TakeReceivedItem()))
 	{
-		InputPort->TryReceiveItem();
-		if (AItemCrate* ItemCrate = Cast<AItemCrate>(InputPort->TakeReceivedItem()))
-		{
-			FTimerDelegate TransportDelegate;
-			TransportDelegate.BindUFunction(this, TEXT("TransportItem"), ItemCrate->GetItemData());
-			GetWorldTimerManager().SetTimer(TransportTimerHandler, TransportDelegate, 1, false);
-			ItemCrate->Destroy();
-			return true;
-		}
+		FTimerDelegate TransportDelegate;
+		TransportDelegate.BindUFunction(this, TEXT("TransportItem"), ItemCrate->GetItemData());
+		GetWorldTimerManager().SetTimer(TransportTimerHandler, TransportDelegate, 1, false);
+		ItemCrate->Destroy();
+		return true;
 	}
 
 	return false;

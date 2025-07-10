@@ -35,7 +35,7 @@ void AConveyorBelt::Tick(float DeltaTime)
 void AConveyorBelt::CompleteConstruction_Implementation()
 {
     Super::CompleteConstruction_Implementation();
-    TransportComponent->Activate(false);
+    TransportComponent->Activate();
     TryAutoConnectToItemSender();
     TryAutoConnectItemReceiver();
 }
@@ -112,8 +112,8 @@ bool AConveyorBelt::TryAutoConnectToItemSender()
     {
         return false;
     }
-    FVector Start = GetActorLocation();
-    FVector End = Start - TransportComponent->GetStartDirection() * 100;
+    FVector Start = GetActorLocation() - TransportComponent->GetStartDirection() * 75;
+    FVector End = Start - TransportComponent->GetStartDirection() * 25;
     TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
     ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_GameTraceChannel1));
     ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_GameTraceChannel4));
@@ -127,7 +127,7 @@ bool AConveyorBelt::TryAutoConnectToItemSender()
         ObjectTypes,
         false,
         ActorsToIgnore,
-        EDrawDebugTrace::ForDuration,
+        EDrawDebugTrace::None,
         HitResults,
         true
     );
@@ -148,8 +148,8 @@ bool AConveyorBelt::TryAutoConnectItemReceiver()
     {
         return false;
     }
-    FVector Start = GetActorLocation();
-    FVector End = Start + TransportComponent->GetEndDirection() * 100;
+    FVector Start = GetActorLocation() + TransportComponent->GetEndDirection() * 75;
+    FVector End = Start + TransportComponent->GetEndDirection() * 25;
     TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
     ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_GameTraceChannel1));
     ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_GameTraceChannel4));
