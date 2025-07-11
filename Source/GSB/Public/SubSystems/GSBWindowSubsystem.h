@@ -11,7 +11,7 @@ class UGSBWindowBody;
 class UGSBConfirmationDialog;
 class UGSBDialogBody;
 class UGSBNumberInputDialogBody;
-class UGSBContextMenuWidget;
+class UGSBContextMenu;
 class AGSBHUD;
 
 
@@ -21,7 +21,7 @@ class GSB_API UGSBWindowSubsystem : public UGameInstanceSubsystem
 	GENERATED_BODY()
 
 public:
-	UGSBWindowWidget* OpenWindow(UObject* InTargetObject, UGSBWindowHead* WindowHead, UGSBWindowBody* WindowBody);
+	UGSBWindowWidget* OpenWindow(UObject* InTargetObject, UGSBWindowBody* WindowBody);
 
 	void CloseWindow(UGSBWindowWidget* WindowWidget);
 
@@ -33,7 +33,7 @@ public:
 
 	bool IsOpened(UGSBWindowWidget* WindowWidget);
 
-	UGSBContextMenuWidget* OpenContextMenu(UObject* InTargetObject);
+	UGSBContextMenu* OpenContextMenu(UObject* InTargetObject);
 
 private	:
 	TArray<UGSBWindowWidget*> WindowWidgets;

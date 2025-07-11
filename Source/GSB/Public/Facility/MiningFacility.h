@@ -21,8 +21,6 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 
-	virtual void OnLinkToPowerProvider_Implementation() override;
-
 	virtual void OnUnlinkFromPowerProvider_Implementation() override;
 
 	virtual void RegisterOutputPort(AOutputPort* OutputPort) override;

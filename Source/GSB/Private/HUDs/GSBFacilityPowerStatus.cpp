@@ -1,20 +1,20 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "HUDs/GSBFacilityPowerStatusWidget.h"
+#include "HUDs/GSBFacilityPowerStatus.h"
 #include "Components/TextBlock.h"
 
-void UGSBFacilityPowerStatusWidget::SetPowerStatus_Powered()
+void UGSBFacilityPowerStatus::SetPowerStatus_Powered()
 {
 	PowerStatusText->SetColorAndOpacity(FColor::Green);
 }
 
-void UGSBFacilityPowerStatusWidget::SetPowerStatus_Unpowered()
+void UGSBFacilityPowerStatus::SetPowerStatus_Unpowered()
 {
 	PowerStatusText->SetColorAndOpacity(FColor::Red);
 }
 
-void UGSBFacilityPowerStatusWidget::SetPowerStatus_TurnedOff()
+void UGSBFacilityPowerStatus::SetPowerStatus_TurnedOff()
 {
 	PowerStatusText->SetColorAndOpacity(FColor(0.2));
 }

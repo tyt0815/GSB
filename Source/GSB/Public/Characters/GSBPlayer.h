@@ -138,6 +138,11 @@ protected:
 
 	bool IsUIMode() const;
 
+
+private:
+	UFUNCTION()
+	void SetOverlayWidget();
+
 public:
 	FORCEINLINE UGSBPlayerOverlay* GetOverlayWidget() const
 	{

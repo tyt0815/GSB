@@ -12,7 +12,9 @@ class UGSBWindowBody;
 class UGSBConfirmationDialog;
 class UGSBDialogBody;
 class UGSBNumberInputDialogBody;
-class UGSBContextMenuWidget;
+class UGSBContextMenu;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FEndBeginPlaySignature);
 
 UCLASS()
 class GSB_API AGSBHUD : public AHUD
@@ -35,7 +37,9 @@ public:
 
 	void CloseAllWindows_Internal();
 
-	UGSBContextMenuWidget* OpenContextMenu_Internal(UObject* InTargetObject);
+	UGSBContextMenu* OpenContextMenu_Internal(UObject* InTargetObject);
+
+	FEndBeginPlaySignature OnEndBeginPlay;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "AGSBHUD")

@@ -13,7 +13,7 @@ class UGSBWindowBody;
 class UGSBConfirmationDialog;
 class UGSBDialogBody;
 class UGSBNumberInputDialogBody;
-class UGSBContextMenuWidget;
+class UGSBContextMenu;
 
 UCLASS()
 class GSB_API UGSBOverlay : public UUserWidget
@@ -35,7 +35,7 @@ public:
 
 	UGSBNumberInputDialogBody* OpenNumberInputDialog_Internal(UObject* InTargetObject, int Number = 0);
 
-	UGSBContextMenuWidget* OpenContextMenu_Internal(UObject* ContextTarget);
+	UGSBContextMenu* OpenContextMenu_Internal(UObject* ContextTarget);
 
 protected:
 
@@ -51,7 +51,7 @@ protected:
 	TSubclassOf<UGSBNumberInputDialogBody> NumberInputDialogBodyWidgetClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "WindowWidget")
-	TSubclassOf<UGSBContextMenuWidget> ContextMenuWidgetClass;
+	TSubclassOf<UGSBContextMenu> ContextMenuWidgetClass;
 
 	UPROPERTY(meta = (BindWidget))
 	UCanvasPanel* RootCanvas;

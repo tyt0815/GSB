@@ -98,10 +98,10 @@ void AGSBPlayer::BeginPlay()
 		HUD = Cast<AGSBPlayerHUD>(PlayerController->GetHUD());
 		if (HUD)
 		{
-			OverlayWidget = Cast<UGSBPlayerOverlay>(HUD->GetOverlayWidget());
+			SetOverlayWidget();
 			if (!OverlayWidget)
 			{
-				TRACE_SCREEN_LOG(TEXT("OverlayWidget 캐스팅 실패"));
+				HUD->OnEndBeginPlay.AddDynamic(this, &AGSBPlayer::SetOverlayWidget);
 			}
 		}
 		else
@@ -222,7 +222,7 @@ void AGSBPlayer::ToggleInventory()
 			{
 				InventoryWidget->TryLinkStorageComponent(InventoryComponent);
 				InventoryWidget->SetTitle(FText::FromString(TEXT("Inventory")));
-				InventoryWindowWidget = WindowManager->OpenWindow(this, nullptr, InventoryWidget);
+				InventoryWindowWidget = WindowManager->OpenWindow(this, InventoryWidget);
 			}
 		}
 		else
@@ -442,4 +442,9 @@ AActor* AGSBPlayer::TraceInteractableActor()
 bool AGSBPlayer::IsUIMode() const
 {
 	return PlayerController->bShowMouseCursor;
+}
+
+void AGSBPlayer::SetOverlayWidget()
+{
+	OverlayWidget = Cast<UGSBPlayerOverlay>(HUD->GetOverlayWidget());
 }

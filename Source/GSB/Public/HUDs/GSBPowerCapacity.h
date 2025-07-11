@@ -4,23 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "HUDs/GSBWidget.h"
-#include "GSBFacilityPowerStatusWidget.generated.h"
+#include "GSBPowerCapacity.generated.h"
 
 class UTextBlock;
 
 UCLASS()
-class GSB_API UGSBFacilityPowerStatusWidget : public UGSBWidget
+class GSB_API UGSBPowerCapacity : public UGSBWidget
 {
 	GENERATED_BODY()
-
 public:
-	void SetPowerStatus_Powered();
-	
-	void SetPowerStatus_Unpowered();
-
-	void SetPowerStatus_TurnedOff();
+	void UpdatePowerCapacity(int32 CurrentPowerUsage, int32 TotalPowerCapacity);
 	
 private	:
 	UPROPERTY(meta = (BindWidget))
-	UTextBlock* PowerStatusText;
+	UTextBlock* PowerCapacityText;
 };

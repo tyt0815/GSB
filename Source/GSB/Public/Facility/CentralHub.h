@@ -8,6 +8,7 @@
 #include "Interfaces/HubFacility.h"
 #include "Interfaces/InputPortHandler.h"
 #include "Interfaces/OutputPortHandler.h"
+#include "HUDs/GSBWindowHead.h"
 #include "CentralHub.generated.h"
 
 class URetryPrioritizedActorRequestHandlerComponent;
@@ -65,6 +66,9 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	URetryPrioritizedActorRequestHandlerComponent* OutputPortHandler;
 
+	UPROPERTY(EditDefaultsOnly, Category = "ACentralHub|UI")
+	TSubclassOf<UGSBWindowHead> PowerStatusClass;
+
 	UFUNCTION()
 	bool TryReceiveItemFromInputPort(AActor* InputPort);
 
@@ -78,5 +82,14 @@ private:
 	UPROPERTY(EditAnywhere, Category = "ACentralHub|Power")
 	int PowerCapacity = 500;
 
+	class UGSBFacilityPowerStatus* PowerStatus;
+
+	class AGSBHUD* GSBHUD;
+
+	class UGSBPlayerOverlay* Overlay;
+
 	void UpdatePowerStatusWidget();
+
+	UFUNCTION()
+	void SetOverlayWidget();
 };

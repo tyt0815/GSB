@@ -24,9 +24,11 @@ void AGSBHUD::BeginPlay()
 		else
 		{
 			OverlayWidget = CreateWidget<UGSBOverlay>(GetOwningPlayerController());
-			SCREEN_LOG_NONE_KEY(TEXT("AGSBHUD::BeginPlay: UGSBOverlay 클래스가 설정되지 않았습니다."))
+			TRACE_SCREEN_LOG(TEXT("OverlayWidgetClass가 nullptr입니다."))
 		}
 	}
+
+	OnEndBeginPlay.Broadcast();
 }
 
 UGSBWindowWidget* AGSBHUD::OpenWindow_Internal(UObject* InTargetObject)
@@ -59,7 +61,7 @@ void AGSBHUD::CloseAllWindows_Internal()
 	OverlayWidget->CloseAllWindows_Internal();
 }
 
-UGSBContextMenuWidget* AGSBHUD::OpenContextMenu_Internal(UObject* InTargetObject)
+UGSBContextMenu* AGSBHUD::OpenContextMenu_Internal(UObject* InTargetObject)
 {
 	return OverlayWidget->OpenContextMenu_Internal(InTargetObject);
 }

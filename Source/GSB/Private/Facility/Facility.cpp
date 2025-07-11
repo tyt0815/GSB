@@ -56,15 +56,19 @@ void AFacility::OnShowDetailInteraction(AActor* Interactor)
 	{
 		TRACE_SCREEN_LOG(TEXT("DetailWindowBodyClass가 nullptr입니다."))
 	}
-	if (DetailWindowHeadClass)
-	{
-		DetailWindowHead = CreateWidget<UGSBWindowHead>(Interactor->GetInstigatorController<APlayerController>(), DetailWindowHeadClass);
-	}
-	else
-	{
-		TRACE_SCREEN_LOG(TEXT("DetailWindowHeadClass가 nullptr입니다."))
-	}
 
 	UGSBWindowSubsystem* WindowManager = GetGameInstance()->GetSubsystem<UGSBWindowSubsystem>();
-	DetailWindow = WindowManager->OpenWindow(this, DetailWindowHead, DetailWindowBody);
+	DetailWindow = WindowManager->OpenWindow(this, DetailWindowBody);
+	if (IsValid(DetailWindow))
+	{
+		DetailWindow->ClearWindowHead();
+	}
+}
+
+void AFacility::AttachDetailWindowHead(UGSBWindowHead* Head)
+{
+	if (IsValid(DetailWindow))
+	{
+		DetailWindow->AttachWindowHead(Head);
+	}
 }

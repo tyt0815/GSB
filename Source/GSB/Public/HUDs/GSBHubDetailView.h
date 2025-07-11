@@ -4,12 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "HUDs/GSBWindowBody.h"
-#include "GSBHubDetailWidget.generated.h"
+#include "GSBHubDetailView.generated.h"
 
 class UGSBStorageWidget;
 class UGSBInventoryWidget;
 class UGSBItemSlotWidget;
-class UGSBContextMenuWidget;
+class UGSBContextMenu;
 class UGSBContextMenuEntry;
 class UGSBConfirmationDialog;
 class UItemStorageComponent;
@@ -17,7 +17,7 @@ class UInventoryComponent;
 class UItemDataAsset;
 
 UCLASS()
-class GSB_API UGSBHubDetailWidget : public UGSBWindowBody
+class GSB_API UGSBHubDetailView : public UGSBWindowBody
 {
 	GENERATED_BODY()
 
@@ -41,7 +41,7 @@ private:
 	void MoveItemFromInventoryToHubStorage(UGSBItemSlotWidget* ItemSlotWidget);
 
 	UFUNCTION()
-	void HandleHubStorageContextMenuCreated(UGSBContextMenuWidget* ContextMenuWidget);
+	void HandleHubStorageContextMenuCreated(UGSBContextMenu* ContextMenuWidget);
 
 	UFUNCTION()
 	void HandleContextMenuEntry_MoveItemToInventory(UGSBContextMenuEntry* MenuEntry);
@@ -50,7 +50,7 @@ private:
 	void HandleOnDialogOKButtonClicked_MoveItemToInventory(UGSBConfirmationDialog* ConfirmationDialog);
 
 	UFUNCTION()
-	void HandleInventoryContextMenuCreated(UGSBContextMenuWidget* ContextMenuWidget);
+	void HandleInventoryContextMenuCreated(UGSBContextMenu* ContextMenuWidget);
 
 	UFUNCTION()
 	void HandleContextMenuEntry_MoveItemToHubStorage(UGSBContextMenuEntry* MenuEntry);

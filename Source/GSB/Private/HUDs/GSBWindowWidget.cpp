@@ -7,6 +7,7 @@
 #include "HUDs/GSBWindowHead.h"
 #include "Components/Button.h"
 #include "Components/NamedSlot.h"
+#include "Components/HorizontalBox.h"
 
 void UGSBWindowWidget::NativeConstruct()
 {
@@ -52,10 +53,13 @@ void UGSBWindowWidget::AttachWindowBody(UGSBWindowBody* InWindowBody)
 	}
 }
 
-void UGSBWindowWidget::AttachWindowHead(UGSBWindowHead* InWindowHead)
+void UGSBWindowWidget::ClearWindowHead()
 {
 	WindowHeadSlot->ClearChildren();
-	WindowHead = InWindowHead;
+}
+
+void UGSBWindowWidget::AttachWindowHead(UGSBWindowHead* WindowHead)
+{
 	if (IsValid(WindowHead))
 	{
 		WindowHeadSlot->AddChild(WindowHead);

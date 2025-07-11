@@ -5,7 +5,7 @@
 #include "HUDs/GSBWindowWidget.h"
 #include "HUDs/GSBConfirmationDialog.h"
 #include "HUDs/GSBNumberInputDialogBody.h"
-#include "HUDs/GSBContextMenuWidget.h"
+#include "HUDs/GSBContextMenu.h"
 
 #include "Components/CanvasPanelSlot.h"
 #include "DebugHeader.h"
@@ -96,11 +96,11 @@ UGSBNumberInputDialogBody* UGSBOverlay::OpenNumberInputDialog_Internal(UObject* 
 	return nullptr;
 }
 
-UGSBContextMenuWidget* UGSBOverlay::OpenContextMenu_Internal(UObject* ContextTarget)
+UGSBContextMenu* UGSBOverlay::OpenContextMenu_Internal(UObject* ContextTarget)
 {
 	if (ContextMenuWidgetClass)
 	{
-		if (UGSBContextMenuWidget* Menu = CreateWidget<UGSBContextMenuWidget>(GetOwningPlayer(), ContextMenuWidgetClass))
+		if (UGSBContextMenu* Menu = CreateWidget<UGSBContextMenu>(GetOwningPlayer(), ContextMenuWidgetClass))
 		{
 			Menu->AddToViewport();
 			FVector2D MousePos;

@@ -7,6 +7,7 @@
 #include "GSBWindowWidget.generated.h"
 
 class UButton;
+class UHorizontalBox;
 class UGSBOverlay;
 class UGSBWindowBody;
 class UGSBWindowHead;
@@ -29,7 +30,9 @@ public:
 
 	void AttachWindowBody(UGSBWindowBody* InWindowBody);
 
-	void AttachWindowHead(UGSBWindowHead* InWindowHead);
+	void ClearWindowHead();
+
+	void AttachWindowHead(UGSBWindowHead* WindowHead);
 
 	UWidget* GetContentWidget() const;
 	
@@ -38,14 +41,12 @@ private:
 	UButton* CloseButton;
 
 	UPROPERTY(meta = (BindWidget))
-	UNamedSlot* WindowHeadSlot;
+	UHorizontalBox* WindowHeadSlot;
 
 	UPROPERTY(meta = (BindWidget))
 	UNamedSlot* WindowBodySlot;
 
 	UGSBWindowBody* WindowBody;
-
-	UGSBWindowHead* WindowHead;
 
 	UGSBOverlay* GSBOverlay;
 };

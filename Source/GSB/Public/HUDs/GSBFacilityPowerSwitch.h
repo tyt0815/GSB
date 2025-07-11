@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "HUDs/GSBWidget.h"
-#include "GSBFacilityPowerSwitchWidget.generated.h"
+#include "GSBFacilityPowerSwitch.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class GSB_API UGSBFacilityPowerSwitchWidget : public UGSBWidget
+class GSB_API UGSBFacilityPowerSwitch : public UGSBWidget
 {
 	GENERATED_BODY()
 	

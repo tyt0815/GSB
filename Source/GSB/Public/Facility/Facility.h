@@ -6,7 +6,6 @@
 #include "BuildSystem/GridSnapActor.h"
 #include "Interfaces/InteractableActor.h"
 #include "HUDs/GSBWindowBody.h"
-#include "HUDs/GSBWindowHead.h"
 #include "Facility.generated.h"
 
 class AFacilityAddon;
@@ -48,14 +47,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "AFacility|UI")
 	TSubclassOf<UGSBWindowBody> DetailWindowBodyClass;
 
-	UPROPERTY(EditDefaultsOnly, Category = "AFacility|UI")
-	TSubclassOf<UGSBWindowHead> DetailWindowHeadClass;
-
 	UGSBWindowWidget* DetailWindow = nullptr;
 
 	UGSBWindowBody* DetailWindowBody = nullptr;
 
-	UGSBWindowHead* DetailWindowHead = nullptr;
+	void AttachDetailWindowHead(class UGSBWindowHead* Head);
 
 	TArray<AFacilityAddon*> ConnectedAddons;
 };

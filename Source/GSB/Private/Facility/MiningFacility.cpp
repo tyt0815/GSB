@@ -34,11 +34,6 @@ void AMiningFacility::Tick(float DeltaSeconds)
 	}
 }
 
-void AMiningFacility::OnLinkToPowerProvider_Implementation()
-{
-	Super::OnLinkToPowerProvider_Implementation();
-}
-
 void AMiningFacility::OnUnlinkFromPowerProvider_Implementation()
 {
 	Super::OnUnlinkFromPowerProvider_Implementation();

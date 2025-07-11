@@ -59,7 +59,7 @@ void AConfigurableOutputPort::OnViewDetailInteraction(AActor* Interactor)
 			DetailWidget->TryLinkItemStorageComponent(LinkedStorage.Get());
 			DetailWidget->UpdateStorageWidget();
 			UpdateSelectedItem(SelectedItem);
-			WindowManager->OpenWindow(this, nullptr,DetailWidget.Get());
+			WindowManager->OpenWindow(this, DetailWidget.Get());
 		}
 		else
 		{

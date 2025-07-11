@@ -31,12 +31,32 @@ void APowerRelayFacility::TurnOn_Implementation()
 	PowerProviderComponent->LinkFacilitiesInPowerInfluenceArea();
 }
 
+void APowerRelayFacility::OnLinkToPowerProvider_Implementation(AActor* PowerProviderActor)
+{
+	Super::OnLinkToPowerProvider_Implementation(PowerProviderActor);
+	if (LinkedPowerProvider)
+	{
+		LinkedPowerProvider->UpdatePowerUsage(PowerProviderComponent->GetCurrentPowerUsage());
+	}
+}
+
+void APowerRelayFacility::OnUnlinkFromPowerProvider_Implementation()
+{
+	Super::OnUnlinkFromPowerProvider_Implementation();
+
+	if (LinkedPowerProvider)
+	{
+		LinkedPowerProvider->UpdatePowerUsage(-PowerProviderComponent->GetCurrentPowerUsage());
+	}
+}
+
 void APowerRelayFacility::UpdatePowerUsage(int32 Addition)
 {
 	PowerProviderComponent->UpdatePowerUsage(Addition);
 
 	if (IsLinkedToPowerProvider())
 	{
+		TRACE_SCREEN_LOG(FString::FromInt(Addition));
 		LinkedPowerProvider->UpdatePowerUsage(Addition);
 	}
 }

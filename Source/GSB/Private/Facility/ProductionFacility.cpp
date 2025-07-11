@@ -149,6 +149,12 @@ bool AProductionFacility::TryStartProduction()
 {
 	if (CanStartProduce())
 	{
+		if (GetWorldTimerManager().IsTimerPaused(ProducingTimerHandle))
+		{
+			GetWorldTimerManager().UnPauseTimer(ProducingTimerHandle);
+			return true;
+		}
+
 		FProductionRecipe* RecipeInProducing = FindProductionRecipe();
 		if (RecipeInProducing)
 		{

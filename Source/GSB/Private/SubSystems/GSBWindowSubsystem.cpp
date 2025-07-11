@@ -8,15 +8,11 @@
 #include "HUDs/GSBWindowBody.h"
 #include "DebugHeader.h"
 
-UGSBWindowWidget* UGSBWindowSubsystem::OpenWindow(UObject* InTargetObject, UGSBWindowHead* WindowHead, UGSBWindowBody* WindowBody)
+UGSBWindowWidget* UGSBWindowSubsystem::OpenWindow(UObject* InTargetObject,UGSBWindowBody* WindowBody)
 {
 	if (AGSBHUD* HUD = GetHUD())
 	{
 		UGSBWindowWidget* Window = HUD->OpenWindow_Internal(InTargetObject);
-		if (IsValid(WindowHead))
-		{
-			Window->AttachWindowHead(WindowHead);
-		}
 		if (IsValid(WindowBody))
 		{
 			Window->AttachWindowBody(WindowBody);
@@ -69,7 +65,7 @@ bool UGSBWindowSubsystem::IsOpened(UGSBWindowWidget* WindowWidget)
 	return false;
 }
 
-UGSBContextMenuWidget* UGSBWindowSubsystem::OpenContextMenu(UObject* InTargetObject)
+UGSBContextMenu* UGSBWindowSubsystem::OpenContextMenu(UObject* InTargetObject)
 {
 	if (AGSBHUD* HUD = GetHUD())
 	{
