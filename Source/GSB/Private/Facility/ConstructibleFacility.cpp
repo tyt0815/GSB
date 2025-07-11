@@ -79,11 +79,12 @@ void AConstructibleFacility::BeginDeconstruction_Implementation()
 	{
 		FTimerDelegate DeconstructionDelegate;
 		DeconstructionDelegate.BindUFunction(this, TEXT("CompleteDeconstruction"));
-		GetWorldTimerManager().SetTimer(ConstructionTimer, DeconstructionDelegate, DeconstructionTime, false);
+		GetWorldTimerManager().SetTimer(DeconstructionTimer, DeconstructionDelegate, DeconstructionTime, false);
 	}
 }
 void AConstructibleFacility::CompleteConstruction_Implementation()
 {
+	GetWorldTimerManager().ClearTimer(ConstructionTimer);
 	for (AFacilityAddon* Addon : ConnectedAddons)
 	{
 		Addon->CompleteConstruction();

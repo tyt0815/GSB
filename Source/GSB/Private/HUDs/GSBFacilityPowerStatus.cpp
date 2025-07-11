@@ -16,5 +16,5 @@ void UGSBFacilityPowerStatus::SetPowerStatus_Unpowered()
 
 void UGSBFacilityPowerStatus::SetPowerStatus_TurnedOff()
 {
-	PowerStatusText->SetColorAndOpacity(FColor(0.2));
+	PowerStatusText->SetColorAndOpacity(FLinearColor(0.2, 0.2, 0.2, 1));
 }

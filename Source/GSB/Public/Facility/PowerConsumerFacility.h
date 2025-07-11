@@ -63,11 +63,10 @@ protected:
 private:
 	void TurnOn();
 
+	void UpdatePowerStatusWidget();
+
 	UPROPERTY(EditAnywhere, Category = "APowerConsumerFacility|Link to PowerProvider")
 	int32 PowerConsumption = 10;
-
-	UPROPERTY(EditDefaultsOnly, Category = "APowerConsumerFacility|UI")
-	TSubclassOf<UGSBWindowHead> PowerStatusClass;
 
 	class UGSBFacilityPowerStatus* PowerStatus;
 

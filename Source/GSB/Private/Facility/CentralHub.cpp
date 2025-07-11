@@ -43,6 +43,7 @@ void ACentralHub::OnShowDetailInteraction(AActor* Interactor)
 	{
 		HubDetailWidget->SetHubStorageAndInventory(GetHubStorageComponent(), Interactor->GetComponentByClass<UItemStorageComponent>());
 	}
+
 	if (UGSBGameInstance* GameInstance = GetGameInstance<UGSBGameInstance>())
 	{
 		if (UClass * PowerStatusClass = GameInstance->GetUserWidgetClass("PowerStatus"))
@@ -59,8 +60,6 @@ void ACentralHub::OnShowDetailInteraction(AActor* Interactor)
 			TRACE_SCREEN_LOG(TEXT("PowerStatusClass가 nullptr 입니다."));
 		}
 	}
-
-	
 }
 
 bool ACentralHub::CanProvidePower()

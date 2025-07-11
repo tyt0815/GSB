@@ -83,6 +83,10 @@ UGSBWindowHead* AFacility::AttachDetailWindowHead(const TSubclassOf<UGSBWindowHe
 			AttachDetailWindowHead(Head);
 			return Head;
 		}
+		else
+		{
+			TRACE_SCREEN_LOG(TEXT("WindowHead생성 실패"));
+		}
 	}
 	else
 	{
@@ -96,5 +100,9 @@ void AFacility::AttachDetailWindowHead(UGSBWindowHead* Head)
 	if (IsValid(DetailWindow))
 	{
 		DetailWindow->AttachWindowHead(Head);
+	}
+	else
+	{
+		TRACE_SCREEN_LOG(TEXT("DetailWindow가 유효하지 않습니다."));
 	}
 }

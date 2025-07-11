@@ -6,6 +6,7 @@
 #include "HUDs/GSBFacilityPowerStatus.h"
 #include "Interfaces/PowerProviderFacility.h"
 #include "Kismet/KismetStringLibrary.h"
+#include "GSBGameInstance.h"
 #include "DebugHeader.h"
 
 bool APowerConsumerFacility::IsOperating() const
@@ -35,17 +36,22 @@ void APowerConsumerFacility::CompleteConstruction_Implementation()
 void APowerConsumerFacility::OnShowDetailInteraction(AActor* Interactor)
 {
 	Super::OnShowDetailInteraction(Interactor);
-	if (PowerStatusClass)
+
+	if (UGSBGameInstance* GameInstance = GetGameInstance<UGSBGameInstance>())
 	{
-		PowerStatus = Cast<UGSBFacilityPowerStatus>(AttachDetailWindowHead(PowerStatusClass));
-		if (!PowerStatus)
+		if (UClass* PowerStatusClass = GameInstance->GetUserWidgetClass("PowerStatus"))
 		{
-			TRACE_SCREEN_LOG(TEXT("UGSBFacilityPowerStatus 캐스팅 실패"));
+			PowerStatus = Cast<UGSBFacilityPowerStatus>(AttachDetailWindowHead(PowerStatusClass));
+			UpdatePowerStatusWidget();
+			if (!PowerStatus)
+			{
+				TRACE_SCREEN_LOG(TEXT("UGSBFacilityPowerStatus 캐스팅 실패"));
+			}
 		}
-	}
-	else
-	{
-		TRACE_SCREEN_LOG(TEXT("PowerStatusClass가 nullptr 입니다."));
+		else
+		{
+			TRACE_SCREEN_LOG(TEXT("PowerStatusClass가 nullptr 입니다."));
+		}
 	}
 }
 
@@ -80,6 +86,7 @@ void APowerConsumerFacility::OnLinkToPowerProvider_Implementation(AActor* PowerP
 	{
 		Addon->OnFacilityLinkedToPowerProvider();
 	}
+	UpdatePowerStatusWidget();
 }
 
 void APowerConsumerFacility::OnUnlinkFromPowerProvider_Implementation()
@@ -89,6 +96,7 @@ void APowerConsumerFacility::OnUnlinkFromPowerProvider_Implementation()
 		LinkedPowerProvider->UpdatePowerUsage(-PowerConsumption);
 	}
 	LinkedPowerProvider = nullptr;
+	UpdatePowerStatusWidget();
 }
 
 bool APowerConsumerFacility::TryLinkToNearByPowerProvider()
@@ -140,6 +148,7 @@ void APowerConsumerFacility::TurnOff_Implementation()
 {
 	bOn = false;
 	UnlinkFromPowerProvider();
+	UpdatePowerStatusWidget();
 }
 
 void APowerConsumerFacility::TraceMultiPowerInfluenceArea(TArray<FHitResult>& HitResults)
@@ -175,4 +184,24 @@ void APowerConsumerFacility::TurnOn()
 {
 	bOn = true;
 	TryLinkToNearByPowerProvider();
+	UpdatePowerStatusWidget();
+}
+
+void APowerConsumerFacility::UpdatePowerStatusWidget()
+{
+	if (PowerStatus)
+	{
+		if (!IsOn())
+		{
+			PowerStatus->SetPowerStatus_TurnedOff();
+		}
+		else if(IsOperating())
+		{
+			PowerStatus->SetPowerStatus_Powered();
+		}
+		else
+		{
+			PowerStatus->SetPowerStatus_Unpowered();
+		}
+	}
 }
