@@ -4,13 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
-#include "Items/ItemCrate.h"
-#include "Items/DroppedItem.h"
-#include "BuildSystem/FacilityBuilder.h"
 #include "GSBGameInstance.generated.h"
 
 class AFacility;
-class AItemCrate;
 struct FItemStack;
 
 UCLASS()
@@ -28,31 +24,27 @@ public:
 
 	void SetPowerInfluenceVisibility(bool bVisibility);
 
-	TSubclassOf<AItemCrate> GetDefaultItemCrateClass() const;
-	
-	ADroppedItem* SpawnDroppedItem(const FItemStack& ItemStack);
+	TSubclassOf<AActor> GetActorClass(const FName& Name) const;
 
-	AFacilityBuilder* SpawnFacilityBuilder();
-	
-protected:
-	UPROPERTY(EditDefaultsOnly, Category = "UGSBGameInstance|Actor Classes")
-	TSubclassOf<AItemCrate> DefaultItemCrateClass;
+	TSubclassOf<UUserWidget> GetUserWidgetClass(const FName& Name) const;
 
-	UPROPERTY(EditDefaultsOnly, Category = "UGSBGameInstance|Actor Classes")
-	TSubclassOf<ADroppedItem> DefaultDroppedItemClass;
-
-	UPROPERTY(EditDefaultsOnly, Category = "UGSBGameInstance|Actor Classes")
-	TSubclassOf<AFacilityBuilder> DefaultFacilityBuilderClass;
-
-	UPROPERTY(EditDefaultsOnly, Category = "UGSBGameInstance|Materials")
-	UMaterialInterface* ValidPlacementDecal;
-
-	UPROPERTY(EditDefaultsOnly, Category = "UGSBGameInstance|Materials")
-	UMaterialInterface* InvalidPlacementDecal;
+	UMaterialInterface* GetMaterialInterface(const FName& Name) const;
 
 private:
 	TArray<AFacility*> AllHubs;
 	TArray<AFacility*> AllPowerDistributor;
+
+	////////////////////////////////////////////////////////////////////////////////
+	// Subclass
+	////////////////////////////////////////////////////////////////////////////////
+	UPROPERTY(EditDefaultsOnly)
+	TMap<FName, TSubclassOf<AActor>> ActorClasses;
+
+	UPROPERTY(EditDefaultsOnly)
+	TMap<FName, TSubclassOf<UUserWidget>> UserWidgetClasses;
+
+	UPROPERTY(EditDefaultsOnly)
+	TMap<FName, UMaterialInterface*> MaterialInterfaces;
 
 public:
 	FORCEINLINE void AddHub(AFacility* Hub)
@@ -62,13 +54,5 @@ public:
 	FORCEINLINE void AddPowerDistributor(AFacility* PowerDistributor)
 	{
 		AllPowerDistributor.Add(PowerDistributor);
-	}
-	FORCEINLINE UMaterialInterface* GetValidPlacementDecal() const
-	{
-		return ValidPlacementDecal;
-	}
-	FORCEINLINE UMaterialInterface* GetInvalidPlacementDecal() const
-	{
-		return InvalidPlacementDecal;
 	}
 };

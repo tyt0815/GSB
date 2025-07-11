@@ -7,6 +7,7 @@
 #include "Interfaces/InteractableActor.h"
 #include "Components/InteractionComponent.h"
 #include "HUDs/GSBWindowBody.h"
+#include "HUDs/GSBWindowHead.h"
 #include "Facility.generated.h"
 
 class AFacilityAddon;
@@ -56,6 +57,8 @@ protected:
 	UGSBWindowWidget* DetailWindow = nullptr;
 
 	UGSBWindowBody* DetailWindowBody = nullptr;
+
+	UGSBWindowHead* AttachDetailWindowHead(const TSubclassOf<UGSBWindowHead>& Head);
 
 	void AttachDetailWindowHead(class UGSBWindowHead* Head);
 

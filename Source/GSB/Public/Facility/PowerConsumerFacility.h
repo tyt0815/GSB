@@ -23,6 +23,8 @@ protected:
 
 	virtual void CompleteConstruction_Implementation() override;
 
+	virtual void OnShowDetailInteraction(AActor* Interactor) override;
+
 public:
 	bool IsLinkedToPowerProvider() const;
 
@@ -63,6 +65,11 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "APowerConsumerFacility|Link to PowerProvider")
 	int32 PowerConsumption = 10;
+
+	UPROPERTY(EditDefaultsOnly, Category = "APowerConsumerFacility|UI")
+	TSubclassOf<UGSBWindowHead> PowerStatusClass;
+
+	class UGSBFacilityPowerStatus* PowerStatus;
 
 	bool bOn = false;
 public:

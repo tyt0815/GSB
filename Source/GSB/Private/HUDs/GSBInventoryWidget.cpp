@@ -11,6 +11,7 @@
 #include "SubSystems/GSBWindowSubsystem.h"
 #include "Items/DroppedItem.h"
 #include "GSBGameInstance.h"
+#include "DebugHeader.h"
 
 void UGSBInventoryWidget::NativeConstruct()
 {
@@ -76,9 +77,16 @@ void UGSBInventoryWidget::HandleDialogOKButton_DropItem(UGSBConfirmationDialog* 
 				ItemStack.ItemData = ItemSlotWidget->GetItemData();
 				ItemStack.Stack = DialogBody->GetNumber();
 				ItemStack.Stack = UnStoreItemStack(ItemStack);
-				if (ADroppedItem* DroppedItem = GameInst->SpawnDroppedItem(ItemStack))
+				if (UClass* DroppedItemClass = GameInst->GetActorClass(TEXT("DroppedItem")))
 				{
-					DroppedItem->SetActorLocation(GetOwningPlayerPawn()->GetActorLocation());
+					if (ADroppedItem* DroppedItem = GetWorld()->SpawnActor<ADroppedItem>(DroppedItemClass))
+					{
+						DroppedItem->SetActorLocation(GetOwningPlayerPawn()->GetActorLocation());
+					}
+				}
+				else
+				{
+					TRACE_SCREEN_LOG(TEXT("DroppedItemClass가 nullptr입니다."));
 				}
 			}
 		}

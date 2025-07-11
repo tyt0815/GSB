@@ -113,12 +113,19 @@ bool AOutputPort::TryCreateAndSendItemCrate(UItemDataAsset* ItemData)
 		{
 			FTransform SpawnTransform = GetActorTransform();
 			SpawnTransform.SetLocation(SpawnTransform.GetLocation() - FVector(0, 0, 50));
-			if (AItemCrate* ItemCrate = World->SpawnActor<AItemCrate>(GameInst->GetDefaultItemCrateClass(), SpawnTransform))
+			if (UClass* ItemCrateClass = GameInst->GetActorClass(TEXT("ItemCrate")))
 			{
-				ItemCrate->SetItemData(ItemData);
-				ItemSender->SetItemToSend(ItemCrate);
-				ItemSender->SendItem();
-				return true;
+				if (AItemCrate* ItemCrate = World->SpawnActor<AItemCrate>(ItemCrateClass, SpawnTransform))
+				{
+					ItemCrate->SetItemData(ItemData);
+					ItemSender->SetItemToSend(ItemCrate);
+					ItemSender->SendItem();
+					return true;
+				}
+			}
+			else
+			{
+				TRACE_SCREEN_LOG(TEXT("ItemCrateClass가 nullptr입니다."))
 			}
 		}
 	}

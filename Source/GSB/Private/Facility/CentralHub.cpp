@@ -14,6 +14,7 @@
 #include "HUDs/GSBPlayerOverlay.h"
 #include "HUDs/GSBHubDetailView.h"
 #include "HUDs/GSBFacilityPowerStatus.h"
+#include "HUDs/GSBWindowHead.h"
 #include "GSBGameInstance.h"
 #include "DebugHeader.h"
 
@@ -42,15 +43,24 @@ void ACentralHub::OnShowDetailInteraction(AActor* Interactor)
 	{
 		HubDetailWidget->SetHubStorageAndInventory(GetHubStorageComponent(), Interactor->GetComponentByClass<UItemStorageComponent>());
 	}
-	if (APawn* Pawn = Cast<APawn>(Interactor))
+	if (UGSBGameInstance* GameInstance = GetGameInstance<UGSBGameInstance>())
 	{
-		if (PowerStatusClass)
+		if (UClass * PowerStatusClass = GameInstance->GetUserWidgetClass("PowerStatus"))
 		{
-			PowerStatus = CreateWidget<UGSBFacilityPowerStatus>(Pawn->GetController<APlayerController>(), PowerStatusClass);
-			AttachDetailWindowHead(PowerStatus);
+			PowerStatus = Cast<UGSBFacilityPowerStatus>(AttachDetailWindowHead(PowerStatusClass));
+			UpdatePowerStatusWidget();
+			if (!PowerStatus)
+			{
+				TRACE_SCREEN_LOG(TEXT("UGSBFacilityPowerStatus 캐스팅 실패"));
+			}
 		}
-		UpdatePowerStatusWidget();
+		else
+		{
+			TRACE_SCREEN_LOG(TEXT("PowerStatusClass가 nullptr 입니다."));
+		}
 	}
+
+	
 }
 
 bool ACentralHub::CanProvidePower()

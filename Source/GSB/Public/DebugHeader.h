@@ -32,7 +32,7 @@
 #define FUNCTION_NAME_MACRO __FUNCTION__ // fallback
 #endif
 
-#define TRACE_SCREEN_LOG(DebugMessage) SCREEN_DEBUG_MESSAGE(-1, 10, FColor::Red, FString(FUNCTION_NAME_MACRO) + TEXT(": ") + DebugMessage);
+#define TRACE_SCREEN_LOG(DebugMessage) SCREEN_DEBUG_MESSAGE(-1, 10, FColor::Cyan, FString(FUNCTION_NAME_MACRO) + TEXT(": ") + DebugMessage);
 
 #define DRAW_SPHERE(Center, Radius, Color, LifeTime)\
 	if (GetWorld())\

@@ -118,7 +118,14 @@ void AGSBPlayer::BeginPlay()
 
 	if (UGSBGameInstance* GameInst = Cast<UGSBGameInstance>(GetGameInstance()))
 	{
-		FacilityBuilder = GameInst->SpawnFacilityBuilder();
+		if (UClass* FacilityBuilderClass = GameInst->GetActorClass("FacilityBuilder"))
+		{
+			FacilityBuilder = GetWorld()->SpawnActor<AFacilityBuilder>(FacilityBuilderClass);
+		}
+		else
+		{
+			TRACE_SCREEN_LOG(TEXT("FacilityBuilderClass가 nullptr 입니다."));
+		}
 		if (!FacilityBuilder)
 		{
 			FacilityBuilder = GetWorld()->SpawnActor<AFacilityBuilder>();

@@ -39,7 +39,6 @@ void APowerRelayFacility::OnLinkToPowerProvider_Implementation(AActor* PowerProv
 	Super::OnLinkToPowerProvider_Implementation(PowerProviderActor);
 	if (LinkedPowerProvider)
 	{
-		TRACE_SCREEN_LOG(FString::FromInt(PowerProviderComponent->GetCurrentPowerUsage()));
 		LinkedPowerProvider->UpdatePowerUsage(PowerProviderComponent->GetCurrentPowerUsage());
 	}
 }
@@ -59,7 +58,6 @@ void APowerRelayFacility::UpdatePowerUsage(int32 Addition)
 	PowerProviderComponent->UpdatePowerUsage(Addition);
 	if (IsLinkedToPowerProvider())
 	{
-		TRACE_SCREEN_LOG(FString::FromInt(Addition));
 		LinkedPowerProvider->UpdatePowerUsage(Addition);
 	}
 }

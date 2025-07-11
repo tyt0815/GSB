@@ -74,6 +74,23 @@ void AFacility::OnShowDetailInteraction(AActor* Interactor)
 	}
 }
 
+UGSBWindowHead* AFacility::AttachDetailWindowHead(const TSubclassOf<UGSBWindowHead>& HeadClass)
+{
+	if (HeadClass)
+	{
+		if (UGSBWindowHead* Head = CreateWidget<UGSBWindowHead>(GetWorld()->GetFirstPlayerController(), HeadClass))
+		{
+			AttachDetailWindowHead(Head);
+			return Head;
+		}
+	}
+	else
+	{
+		TRACE_SCREEN_LOG(TEXT("WindowHeadClass가 유효하지 않습니다."));
+	}
+	return nullptr;
+}
+
 void AFacility::AttachDetailWindowHead(UGSBWindowHead* Head)
 {
 	if (IsValid(DetailWindow))

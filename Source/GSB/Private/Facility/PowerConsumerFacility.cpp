@@ -3,6 +3,7 @@
 
 #include "Facility/PowerConsumerFacility.h"
 #include "Facility/Addon/FacilityAddon.h"
+#include "HUDs/GSBFacilityPowerStatus.h"
 #include "Interfaces/PowerProviderFacility.h"
 #include "Kismet/KismetStringLibrary.h"
 #include "DebugHeader.h"
@@ -31,6 +32,23 @@ void APowerConsumerFacility::CompleteConstruction_Implementation()
 	TurnOn();
 }
 
+void APowerConsumerFacility::OnShowDetailInteraction(AActor* Interactor)
+{
+	Super::OnShowDetailInteraction(Interactor);
+	if (PowerStatusClass)
+	{
+		PowerStatus = Cast<UGSBFacilityPowerStatus>(AttachDetailWindowHead(PowerStatusClass));
+		if (!PowerStatus)
+		{
+			TRACE_SCREEN_LOG(TEXT("UGSBFacilityPowerStatus 캐스팅 실패"));
+		}
+	}
+	else
+	{
+		TRACE_SCREEN_LOG(TEXT("PowerStatusClass가 nullptr 입니다."));
+	}
+}
+
 bool APowerConsumerFacility::IsLinkedToPowerProvider() const
 {
 	return IsOn() && IsValidPowerProviderScriptInterface(LinkedPowerProvider);
@@ -56,7 +74,6 @@ void APowerConsumerFacility::OnLinkToPowerProvider_Implementation(AActor* PowerP
 	LinkedPowerProvider = TScriptInterface<IPowerProviderFacility>(PowerProviderActor);
 	if (LinkedPowerProvider)
 	{
-		TRACE_SCREEN_LOG(GetActorLabel() + FString::FromInt(PowerConsumption));
 		LinkedPowerProvider->UpdatePowerUsage(PowerConsumption);
 	}
 	for (AFacilityAddon* Addon : ConnectedAddons)

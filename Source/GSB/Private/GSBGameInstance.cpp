@@ -59,37 +59,34 @@ void UGSBGameInstance::SetPowerInfluenceVisibility(bool bVisibility)
 	SetFacilitiesPowerInfluenceVisibility(AllPowerDistributor, bVisibility);
 }
 
-TSubclassOf<AItemCrate> UGSBGameInstance::GetDefaultItemCrateClass() const
+TSubclassOf<AActor> UGSBGameInstance::GetActorClass(const FName& Name) const
 {
-	return DefaultItemCrateClass;
-}
-
-ADroppedItem* UGSBGameInstance::SpawnDroppedItem(const FItemStack& ItemStack)
-{
-	if (DefaultDroppedItemClass)
+	if (ActorClasses.Contains(Name))
 	{
-		if (ADroppedItem* DroppedItem = GetWorld()->SpawnActor<ADroppedItem>(DefaultDroppedItemClass))
-		{
-			DroppedItem->UpdateItem(ItemStack);
-			return DroppedItem;
-		}
+		return ActorClasses[Name];
 	}
-	else
-	{
-		TRACE_SCREEN_LOG(TEXT("DefaultDroppedItemClass가 nullptr 입니다."));
-	}
+	TRACE_SCREEN_LOG(TEXT("존재하지 않는 공용 Actor 클래스: ") + Name.ToString());
 	return nullptr;
 }
 
-AFacilityBuilder* UGSBGameInstance::SpawnFacilityBuilder()
+TSubclassOf<UUserWidget> UGSBGameInstance::GetUserWidgetClass(const FName& Name) const
 {
-	if (DefaultFacilityBuilderClass)
+	if (UserWidgetClasses.Contains(Name))
 	{
-		return GetWorld()->SpawnActor<AFacilityBuilder>(DefaultFacilityBuilderClass);
+		return UserWidgetClasses[Name];
 	}
-	else
+	TRACE_SCREEN_LOG(TEXT("존재하지 않는 공용 UserWidget 클래스: ") + Name.ToString());
+	return nullptr;
+}
+
+UMaterialInterface* UGSBGameInstance::GetMaterialInterface(const FName& Name) const
+{
+	if (MaterialInterfaces.Contains(Name))
 	{
-		TRACE_SCREEN_LOG(TEXT("DefaultFacilityBuilderClass가 nullptr 입니다."));
+		return MaterialInterfaces[Name];
 	}
+	
+	TRACE_SCREEN_LOG(TEXT("존재하지 않는 공용 MaterialInterface: ") + Name.ToString());
+
 	return nullptr;
 }
