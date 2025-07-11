@@ -64,4 +64,8 @@ public:
 	{
 		return GridSize;
 	}
+	FORCEINLINE void SetGridSize(const FUintVector& InGridSize)
+	{
+		GridSize = InGridSize;
+	}
 };

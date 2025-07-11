@@ -11,7 +11,8 @@
 
 AConfigurableOutputPort::AConfigurableOutputPort()
 {
-	InteractionComponent = CreateDefaultSubobject<UInteractionComponent>(TEXT("Interaction"));
+	InteractionComponent = CreateDefaultSubobject<UInteractionComponent>(TEXT("InteractionRange"));
+	InteractionComponent->SetupAttachment(GetRootComponent());
 }
 
 void AConfigurableOutputPort::GetInteractionDescriptions(TArray<FString>& Descriptions)

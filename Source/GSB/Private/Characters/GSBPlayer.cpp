@@ -421,38 +421,23 @@ AActor* AGSBPlayer::TraceInteractableActor()
 	FVector Start = CameraComponent->GetComponentLocation();
 	FVector End = Start + CameraComponent->GetForwardVector() * TraceDistance;
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldStatic));
-	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldDynamic));
-	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_GameTraceChannel2));
-	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_GameTraceChannel6));
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_GameTraceChannel7));
 	TArray<AActor*> ActorsToIgnore;
-	TArray<FHitResult> HitResults;
-	UKismetSystemLibrary::BoxTraceMultiForObjects(
+
+	FHitResult HitResult;
+	UKismetSystemLibrary::LineTraceSingleForObjects(
 		this,
 		Start,
 		End,
-		FVector(0.0f, 100.0f, 100.0f),
-		CameraComponent->GetComponentRotation(),
 		ObjectTypes,
 		false,
 		ActorsToIgnore,
-		EDrawDebugTrace::None,
-		HitResults,
+		EDrawDebugTrace::ForOneFrame,
+		HitResult,
 		true
 	);
 
-	 
-	float MinDist = TraceDistance * 10;
-	AActor* TargetActor = nullptr;
-	for (const FHitResult& HitResult : HitResults)
-	{
-		if (MinDist > HitResult.Distance && HitResult.GetActor()->Implements<UInteractableActor>())
-		{
-			TargetActor = HitResult.GetActor();
-		}
-	}
-
-	return TargetActor;
+	return HitResult.GetActor();
 }
 
 bool AGSBPlayer::IsUIMode() const

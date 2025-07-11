@@ -14,7 +14,8 @@ AFacility::AFacility()
 	StaticMeshComponent->SetupAttachment(GetRootComponent());
 	StaticMeshComponent->SetCollisionProfileName(TEXT("FacilityMesh"));
 
-	InteractionComponent = CreateDefaultSubobject<UInteractionComponent>(TEXT("Interaction"));
+	InteractionComponent = CreateDefaultSubobject<UInteractionComponent>(TEXT("InteractionRange"));
+	InteractionComponent->SetupAttachment(GetRootComponent());
 }
 
 void AFacility::Tick(float DeltaSeconds)

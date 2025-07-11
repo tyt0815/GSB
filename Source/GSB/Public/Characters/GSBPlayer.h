@@ -104,9 +104,6 @@ private:
 private:
 	void UpdateFacilityBuilderLocation();
 
-	UPROPERTY(EditAnywhere, Category = "GSBPlayer|Build Mode")
-	TArray<TSubclassOf<AConstructibleFacility>> TestFacilityClasses;
-
 	AFacilityBuilder* FacilityBuilder;
 
 	///////////////////////////////////////////////////////////
