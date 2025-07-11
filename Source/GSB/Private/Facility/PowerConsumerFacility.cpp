@@ -4,6 +4,8 @@
 #include "Facility/PowerConsumerFacility.h"
 #include "Facility/Addon/FacilityAddon.h"
 #include "HUDs/GSBFacilityPowerStatus.h"
+#include "HUDs/GSBPowerConsumption.h"
+#include "HUDs/GSBFacilityPowerSwitch.h"
 #include "Interfaces/PowerProviderFacility.h"
 #include "Kismet/KismetStringLibrary.h"
 #include "GSBGameInstance.h"
@@ -41,9 +43,9 @@ void APowerConsumerFacility::OnShowDetailInteraction(AActor* Interactor)
 	{
 		if (UClass* PowerStatusClass = GameInstance->GetUserWidgetClass("PowerStatus"))
 		{
-			PowerStatus = Cast<UGSBFacilityPowerStatus>(AttachDetailWindowHead(PowerStatusClass));
+			PowerStatusWidget = Cast<UGSBFacilityPowerStatus>(AttachDetailWindowHead(PowerStatusClass));
 			UpdatePowerStatusWidget();
-			if (!PowerStatus)
+			if (!PowerStatusWidget)
 			{
 				TRACE_SCREEN_LOG(TEXT("UGSBFacilityPowerStatus 캐스팅 실패"));
 			}
@@ -51,6 +53,35 @@ void APowerConsumerFacility::OnShowDetailInteraction(AActor* Interactor)
 		else
 		{
 			TRACE_SCREEN_LOG(TEXT("PowerStatusClass가 nullptr 입니다."));
+		}
+		if (UClass* PowerSwitchClass = GameInstance->GetUserWidgetClass("PowerSwitch"))
+		{
+			if (UGSBFacilityPowerSwitch* PowerSwitch = Cast<UGSBFacilityPowerSwitch>(AttachDetailWindowHead(PowerSwitchClass)))
+			{
+				PowerSwitch->OnPowerSwitchClicked.BindDynamic(this, &APowerConsumerFacility::HandleOnPowerSwitchClicked);
+				UpdatePowerSwitchWidget(PowerSwitch);
+			}
+			else
+			{
+				TRACE_SCREEN_LOG(TEXT("UGSBFacilityPowerSwitch 캐스팅 실패"));
+			}
+		}
+		else
+		{
+			TRACE_SCREEN_LOG(TEXT("PowerSwitchClass가 nullptr 입니다."));
+		}
+		if (UClass* PowerConsumptionClass = GameInstance->GetUserWidgetClass("PowerConsumption"))
+		{
+			PowerConsumptionWidget = Cast<UGSBPowerConsumption>(AttachDetailWindowHead(PowerConsumptionClass));
+			UpdatePowerConsumptionWidget();
+			if (!PowerConsumptionWidget)
+			{
+				TRACE_SCREEN_LOG(TEXT("UGSBPowerConsumption 캐스팅 실패"));
+			}
+		}
+		else
+		{
+			TRACE_SCREEN_LOG(TEXT("PowerConsumptionClass가 nullptr 입니다."));
 		}
 	}
 }
@@ -86,7 +117,7 @@ void APowerConsumerFacility::OnLinkToPowerProvider_Implementation(AActor* PowerP
 	{
 		Addon->OnFacilityLinkedToPowerProvider();
 	}
-	UpdatePowerStatusWidget();
+	UpdatePowerWidget();
 }
 
 void APowerConsumerFacility::OnUnlinkFromPowerProvider_Implementation()
@@ -96,7 +127,7 @@ void APowerConsumerFacility::OnUnlinkFromPowerProvider_Implementation()
 		LinkedPowerProvider->UpdatePowerUsage(-PowerConsumption);
 	}
 	LinkedPowerProvider = nullptr;
-	UpdatePowerStatusWidget();
+	UpdatePowerWidget();
 }
 
 bool APowerConsumerFacility::TryLinkToNearByPowerProvider()
@@ -134,7 +165,7 @@ void APowerConsumerFacility::UnlinkFromPowerProvider()
 	}
 }
 
-bool APowerConsumerFacility::TryTurnOn_Implementation()
+bool APowerConsumerFacility::TryTurnOn()
 {
 	if (IsConstructed())
 	{
@@ -144,11 +175,16 @@ bool APowerConsumerFacility::TryTurnOn_Implementation()
 	return false;
 }
 
-void APowerConsumerFacility::TurnOff_Implementation()
+void APowerConsumerFacility::TurnOff()
 {
 	bOn = false;
 	UnlinkFromPowerProvider();
-	UpdatePowerStatusWidget();
+	UpdatePowerWidget();
+}
+
+int32 APowerConsumerFacility::GetTotalPowerUsage() const
+{
+	return PowerConsumption;
 }
 
 void APowerConsumerFacility::TraceMultiPowerInfluenceArea(TArray<FHitResult>& HitResults)
@@ -180,28 +216,68 @@ bool APowerConsumerFacility::IsValidPowerProviderScriptInterface(const TScriptIn
 	return IsValid(PowerProvider.GetObject()) && PowerProvider.GetInterface();
 }
 
-void APowerConsumerFacility::TurnOn()
+void APowerConsumerFacility::UpdatePowerWidget()
 {
-	bOn = true;
-	TryLinkToNearByPowerProvider();
 	UpdatePowerStatusWidget();
+	UpdatePowerConsumptionWidget();
 }
 
 void APowerConsumerFacility::UpdatePowerStatusWidget()
 {
-	if (PowerStatus)
+	if (IsValid(PowerStatusWidget))
 	{
 		if (!IsOn())
 		{
-			PowerStatus->SetPowerStatus_TurnedOff();
+			PowerStatusWidget->SetPowerStatus_TurnedOff();
 		}
 		else if(IsOperating())
 		{
-			PowerStatus->SetPowerStatus_Powered();
+			PowerStatusWidget->SetPowerStatus_Powered();
 		}
 		else
 		{
-			PowerStatus->SetPowerStatus_Unpowered();
+			PowerStatusWidget->SetPowerStatus_Unpowered();
 		}
+	}
+}
+
+void APowerConsumerFacility::UpdatePowerConsumptionWidget()
+{
+	if (IsValid(PowerConsumptionWidget))
+	{
+		PowerConsumptionWidget->SetPowerConsumptionText(GetTotalPowerUsage());
+	}
+}
+
+void APowerConsumerFacility::TurnOn()
+{
+	bOn = true;
+	TryLinkToNearByPowerProvider();
+	UpdatePowerWidget();
+}
+
+void APowerConsumerFacility::HandleOnPowerSwitchClicked(UGSBFacilityPowerSwitch* PowerSwtichWidget)
+{
+	if (bOn)
+	{
+		TurnOff();
+	}
+	else
+	{
+		TryTurnOn();
+	}
+
+	UpdatePowerSwitchWidget(PowerSwtichWidget);
+}
+
+void APowerConsumerFacility::UpdatePowerSwitchWidget(UGSBFacilityPowerSwitch* PowerSwtichWidget)
+{
+	if (bOn)
+	{
+		PowerSwtichWidget->TurnOn();
+	}
+	else
+	{
+		PowerSwtichWidget->TurnOff();
 	}
 }

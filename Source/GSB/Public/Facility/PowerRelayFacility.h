@@ -20,11 +20,13 @@ public:
 
 	virtual void BeginConstruction_Implementation() override;
 
-	virtual bool TryTurnOn_Implementation() override;
-
 	virtual void OnLinkToPowerProvider_Implementation(AActor* PowerProviderActor) override;
 
 	virtual void OnUnlinkFromPowerProvider_Implementation() override;
+
+	virtual int32 GetTotalPowerUsage() const override;
+
+	virtual void TurnOff() override;
 
 	/////////////////////////////////////////////////////
 	// IPowerProviderFacility Functions
@@ -43,6 +45,8 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+
+	virtual void TurnOn() override;
 
 protected:
 	UPROPERTY(VisibleAnywhere)

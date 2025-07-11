@@ -76,7 +76,7 @@ private:
 	UPROPERTY(EditAnywhere, Category = "ACentralHub|Power")
 	int PowerCapacity = 500;
 
-	class UGSBFacilityPowerStatus* PowerStatus;
+	class UGSBFacilityPowerStatus* PowerStatusWidget;
 
 	class AGSBHUD* GSBHUD;
 

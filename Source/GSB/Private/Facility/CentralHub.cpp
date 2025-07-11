@@ -48,9 +48,9 @@ void ACentralHub::OnShowDetailInteraction(AActor* Interactor)
 	{
 		if (UClass * PowerStatusClass = GameInstance->GetUserWidgetClass("PowerStatus"))
 		{
-			PowerStatus = Cast<UGSBFacilityPowerStatus>(AttachDetailWindowHead(PowerStatusClass));
+			PowerStatusWidget = Cast<UGSBFacilityPowerStatus>(AttachDetailWindowHead(PowerStatusClass));
 			UpdatePowerStatusWidget();
-			if (!PowerStatus)
+			if (!PowerStatusWidget)
 			{
 				TRACE_SCREEN_LOG(TEXT("UGSBFacilityPowerStatus 캐스팅 실패"));
 			}
@@ -207,15 +207,15 @@ bool ACentralHub::CanReceiveItem(const AInputPort* InputPort)
 
 void ACentralHub::UpdatePowerStatusWidget()
 {
-	if (PowerStatus)
+	if (PowerStatusWidget)
 	{
 		if (CanProvidePower())
 		{
-			PowerStatus->SetPowerStatus_Powered();
+			PowerStatusWidget->SetPowerStatus_Powered();
 		}
 		else
 		{
-			PowerStatus->SetPowerStatus_Unpowered();
+			PowerStatusWidget->SetPowerStatus_Unpowered();
 		}
 	}
 }

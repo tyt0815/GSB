@@ -49,8 +49,7 @@ void UPowerProviderComponent::LinkFacilitiesInPowerInfluenceArea()
 		APowerConsumerFacility* PowerConsumer = Cast<APowerConsumerFacility>(Facility);
 		if (IsValid(PowerConsumer) && !PowerConsumer->IsLinkedToPowerProvider())
 		{
-			IPowerProviderFacility* a = Cast<IPowerProviderFacility>(GetOwner());
-			PowerConsumer->TryLinkToPowerProvider(a);
+			PowerConsumer->TryLinkToPowerProvider(Cast<IPowerProviderFacility>(GetOwner()));
 		}
 	}
 }

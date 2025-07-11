@@ -24,16 +24,6 @@ void APowerRelayFacility::BeginConstruction_Implementation()
 	SetPowerInfluenceAreaVisibility(false);
 }
 
-bool APowerRelayFacility::TryTurnOn_Implementation()
-{
-	if (Super::TryTurnOn_Implementation())
-	{
-		PowerProviderComponent->LinkFacilitiesInPowerInfluenceArea();
-		return true;
-	}
-	return false;
-}
-
 void APowerRelayFacility::OnLinkToPowerProvider_Implementation(AActor* PowerProviderActor)
 {
 	Super::OnLinkToPowerProvider_Implementation(PowerProviderActor);
@@ -51,6 +41,18 @@ void APowerRelayFacility::OnUnlinkFromPowerProvider_Implementation()
 	{
 		LinkedPowerProvider->UpdatePowerUsage(-PowerProviderComponent->GetCurrentPowerUsage());
 	}
+
+}
+
+int32 APowerRelayFacility::GetTotalPowerUsage() const
+{
+	return Super::GetTotalPowerUsage() + PowerProviderComponent->GetCurrentPowerUsage();
+}
+
+void APowerRelayFacility::TurnOff()
+{
+	PowerProviderComponent->UnlinkAllPowerConsumerFacility();
+	Super::TurnOff();
 }
 
 void APowerRelayFacility::UpdatePowerUsage(int32 Addition)
@@ -60,6 +62,7 @@ void APowerRelayFacility::UpdatePowerUsage(int32 Addition)
 	{
 		LinkedPowerProvider->UpdatePowerUsage(Addition);
 	}
+	UpdatePowerWidget();
 }
 
 
@@ -79,6 +82,12 @@ void APowerRelayFacility::BeginPlay()
 
 	PowerProviderComponent->SetPowerInfluenceAreaMeshComponent(PowerInfluenceAreaStaticMeshComponent);
 	SetPowerInfluenceAreaVisibility(false);
+}
+
+void APowerRelayFacility::TurnOn()
+{
+	Super::TurnOn();
+	PowerProviderComponent->LinkFacilitiesInPowerInfluenceArea();
 }
 
 bool APowerRelayFacility::TryLinkPowerConsumerFacility(APowerConsumerFacility* PowerConsumer)

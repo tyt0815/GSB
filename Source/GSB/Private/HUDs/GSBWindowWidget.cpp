@@ -8,6 +8,7 @@
 #include "Components/Button.h"
 #include "Components/NamedSlot.h"
 #include "Components/HorizontalBox.h"
+#include "Components/HorizontalBoxSlot.h"
 
 void UGSBWindowWidget::NativeConstruct()
 {
@@ -62,7 +63,11 @@ void UGSBWindowWidget::AttachWindowHead(UGSBWindowHead* WindowHead)
 {
 	if (IsValid(WindowHead))
 	{
-		WindowHeadSlot->AddChild(WindowHead);
+		if (UHorizontalBoxSlot* HorizontalBoxSlot = Cast<UHorizontalBoxSlot>(WindowHeadSlot->AddChild(WindowHead)))
+		{
+			HorizontalBoxSlot->SetHorizontalAlignment(EHorizontalAlignment::HAlign_Center);
+			HorizontalBoxSlot->SetVerticalAlignment(EVerticalAlignment::VAlign_Center);
+		}
 		WindowHead->OnAttachedToWindow(this);
 	}
 }

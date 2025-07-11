@@ -7,6 +7,8 @@
 #include "Interfaces/PowerProviderFacility.h"
 #include "PowerConsumerFacility.generated.h"
 
+class UGSBFacilityPowerSwitch;
+
 
 UCLASS()
 class GSB_API APowerConsumerFacility : public AConstructibleFacility
@@ -44,13 +46,11 @@ public:
 
 	void UnlinkFromPowerProvider();
 
-	UFUNCTION(BlueprintNativeEvent, Category = "APowerConsumerFacility|LinkToPowerProvider")
 	bool TryTurnOn();
-	virtual bool TryTurnOn_Implementation();
 	
-	UFUNCTION(BlueprintNativeEvent, Category = "APowerConsumerFacility|LinkToPowerProvider")
-	void TurnOff();
-	virtual void TurnOff_Implementation();
+	virtual void TurnOff();
+
+	virtual int32 GetTotalPowerUsage() const;
 
 protected:
 	void TraceMultiPowerInfluenceArea(TArray<FHitResult>& HitResults);
@@ -60,15 +60,27 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TScriptInterface<IPowerProviderFacility> LinkedPowerProvider = nullptr;
 
-private:
-	void TurnOn();
+	void UpdatePowerWidget();
 
 	void UpdatePowerStatusWidget();
+
+	void UpdatePowerConsumptionWidget();
+
+	virtual void TurnOn();
+
+private:
+
+	UFUNCTION()
+	void HandleOnPowerSwitchClicked(UGSBFacilityPowerSwitch* PowerSwtichWidget);
+
+	void UpdatePowerSwitchWidget(UGSBFacilityPowerSwitch* PowerSwtichWidget);
 
 	UPROPERTY(EditAnywhere, Category = "APowerConsumerFacility|Link to PowerProvider")
 	int32 PowerConsumption = 10;
 
-	class UGSBFacilityPowerStatus* PowerStatus;
+	class UGSBFacilityPowerStatus* PowerStatusWidget;
+
+	class UGSBPowerConsumption* PowerConsumptionWidget;
 
 	bool bOn = false;
 public:
