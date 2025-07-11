@@ -7,6 +7,11 @@
 #include "Kismet/KismetStringLibrary.h"
 #include "DebugHeader.h"
 
+bool APowerConsumerFacility::IsOperating() const
+{
+	return Super::IsOperating() && IsOn() && IsLinkedToPowerProvider() && LinkedPowerProvider->CanProvidePower();
+}
+
 void APowerConsumerFacility::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	UnlinkFromPowerProvider();
@@ -26,14 +31,9 @@ void APowerConsumerFacility::CompleteConstruction_Implementation()
 	TurnOn();
 }
 
-bool APowerConsumerFacility::IsLinkedToPowerProvider()
+bool APowerConsumerFacility::IsLinkedToPowerProvider() const
 {
 	return IsOn() && IsValidPowerProviderScriptInterface(LinkedPowerProvider);
-}
-
-bool APowerConsumerFacility::IsActivate()
-{
-	return IsLinkedToPowerProvider() && LinkedPowerProvider->CanProvidePower();
 }
 
 bool APowerConsumerFacility::TryLinkToPowerProvider(IPowerProviderFacility* PowerProvider)
@@ -56,7 +56,7 @@ void APowerConsumerFacility::OnLinkToPowerProvider_Implementation(AActor* PowerP
 	LinkedPowerProvider = TScriptInterface<IPowerProviderFacility>(PowerProviderActor);
 	if (LinkedPowerProvider)
 	{
-		TRACE_SCREEN_LOG(FString::FromInt(PowerConsumption));
+		TRACE_SCREEN_LOG(GetActorLabel() + FString::FromInt(PowerConsumption));
 		LinkedPowerProvider->UpdatePowerUsage(PowerConsumption);
 	}
 	for (AFacilityAddon* Addon : ConnectedAddons)
@@ -77,6 +77,11 @@ void APowerConsumerFacility::OnUnlinkFromPowerProvider_Implementation()
 bool APowerConsumerFacility::TryLinkToNearByPowerProvider()
 {
 	if (IsLinkedToPowerProvider())
+	{
+		return false;
+	}
+
+	if (!IsOn())
 	{
 		return false;
 	}
@@ -104,10 +109,14 @@ void APowerConsumerFacility::UnlinkFromPowerProvider()
 	}
 }
 
-void APowerConsumerFacility::TurnOn_Implementation()
+bool APowerConsumerFacility::TryTurnOn_Implementation()
 {
-	bOn = true;	
-	TryLinkToNearByPowerProvider();
+	if (IsConstructed())
+	{
+		TurnOn();
+		return true;
+	}
+	return false;
 }
 
 void APowerConsumerFacility::TurnOff_Implementation()
@@ -140,7 +149,13 @@ void APowerConsumerFacility::TraceMultiPowerInfluenceArea(TArray<FHitResult>& Hi
 	}
 }
 
-bool APowerConsumerFacility::IsValidPowerProviderScriptInterface(TScriptInterface<IPowerProviderFacility> PowerProvider)
+bool APowerConsumerFacility::IsValidPowerProviderScriptInterface(const TScriptInterface<IPowerProviderFacility>& PowerProvider) const
 {
 	return IsValid(PowerProvider.GetObject()) && PowerProvider.GetInterface();
+}
+
+void APowerConsumerFacility::TurnOn()
+{
+	bOn = true;
+	TryLinkToNearByPowerProvider();
 }

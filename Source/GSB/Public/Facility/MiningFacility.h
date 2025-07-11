@@ -19,15 +19,13 @@ class GSB_API AMiningFacility : public APowerDistributorLinkedFacility, public I
 public:
 	AMiningFacility();
 
-	virtual void Tick(float DeltaSeconds) override;
+	virtual void CompleteConstruction_Implementation() override;
+
+	virtual void Tick_OnOperating(float DeltaSeconds) override;
 
 	virtual void OnUnlinkFromPowerProvider_Implementation() override;
 
 	virtual void RegisterOutputPort(AOutputPort* OutputPort) override;
-
-
-protected:
-	virtual void BeginPlay() override;
 
 private:
 	bool TryOccupyMiningPoint();

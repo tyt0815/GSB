@@ -27,8 +27,6 @@ class GSB_API ACentralHub :
 public:
 	ACentralHub();
 
-	virtual void Tick(float Delta) override;
-
 	virtual void OnShowDetailInteraction(AActor* Interactor) override;
 
 	virtual bool CanProvidePower() override;

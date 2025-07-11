@@ -24,11 +24,14 @@ void APowerRelayFacility::BeginConstruction_Implementation()
 	SetPowerInfluenceAreaVisibility(false);
 }
 
-void APowerRelayFacility::TurnOn_Implementation()
+bool APowerRelayFacility::TryTurnOn_Implementation()
 {
-	Super::TurnOn_Implementation();
-
-	PowerProviderComponent->LinkFacilitiesInPowerInfluenceArea();
+	if (Super::TryTurnOn_Implementation())
+	{
+		PowerProviderComponent->LinkFacilitiesInPowerInfluenceArea();
+		return true;
+	}
+	return false;
 }
 
 void APowerRelayFacility::OnLinkToPowerProvider_Implementation(AActor* PowerProviderActor)
@@ -36,6 +39,7 @@ void APowerRelayFacility::OnLinkToPowerProvider_Implementation(AActor* PowerProv
 	Super::OnLinkToPowerProvider_Implementation(PowerProviderActor);
 	if (LinkedPowerProvider)
 	{
+		TRACE_SCREEN_LOG(FString::FromInt(PowerProviderComponent->GetCurrentPowerUsage()));
 		LinkedPowerProvider->UpdatePowerUsage(PowerProviderComponent->GetCurrentPowerUsage());
 	}
 }
@@ -53,7 +57,6 @@ void APowerRelayFacility::OnUnlinkFromPowerProvider_Implementation()
 void APowerRelayFacility::UpdatePowerUsage(int32 Addition)
 {
 	PowerProviderComponent->UpdatePowerUsage(Addition);
-
 	if (IsLinkedToPowerProvider())
 	{
 		TRACE_SCREEN_LOG(FString::FromInt(Addition));

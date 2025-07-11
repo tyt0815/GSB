@@ -12,6 +12,9 @@ UCLASS()
 class GSB_API APowerConsumerFacility : public AConstructibleFacility
 {
 	GENERATED_BODY()
+public:
+
+	virtual bool IsOperating() const override;
 
 protected:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
@@ -21,9 +24,7 @@ protected:
 	virtual void CompleteConstruction_Implementation() override;
 
 public:
-	bool IsLinkedToPowerProvider();
-
-	bool IsActivate();
+	bool IsLinkedToPowerProvider() const;
 
 	bool TryLinkToPowerProvider(IPowerProviderFacility* PowerProvider);
 
@@ -36,13 +37,14 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category = "APowerConsumerFacility|LinkToPowerProvider")
 	void OnUnlinkFromPowerProvider();
 	virtual void OnUnlinkFromPowerProvider_Implementation();
+
 	bool TryLinkToNearByPowerProvider();
 
 	void UnlinkFromPowerProvider();
 
 	UFUNCTION(BlueprintNativeEvent, Category = "APowerConsumerFacility|LinkToPowerProvider")
-	void TurnOn();
-	virtual void TurnOn_Implementation();
+	bool TryTurnOn();
+	virtual bool TryTurnOn_Implementation();
 	
 	UFUNCTION(BlueprintNativeEvent, Category = "APowerConsumerFacility|LinkToPowerProvider")
 	void TurnOff();
@@ -51,17 +53,18 @@ public:
 protected:
 	void TraceMultiPowerInfluenceArea(TArray<FHitResult>& HitResults);
 
-	bool IsValidPowerProviderScriptInterface(TScriptInterface<IPowerProviderFacility> PowerProvider);
+	bool IsValidPowerProviderScriptInterface(const TScriptInterface<IPowerProviderFacility>& PowerProvider) const;
 
 	UPROPERTY(VisibleAnywhere)
 	TScriptInterface<IPowerProviderFacility> LinkedPowerProvider = nullptr;
 
 private:
+	void TurnOn();
 
 	UPROPERTY(EditAnywhere, Category = "APowerConsumerFacility|Link to PowerProvider")
 	int32 PowerConsumption = 10;
 
-	bool bOn = true;
+	bool bOn = false;
 public:
 	FORCEINLINE TScriptInterface<IPowerProviderFacility> GetLinkedPowerProvider() const
 	{
@@ -73,6 +76,6 @@ public:
 	}
 	FORCEINLINE bool IsOn() const
 	{
-		return IsConstructed() && bOn;
+		return bOn;
 	}
 };

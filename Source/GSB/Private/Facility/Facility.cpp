@@ -1,7 +1,6 @@
 #include "Facility/Facility.h"
 #include "Facility/Addon/FacilityAddon.h"
 #include "Interfaces/InteractableActor.h"
-#include "Components/InteractionComponent.h"
 #include "SubSystems/GSBWindowSubsystem.h"
 #include "HUDs/GSBWindowWidget.h"
 #include "HUDs/GSBWindowBody.h"
@@ -16,6 +15,16 @@ AFacility::AFacility()
 	StaticMeshComponent->SetCollisionProfileName(TEXT("FacilityMesh"));
 
 	InteractionComponent = CreateDefaultSubobject<UInteractionComponent>(TEXT("Interaction"));
+}
+
+void AFacility::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if (IsOperating())
+	{
+		Tick_OnOperating(DeltaSeconds);
+	}
 }
 
 void AFacility::GetInteractionDescriptions(TArray<FString>& Descriptions)

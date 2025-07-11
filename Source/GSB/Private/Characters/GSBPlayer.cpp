@@ -68,7 +68,8 @@ void AGSBPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 		EnhancedInputComponent->BindAction(InputSet->JumpInputAction, ETriggerEvent::Triggered, this, &AGSBPlayer::Jump);
 		EnhancedInputComponent->BindAction(InputSet->ToggleCombatAndBuildModeInputAction, ETriggerEvent::Started, this, &AGSBPlayer::ToggleCombatAndBuildMode);
 		EnhancedInputComponent->BindAction(InputSet->InteractionInputAction, ETriggerEvent::Started, this, &AGSBPlayer::Interaction);
-		EnhancedInputComponent->BindAction(InputSet->SelectInteractionScrollInputAction, ETriggerEvent::Started, this, &AGSBPlayer::SelectInteractionScroll);
+		EnhancedInputComponent->BindAction(InputSet->SelectInteractionScrollUpInputAction, ETriggerEvent::Started, this, &AGSBPlayer::SelectInteractionScrollUp);
+		EnhancedInputComponent->BindAction(InputSet->SelectInteractionScrollDownInputAction, ETriggerEvent::Started, this, &AGSBPlayer::SelectInteractionScrollDown);
 		EnhancedInputComponent->BindAction(InputSet->ToggleInventoryInputAction, ETriggerEvent::Started, this, &AGSBPlayer::ToggleInventory);
 		EnhancedInputComponent->BindAction(InputSet->EscInputAction, ETriggerEvent::Started, this, &AGSBPlayer::Esc_Triggered);
 
@@ -197,12 +198,20 @@ void AGSBPlayer::Interaction()
 	}
 }
 
-void AGSBPlayer::SelectInteractionScroll(const FInputActionValue& Value)
+void AGSBPlayer::SelectInteractionScrollUp()
 {
 	if (InteractableActor)
 	{
-		float Delta = Value.Get<FInputActionValue::Axis1D>();
-		SelectedInteractionIndex = FMath::Clamp(SelectedInteractionIndex + Delta, 0, InteractableActor->GetNumInteractions() - 1);
+		SelectedInteractionIndex = FMath::Clamp(SelectedInteractionIndex - 1, 0, InteractableActor->GetNumInteractions() - 1);
+		OverlayWidget->UpdateInteractionFocusing(SelectedInteractionIndex);
+	}
+}
+
+void AGSBPlayer::SelectInteractionScrollDown()
+{
+	if (InteractableActor)
+	{
+		SelectedInteractionIndex = FMath::Clamp(SelectedInteractionIndex + 1, 0, InteractableActor->GetNumInteractions() - 1);
 		OverlayWidget->UpdateInteractionFocusing(SelectedInteractionIndex);
 	}
 }

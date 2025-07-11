@@ -21,7 +21,6 @@ class GSB_API AProductionFacility : public APowerDistributorLinkedFacility, publ
 	GENERATED_BODY()
 public:
 	AProductionFacility();
-	virtual void Tick(float DeltaTime) override;
 
 	////////////////////////////////////////////////
 	// IInputPortHandler

@@ -54,7 +54,8 @@ protected:
 	void Look(const FInputActionValue& Value);
 	void ToggleCombatAndBuildMode();
 	void Interaction();
-	void SelectInteractionScroll(const FInputActionValue& Value);
+	void SelectInteractionScrollUp();
+	void SelectInteractionScrollDown();
 	void ToggleInventory();
 	void Esc_Triggered();
 	void HideWindow();

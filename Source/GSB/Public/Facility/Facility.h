@@ -5,11 +5,11 @@
 #include "CoreMinimal.h"
 #include "BuildSystem/GridSnapActor.h"
 #include "Interfaces/InteractableActor.h"
+#include "Components/InteractionComponent.h"
 #include "HUDs/GSBWindowBody.h"
 #include "Facility.generated.h"
 
 class AFacilityAddon;
-class UInteractionComponent;
 
 UCLASS()
 class GSB_API AFacility : public AGridSnapActor, public IInteractableActor
@@ -18,6 +18,8 @@ class GSB_API AFacility : public AGridSnapActor, public IInteractableActor
 	
 public:	
 	AFacility();
+
+	virtual void Tick(float DeltaSeconds) override final;
 
 	virtual void GetInteractionDescriptions(TArray<FString>& Descriptions) override;
 
@@ -31,7 +33,11 @@ protected:
 public:
 	void ConnectFacilityAddon(AFacilityAddon* Addon);
 
+	virtual bool IsOperating() const { return true; };
+
 protected:
+	virtual void Tick_OnOperating(float DeltaSecond) {};
+
 	UFUNCTION()
 	virtual void OnShowDetailInteraction(AActor* Interactor);
 

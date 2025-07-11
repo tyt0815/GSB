@@ -6,25 +6,43 @@
 #include "Interfaces/PowerProviderFacility.h"
 #include "DebugHeader.h"
 
-AConstructibleFacility::AConstructibleFacility()
+bool AConstructibleFacility::IsOperating() const
 {
+	return Super::IsOperating() && IsConstructed();
 }
 
 void AConstructibleFacility::BeginPlay()
 {
 	Super::BeginPlay();
 
+	InteractionComponent->AddInteractionDynamic(TEXT("철거"), this, &AConstructibleFacility::HandleDeconstructRequest);
+
 	BeginConstruction();
 }
 
 bool AConstructibleFacility::IsConstructed() const
 {
-	return !GetWorldTimerManager().IsTimerActive(ConstructionTimer);
+	return !IsConstructing() && !IsDeconstructing();
+}
+
+bool AConstructibleFacility::IsConstructing() const
+{
+	return GetWorldTimerManager().IsTimerActive(ConstructionTimer);
+}
+
+bool AConstructibleFacility::IsDeconstructing() const
+{
+	return GetWorldTimerManager().IsTimerActive(DeconstructionTimer);
 }
 
 float AConstructibleFacility::GetConstructionProgress() const
 {
 	return GetWorldTimerManager().GetTimerElapsed(ConstructionTimer) / ConstructionTime;
+}
+
+float AConstructibleFacility::GetDeconstructionProgress() const
+{
+	return GetWorldTimerManager().GetTimerElapsed(DeconstructionTimer) / DeconstructionTime;
 }
 
 void AConstructibleFacility::BeginConstruction_Implementation()
@@ -40,10 +58,39 @@ void AConstructibleFacility::BeginConstruction_Implementation()
 		GetWorldTimerManager().SetTimer(ConstructionTimer, ConstructionDelegate, ConstructionTime, false);
 	}
 }
+void AConstructibleFacility::HandleDeconstructRequest(AActor* Interactor)
+{
+	if (IsConstructing())
+	{
+		CompleteConstruction();
+	}
+	else if(IsConstructed())
+	{
+		BeginDeconstruction();
+	}
+}
+void AConstructibleFacility::BeginDeconstruction_Implementation()
+{
+	if (DeconstructionTime == 0)
+	{
+		CompleteDeconstruction();
+	}
+	else
+	{
+		FTimerDelegate DeconstructionDelegate;
+		DeconstructionDelegate.BindUFunction(this, TEXT("CompleteDeconstruction"));
+		GetWorldTimerManager().SetTimer(ConstructionTimer, DeconstructionDelegate, DeconstructionTime, false);
+	}
+}
 void AConstructibleFacility::CompleteConstruction_Implementation()
 {
 	for (AFacilityAddon* Addon : ConnectedAddons)
 	{
 		Addon->CompleteConstruction();
 	}
+}
+
+void AConstructibleFacility::CompleteDeconstruction_Implementation()
+{
+	Destroy();
 }

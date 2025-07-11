@@ -26,7 +26,6 @@ bool UPowerProviderComponent::TryLinkPowerConsumerFacility(APowerConsumerFacilit
 	{
 		LinkedPowerConsumerFacilities.AddUnique(PowerConsumerFacility);
 		PowerConsumerFacility->OnLinkToPowerProvider(GetOwner());
-		UpdatePowerUsage(PowerConsumerFacility->GetPowerConsumption());
 		return true;
 	}
 	return false;

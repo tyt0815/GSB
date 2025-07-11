@@ -24,9 +24,9 @@ AConveyorBelt::AConveyorBelt()
     FacilityName = TEXT("컨베이어 벨트");
 }
 
-void AConveyorBelt::Tick(float DeltaTime)
+void AConveyorBelt::Tick_OnOperating(float DeltaTime)
 {
-    Super::Tick(DeltaTime);
+    Super::Tick_OnOperating(DeltaTime);
 
     ItemReceiveComponent->TryReceiveItem();
     TrySendItem();
@@ -38,6 +38,13 @@ void AConveyorBelt::CompleteConstruction_Implementation()
     TransportComponent->Activate();
     TryAutoConnectToItemSender();
     TryAutoConnectItemReceiver();
+    
+    if (DebugPayload)
+    {
+        OnReceiveItem(DebugPayload);
+    }
+
+    ItemReceiveComponent->TryReceiveItem();
 }
 
 bool AConveyorBelt::CanReceiveItem() const
@@ -99,11 +106,6 @@ void AConveyorBelt::BeginPlay()
     ItemSendComponent->SetSendingDirection(TransportComponent->GetEndDirection());
 
     TransportComponent->OnArrived.AddDynamic(this, &AConveyorBelt::SetItemToSend);
-
-    if (DebugPayload)
-    {
-        OnReceiveItem(DebugPayload);
-    }
 }
 
 bool AConveyorBelt::TryAutoConnectToItemSender()

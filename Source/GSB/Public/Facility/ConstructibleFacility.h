@@ -12,7 +12,7 @@ class GSB_API AConstructibleFacility : public AFacility
 	GENERATED_BODY()
 
 public:
-	AConstructibleFacility();
+	virtual bool IsOperating() const override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -20,21 +20,42 @@ protected:
 public:
 	bool IsConstructed() const;
 
-	UFUNCTION(BlueprintPure, Category = "AConstructibleFacility|Constructing")
+	bool IsConstructing() const;
+
+	bool IsDeconstructing() const;
+
+	UFUNCTION(BlueprintPure, Category = "AConstructibleFacility|Construction")
 	float GetConstructionProgress() const;
 
-	UFUNCTION(BlueprintNativeEvent, Category = "AConstructibleFacility|Constructing")
+	UFUNCTION(BlueprintPure, Category = "AConstructibleFacility|Construction")
+	float GetDeconstructionProgress() const;
+
+	UFUNCTION(BlueprintNativeEvent, Category = "AConstructibleFacility|Construction")
 	void BeginConstruction();
 	virtual void BeginConstruction_Implementation();
 
 protected:
-	UFUNCTION(BlueprintNativeEvent, Category = "AConstructibleFacility|Constructing")
+	UFUNCTION()
+	void HandleDeconstructRequest(AActor* Interactor);
+
+	UFUNCTION(BlueprintNativeEvent, Category = "AConstructibleFacility|Construction")
+	void BeginDeconstruction();
+	virtual void BeginDeconstruction_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, Category = "AConstructibleFacility|Construction")
 	void CompleteConstruction();
 	virtual void CompleteConstruction_Implementation();	
 
-protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AConstructibleFacility|Constructing")
+	UFUNCTION(BlueprintNativeEvent, Category = "AConstructibleFacility|Construction")
+	void CompleteDeconstruction();
+	virtual void CompleteDeconstruction_Implementation();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AConstructibleFacility|Construction")
 	float ConstructionTime = 2;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AConstructibleFacility|Construction")
+	float DeconstructionTime = 2;
+
 	FTimerHandle ConstructionTimer;
+	FTimerHandle DeconstructionTimer;
 };

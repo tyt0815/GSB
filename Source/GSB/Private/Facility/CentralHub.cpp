@@ -34,13 +34,6 @@ ACentralHub::ACentralHub()
 	FacilityName = TEXT("중앙 허브");
 }
 
-void ACentralHub::Tick(float Delta)
-{
-	Super::Tick(Delta);
-
-	SCREEN_LOG_COLOR(22, FColor::Green, TEXT("Power Capacity: ") + FString::FromInt(PowerCapacity) + TEXT("   Current Power Usage: ") + FString::FromInt(PowerProviderComponent->GetCurrentPowerUsage()));
-}
-
 void ACentralHub::OnShowDetailInteraction(AActor* Interactor)
 {
 	Super::OnShowDetailInteraction(Interactor);

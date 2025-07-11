@@ -20,7 +20,7 @@ public:
 
 	virtual void BeginConstruction_Implementation() override;
 
-	virtual void TurnOn_Implementation() override;
+	virtual bool TryTurnOn_Implementation() override;
 
 	virtual void OnLinkToPowerProvider_Implementation(AActor* PowerProviderActor) override;
 

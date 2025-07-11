@@ -21,12 +21,6 @@ AProductionFacility::AProductionFacility()
 	OutputPortHandler = CreateDefaultSubobject<URetryPrioritizedActorRequestHandlerComponent>(TEXT("OutputPortHandler"));
 	
 }
-
-void AProductionFacility::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
-
 void AProductionFacility::RegisterInputPort(AInputPort* InputPort)
 {
 	InputPortHandler->RegisterActor(InputPort);
@@ -89,7 +83,7 @@ FProductionRecipe* AProductionFacility::FindProductionRecipe()
 
 bool AProductionFacility::CanStartProduce()
 {
-	return IsActivate() && ProducingItem == nullptr;
+	return IsOperating() && ProducingItem == nullptr;
 }
 
 bool AProductionFacility::TryReceiveItemFromInputPort(AActor* Actor)

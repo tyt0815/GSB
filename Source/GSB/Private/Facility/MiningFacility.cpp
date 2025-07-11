@@ -15,22 +15,29 @@ AMiningFacility::AMiningFacility()
 	FacilityName = TEXT("채굴기");
 }
 
-void AMiningFacility::Tick(float DeltaSeconds)
+void AMiningFacility::CompleteConstruction_Implementation()
 {
-	Super::Tick(DeltaSeconds);
-	if (IsActivate() && IsValid(OccupiedMiningPoint))
+	TryOccupyMiningPoint();
+}
+
+void AMiningFacility::Tick_OnOperating(float DeltaSeconds)
+{
+	Super::Tick_OnOperating(DeltaSeconds);
+	if (!IsValid(OccupiedMiningPoint))
 	{
-		if (CurrentMiningTime >= OccupiedMiningPoint->GetMiningTime())
+		return;
+	}
+
+	if (CurrentMiningTime >= OccupiedMiningPoint->GetMiningTime())
+	{
+		if (ConnectedOutputPort->TryCreateAndSendItemCrate(OccupiedMiningPoint->GetMineableItem()))
 		{
-			if (ConnectedOutputPort->TryCreateAndSendItemCrate(OccupiedMiningPoint->GetMineableItem()))
-			{
-				CurrentMiningTime = 0;
-			}
+			CurrentMiningTime = 0;
 		}
-		else
-		{
-			CurrentMiningTime += DeltaSeconds;
-		}
+	}
+	else
+	{
+		CurrentMiningTime += DeltaSeconds;
 	}
 }
 
@@ -43,13 +50,6 @@ void AMiningFacility::OnUnlinkFromPowerProvider_Implementation()
 void AMiningFacility::RegisterOutputPort(AOutputPort* OutputPort)
 {
 	ConnectedOutputPort = OutputPort;
-}
-
-void AMiningFacility::BeginPlay()
-{
-	Super::BeginPlay();
-
-	TryOccupyMiningPoint();
 }
 
 bool AMiningFacility::TryOccupyMiningPoint()

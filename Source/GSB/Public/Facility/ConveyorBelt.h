@@ -20,7 +20,7 @@ class GSB_API AConveyorBelt : public AConstructibleFacility, public IItemReceive
 public:
 	AConveyorBelt();
 
-	virtual void Tick(float DeltaTime) override;
+	virtual void Tick_OnOperating(float DeltaTime) override;
 
 	virtual void CompleteConstruction_Implementation() override;
 

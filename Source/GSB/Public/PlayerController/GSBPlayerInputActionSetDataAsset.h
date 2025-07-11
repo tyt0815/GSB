@@ -36,7 +36,10 @@ public:
 	UInputAction* InteractionInputAction;
 
 	UPROPERTY(EditDefaultsOnly)
-	UInputAction* SelectInteractionScrollInputAction;
+	UInputAction* SelectInteractionScrollUpInputAction;
+
+	UPROPERTY(EditDefaultsOnly)
+	UInputAction* SelectInteractionScrollDownInputAction;
 
 	UPROPERTY(EditDefaultsOnly)
 	UInputAction* ToggleInventoryInputAction;
