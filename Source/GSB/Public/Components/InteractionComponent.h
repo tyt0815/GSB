@@ -32,7 +32,6 @@ public:
 	void DeactivateInteraction();
 
 private:
-
 	TArray<FString> InteractionDescriptions;
 
 	TArray<FComponentOnInteractionSignature> OnInteractionDelegates;

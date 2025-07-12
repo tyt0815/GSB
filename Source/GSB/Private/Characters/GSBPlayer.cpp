@@ -396,6 +396,8 @@ void AGSBPlayer::UpdateInteractableActor(AActor* Candidate)
 		{
 			return;
 		}
+
+		InteractableActor->SetHighlighInteractableActor(false);
 	}
 	
 
@@ -403,6 +405,7 @@ void AGSBPlayer::UpdateInteractableActor(AActor* Candidate)
 
 	if (InteractableActor)
 	{
+		InteractableActor->SetHighlighInteractableActor(true);
 		TArray<FString> Descriptions;
 		InteractableActor->GetInteractionDescriptions(Descriptions);
 		OverlayWidget->ShowInteractionList();
@@ -436,10 +439,26 @@ AActor* AGSBPlayer::TraceInteractableActor()
 		ObjectTypes,
 		false,
 		ActorsToIgnore,
-		EDrawDebugTrace::ForOneFrame,
+		EDrawDebugTrace::None,
 		HitResult,
 		true
 	);
+
+	if (!IsValid(HitResult.GetActor()))
+	{
+		UKismetSystemLibrary::SphereTraceSingleForObjects(
+			this,
+			Start,
+			End,
+			100,
+			ObjectTypes,
+			false,
+			ActorsToIgnore,
+			EDrawDebugTrace::None,
+			HitResult,
+			true
+		);
+	}
 
 	return HitResult.GetActor();
 }

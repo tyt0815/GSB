@@ -2,6 +2,7 @@
 
 
 #include "Components/InteractionComponent.h"
+#include "GSBGameInstance.h"
 
 UInteractionComponent::UInteractionComponent()
 {

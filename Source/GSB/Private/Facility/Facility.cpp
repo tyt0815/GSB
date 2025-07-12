@@ -1,10 +1,12 @@
 #include "Facility/Facility.h"
 #include "Facility/Addon/FacilityAddon.h"
 #include "Interfaces/InteractableActor.h"
+#include "Components/MeshOverlayHelperComponent.h"
 #include "SubSystems/GSBWindowSubsystem.h"
 #include "HUDs/GSBWindowWidget.h"
 #include "HUDs/GSBWindowBody.h"
 #include "HUDs/GSBWindowHead.h"
+#include "GSBGameInstance.h"
 #include "GSBDefines.h"
 #include "DebugHeader.h"
 
@@ -16,6 +18,8 @@ AFacility::AFacility()
 
 	InteractionComponent = CreateDefaultSubobject<UInteractionComponent>(TEXT("InteractionRange"));
 	InteractionComponent->SetupAttachment(GetRootComponent());
+
+	MeshOverlayHelperComponent = CreateDefaultSubobject<UMeshOverlayHelperComponent>(TEXT("MeshOverlayHelper"));
 }
 
 void AFacility::Tick(float DeltaSeconds)
@@ -48,11 +52,19 @@ bool AFacility::IsInteractable() const
 	return InteractionComponent->IsInteractable();
 }
 
+void AFacility::SetHighlighInteractableActor(bool bVisibility)
+{
+	MeshOverlayHelperComponent->SetOutlineVisibility(bVisibility);
+	MeshOverlayHelperComponent->SetHighlightVisibility(bVisibility);
+}
+
 void AFacility::BeginPlay()
 {
 	Super::BeginPlay();
 
 	InteractionComponent->AddInteractionDynamic(FacilityName.ToString(), this, &AFacility::OnShowDetailInteraction);
+
+	MeshOverlayHelperComponent->AddHighlightTarget(StaticMeshComponent);
 }
 
 void AFacility::ConnectFacilityAddon(AFacilityAddon* Addon)

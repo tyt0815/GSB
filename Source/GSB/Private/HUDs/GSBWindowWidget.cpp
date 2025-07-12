@@ -36,6 +36,8 @@ void UGSBWindowWidget::OnOpenWindow(UGSBOverlay* InGSBOverlay, UObject* InTarget
 	SetTargetObject(InTargetObject);
 	SetFocus();
 	SetPositionInViewport(FVector2D(1, 1));
+	WindowBodySlot->ClearChildren();
+	WindowHeadSlot->ClearChildren();
 }
 
 void UGSBWindowWidget::OnCloseWindow()

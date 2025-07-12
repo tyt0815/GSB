@@ -9,6 +9,7 @@
 
 class UInteractionComponent;
 class UItemStorageComponent;
+class UMeshOverlayHelperComponent;
 class UGSBOutputPortDetailWidget;
 
 UCLASS()
@@ -27,6 +28,8 @@ public:
 
 	virtual bool IsInteractable() const override;
 
+	virtual void SetHighlighInteractableActor(bool bVisibility) override;
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -39,6 +42,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	UInteractionComponent* InteractionComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UMeshOverlayHelperComponent* MeshOverlayHelperComponent;
 
 	UPROPERTY(EditDefaultsOnly, Category = "AConfigurableOutputPort")
 	TSubclassOf<UGSBOutputPortDetailWidget> DetailWidgetClass;

@@ -29,4 +29,6 @@ public:
 	virtual int32 GetNumInteractions() const = 0;
 
 	virtual bool IsInteractable() const = 0;
+
+	virtual void SetHighlighInteractableActor(bool bHighlight) = 0;
 };

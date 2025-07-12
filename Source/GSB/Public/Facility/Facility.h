@@ -11,6 +11,7 @@
 #include "Facility.generated.h"
 
 class AFacilityAddon;
+class UMeshOverlayHelperComponent;
 
 UCLASS()
 class GSB_API AFacility : public AGridSnapActor, public IInteractableActor
@@ -30,6 +31,8 @@ public:
 
 	virtual bool IsInteractable() const override;
 
+	virtual void SetHighlighInteractableActor(bool bVisibility) override;
+
 protected:
 	virtual void BeginPlay();
 
@@ -44,11 +47,14 @@ protected:
 	UFUNCTION()
 	virtual void OnShowDetailInteraction(AActor* Interactor);
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* StaticMeshComponent;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	UInteractionComponent* InteractionComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UMeshOverlayHelperComponent* MeshOverlayHelperComponent;
 
 	UPROPERTY(EditAnywhere)
 	FName FacilityName = FName(TEXT("FacilityName_None"));

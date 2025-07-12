@@ -4,6 +4,7 @@
 #include "Facility/Addon/ConfigurableOutputPort.h"
 #include "Components/InteractionComponent.h"
 #include "Components/ItemStorageComponent.h"
+#include "Components/MeshOverlayHelperComponent.h"
 #include "Interfaces/HubFacility.h"
 #include "HUDs/GSBOutputPortDetailWidget.h"
 #include "SubSystems/GSBWindowSubsystem.h"
@@ -13,6 +14,8 @@ AConfigurableOutputPort::AConfigurableOutputPort()
 {
 	InteractionComponent = CreateDefaultSubobject<UInteractionComponent>(TEXT("InteractionRange"));
 	InteractionComponent->SetupAttachment(GetRootComponent());
+
+	MeshOverlayHelperComponent = CreateDefaultSubobject<UMeshOverlayHelperComponent>(TEXT("MeshOverlayHelper"));
 }
 
 void AConfigurableOutputPort::GetInteractionDescriptions(TArray<FString>& Descriptions)
@@ -33,6 +36,12 @@ int32 AConfigurableOutputPort::GetNumInteractions() const
 bool AConfigurableOutputPort::IsInteractable() const
 {
 	return InteractionComponent->IsInteractable();
+}
+
+void AConfigurableOutputPort::SetHighlighInteractableActor(bool bVisibility)
+{
+	MeshOverlayHelperComponent->SetOutlineVisibility(bVisibility);
+	MeshOverlayHelperComponent->SetHighlightVisibility(bVisibility);
 }
 
 void AConfigurableOutputPort::BeginPlay()

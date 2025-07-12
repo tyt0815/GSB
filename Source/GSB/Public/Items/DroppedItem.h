@@ -11,6 +11,7 @@
 class UInteractionComponent;
 class UItemDataAsset;
 class UBoxComponent;
+class UNiagaraSystem;
 
 UCLASS()
 class GSB_API ADroppedItem : public AActor, public IInteractableActor
@@ -28,6 +29,8 @@ public:
 
 	virtual bool IsInteractable() const override;
 
+	virtual void SetHighlighInteractableActor(bool bHighlight) override;
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -41,8 +44,16 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	UInteractionComponent* InteractionComponent;
 
+	UPROPERTY(VisibleAnywhere)
+	class UNiagaraComponent* NiagaraComponent;
+
 	UPROPERTY(EditAnywhere, Category = "ADroppedItem")
 	FItemStack ItemStack;
+
+	UNiagaraSystem* DefaultNiagara;
+
+	UPROPERTY(EditAnywhere, Category = "ADroppedItem")
+	UNiagaraSystem* HighlightedNiagara;
 
 private:
 	UFUNCTION()

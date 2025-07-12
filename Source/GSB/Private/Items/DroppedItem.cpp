@@ -6,6 +6,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/InteractionComponent.h"
 #include "Interfaces/ItemPickupActor.h"
+#include "NiagaraComponent.h"
 
 #define DEFAULT_ITEM_NAME TEXT("DroppedItem")
 
@@ -19,6 +20,10 @@ ADroppedItem::ADroppedItem()
 	ItemOverlapBox->SetSimulatePhysics(true);
 
 	InteractionComponent = CreateDefaultSubobject<UInteractionComponent>(TEXT("Interaction"));
+	InteractionComponent->SetupAttachment(GetRootComponent());
+
+	NiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Niagara"));
+	NiagaraComponent->SetupAttachment(GetRootComponent());
 
 	ItemStack.Stack = 1;
 }
@@ -43,12 +48,26 @@ bool ADroppedItem::IsInteractable() const
 	return InteractionComponent->IsInteractable();
 }
 
+void ADroppedItem::SetHighlighInteractableActor(bool bHighlight)
+{
+	if (bHighlight)
+	{
+		NiagaraComponent->SetAsset(HighlightedNiagara);
+	}
+	else
+	{
+		NiagaraComponent->SetAsset(DefaultNiagara);
+	}
+}
+
 void ADroppedItem::BeginPlay()
 {
 	Super::BeginPlay();
 
 	InteractionComponent->AddInteractionDynamic(GetItemName().ToString(), this, &ADroppedItem::HandlePickup);
 	UpdateItem(ItemStack);
+
+	DefaultNiagara = NiagaraComponent->GetAsset();
 }
 
 void ADroppedItem::UpdateItem(const FItemStack& NewItemStack)
@@ -56,6 +75,7 @@ void ADroppedItem::UpdateItem(const FItemStack& NewItemStack)
 	if (NewItemStack.Stack == 0 || !IsValid(NewItemStack.ItemData))
 	{
 		Destroy();
+		return;
 	}
 
 	int32 InteractionIndex = InteractionComponent->GetInteractionIndex(GetItemName().ToString());
