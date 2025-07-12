@@ -43,6 +43,11 @@ int32 AFacility::GetNumInteractions() const
 	return InteractionComponent->GetNumInteractions();
 }
 
+bool AFacility::IsInteractable() const
+{
+	return InteractionComponent->IsInteractable();
+}
+
 void AFacility::BeginPlay()
 {
 	Super::BeginPlay();

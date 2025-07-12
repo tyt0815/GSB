@@ -28,6 +28,8 @@ public:
 
 	virtual int32 GetNumInteractions() const override;
 
+	virtual bool IsInteractable() const override;
+
 protected:
 	virtual void BeginPlay();
 

@@ -36,3 +36,15 @@ FComponentOnInteractionSignature& UInteractionComponent::AddInteraction_Internal
 	OnInteractionDelegates.Add({});
 	return OnInteractionDelegates.Last();
 }
+
+void UInteractionComponent::ActivateInteraction()
+{
+	bInteractable = true;
+	SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+}
+
+void UInteractionComponent::DeactivateInteraction()
+{
+	bInteractable = false;
+	SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}

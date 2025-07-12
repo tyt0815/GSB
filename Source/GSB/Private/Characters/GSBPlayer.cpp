@@ -390,10 +390,14 @@ void AGSBPlayer::UpdateFacilityBuilderLocation()
 
 void AGSBPlayer::UpdateInteractableActor(AActor* Candidate)
 {
-	if (InteractableActor.GetObject() == Candidate)
+	if (IsValid(InteractableActor.GetObject()))
 	{
-		return;
+		if (InteractableActor.GetObject() == Candidate && InteractableActor->IsInteractable())
+		{
+			return;
+		}
 	}
+	
 
 	InteractableActor = TScriptInterface<IInteractableActor>(Candidate);
 

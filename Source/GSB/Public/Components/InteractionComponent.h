@@ -27,18 +27,23 @@ public:
 
 	FComponentOnInteractionSignature& AddInteraction_Internal(const FString& Description);
 
+	void ActivateInteraction();
+
+	void DeactivateInteraction();
+
 private:
 
 	TArray<FString> InteractionDescriptions;
 
 	TArray<FComponentOnInteractionSignature> OnInteractionDelegates;
 
+	bool bInteractable = true;
+
 public:
 	FORCEINLINE void GetInteractionDescriptions(TArray<FString>& InDescriptions) const
 	{
 		InDescriptions = InteractionDescriptions;
 	}
-
 	FORCEINLINE int32 GetNumInteractions() const
 	{
 		return InteractionDescriptions.Num();
@@ -46,6 +51,10 @@ public:
 	FORCEINLINE void SetDescriptionAt(int32 Index, const FString& Description)
 	{
 		InteractionDescriptions[Index] = Description;
+	}
+	FORCEINLINE bool IsInteractable() const
+	{
+		return bInteractable;
 	}
 };
 

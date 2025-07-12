@@ -71,6 +71,7 @@ void AConstructibleFacility::HandleDeconstructRequest(AActor* Interactor)
 }
 void AConstructibleFacility::BeginDeconstruction_Implementation()
 {
+	InteractionComponent->DeactivateInteraction();
 	if (DeconstructionTime == 0)
 	{
 		CompleteDeconstruction();
@@ -81,6 +82,7 @@ void AConstructibleFacility::BeginDeconstruction_Implementation()
 		DeconstructionDelegate.BindUFunction(this, TEXT("CompleteDeconstruction"));
 		GetWorldTimerManager().SetTimer(DeconstructionTimer, DeconstructionDelegate, DeconstructionTime, false);
 	}
+	
 }
 void AConstructibleFacility::CompleteConstruction_Implementation()
 {

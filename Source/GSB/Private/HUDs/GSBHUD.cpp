@@ -14,7 +14,7 @@ void AGSBHUD::BeginPlay()
 	{
 		if (OverlayWidgetClass)
 		{
-			OverlayWidget = CreateWidget <UGSBOverlay>(GetOwningPlayerController(), OverlayWidgetClass);
+			OverlayWidget = CreateWidget <UGSBOverlay>(GetWorld(), OverlayWidgetClass);
 			if (OverlayWidget)
 			{
 				OverlayWidget->AddToViewport();

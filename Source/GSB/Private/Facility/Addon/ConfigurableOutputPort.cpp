@@ -30,6 +30,11 @@ int32 AConfigurableOutputPort::GetNumInteractions() const
 	return InteractionComponent->GetNumInteractions();
 }
 
+bool AConfigurableOutputPort::IsInteractable() const
+{
+	return InteractionComponent->IsInteractable();
+}
+
 void AConfigurableOutputPort::BeginPlay()
 {
 	Super::BeginPlay();
