@@ -89,7 +89,7 @@ void AOutputPort::AutoConnectItemReceiver()
 		ObjectTypes,
 		false,
 		ActorsToIgnore,
-		EDrawDebugTrace::ForDuration,
+		EDrawDebugTrace::None,
 		HitResults,
 		true
 	);

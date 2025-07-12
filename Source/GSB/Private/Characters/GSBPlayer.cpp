@@ -410,6 +410,7 @@ void AGSBPlayer::UpdateInteractableActor(AActor* Candidate)
 		InteractableActor->GetInteractionDescriptions(Descriptions);
 		OverlayWidget->ShowInteractionList();
 		OverlayWidget->UpdateInteractionList(Descriptions);
+		SelectedInteractionIndex = 0;
 	}
 	else
 	{

@@ -95,7 +95,7 @@ void AInputPort::AutoConnectItemSender()
         ObjectTypes,
         false,
         ActorsToIgnore,
-        EDrawDebugTrace::ForDuration,
+        EDrawDebugTrace::None,
         HitResults,
         true
     );

@@ -72,6 +72,7 @@ void AConstructibleFacility::HandleDeconstructRequest(AActor* Interactor)
 void AConstructibleFacility::BeginDeconstruction_Implementation()
 {
 	InteractionComponent->DeactivateInteraction();
+	SetHighlighInteractableActor(false);
 	if (DeconstructionTime == 0)
 	{
 		CompleteDeconstruction();
