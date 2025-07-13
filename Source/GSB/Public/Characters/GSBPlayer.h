@@ -13,9 +13,8 @@ class UInputAction;
 class USpringArmComponent;
 class UCameraComponent;
 class UInventoryComponent;
-class UGSBInventoryWidget;
+class UGSBInventory;
 class UGSBPlayerOverlay;
-class UGSBWindowWidget;
 class AGSBPlayerHUD;
 class AGSBPlayerController;
 class AConstructibleFacility;
@@ -131,6 +130,7 @@ protected:
 
 	bool IsUIMode() const;
 
+	UGSBInventory* InventoryWidget;
 
 private:
 	UFUNCTION()

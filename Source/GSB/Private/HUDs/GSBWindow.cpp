@@ -10,6 +10,7 @@ void UGSBWindow::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	SetIsFocusable(true);
 	WindowFrame->CloseButton->OnClicked.AddDynamic(this, &UGSBWindow::Close);
 	SetFocus();
 }

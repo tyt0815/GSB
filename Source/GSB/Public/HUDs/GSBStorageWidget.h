@@ -26,8 +26,6 @@ public:
 public:
 	virtual void UpdateWidget();
 
-	bool TryLinkStorageComponent(UItemStorageComponent* StorageComponent);
-
 	void OnLinkedStorageComponent(UItemStorageComponent* StorageComponent);
 
 	void SetTitle(const FText& NewTitle);

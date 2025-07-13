@@ -38,15 +38,6 @@ void UGSBStorageWidget::UpdateWidget()
 	}
 }
 
-bool UGSBStorageWidget::TryLinkStorageComponent(UItemStorageComponent* StorageComponent)
-{
-	if (IsValid(StorageComponent))
-	{
-		return StorageComponent->TryLinkStorageWidget(this);
-	}
-	return false;
-}
-
 void UGSBStorageWidget::OnLinkedStorageComponent(UItemStorageComponent* StorageComponent)
 {
 	LinkedItemStorageComponent = StorageComponent;

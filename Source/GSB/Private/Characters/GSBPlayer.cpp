@@ -16,7 +16,7 @@
 #include "GSBGameInstance.h"
 #include "HUDs/GSBPlayerHUD.h"
 #include "HUDs/GSBPlayerOverlay.h"
-#include "HUDs/GSBInventoryWidget.h"
+#include "HUDs/GSBInventory.h"
 #include "SubSystems/GSBWindowSubsystem.h"
 #include "DebugHeader.h"
 
@@ -226,26 +226,28 @@ void AGSBPlayer::SelectInteractionScrollDown()
 void AGSBPlayer::ToggleInventory()
 {
 	UGSBWindowSubsystem* WindowManager = GetGameInstance()->GetSubsystem<UGSBWindowSubsystem>();
-	//if (WindowManager->IsOpened(InventoryWindowWidget))
-	//{
-	//	WindowManager->CloseWindow(InventoryWindowWidget);
-	//}
-	//else 
-	//{
-	//	if (InventoryWidgetClass)
-	//	{
-	//		if (UGSBInventoryWidget* InventoryWidget = CreateWidget<UGSBInventoryWidget>(PlayerController, InventoryWidgetClass))
-	//		{
-	//			InventoryWidget->TryLinkStorageComponent(InventoryComponent);
-	//			InventoryWidget->SetTitle(FText::FromString(TEXT("Inventory")));
-	//			InventoryWindowWidget = WindowManager->OpenWindow(this, InventoryWidget);
-	//		}
-	//	}
-	//	else
-	//	{
-	//		TRACE_SCREEN_LOG(TEXT("InventoryWidgetClass 가 nullptr 입니다."));
-	//	}
-	//}
+	UGSBGameInstance* GameInst = GetGameInstance<UGSBGameInstance>();
+	if (WindowManager->IsWindowOpened(InventoryWidget))
+	{
+		WindowManager->CloseWindow(InventoryWidget);
+	}
+	else
+	{
+		UClass* InventoryWidgetClass = GameInst->GetUserWidgetClass(TEXT("Inventory"));
+		if (UGSBWindow* Window = WindowManager->OpenWindow(InventoryWidgetClass, TEXT("Inventory")))
+		{
+			InventoryWidget = Cast<UGSBInventory>(Window);
+			if (InventoryWidget)
+			{
+				InventoryWidget->LinkStorageComponent(InventoryComponent);
+			}
+			else
+			{
+				TRACE_SCREEN_LOG(TEXT("InventoryWidget 생성 실패"));
+				WindowManager->CloseWindow(Window);
+			}
+		}
+	}
 }
 
 void AGSBPlayer::Esc_Triggered()
