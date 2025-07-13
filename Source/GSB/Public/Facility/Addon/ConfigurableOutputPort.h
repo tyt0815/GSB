@@ -5,12 +5,12 @@
 #include "CoreMinimal.h"
 #include "Facility/Addon/OutputPort.h"
 #include "Interfaces/InteractableActor.h"
+#include "HUDs/GSBOutputPortDetailWidget.h"
 #include "ConfigurableOutputPort.generated.h"
 
 class UInteractionComponent;
 class UItemStorageComponent;
 class UMeshOverlayHelperComponent;
-class UGSBOutputPortDetailWidget;
 
 UCLASS()
 class GSB_API AConfigurableOutputPort : public AOutputPort, public IInteractableActor
@@ -49,9 +49,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "AConfigurableOutputPort")
 	TSubclassOf<UGSBOutputPortDetailWidget> DetailWidgetClass;
 
-	TWeakObjectPtr<UGSBOutputPortDetailWidget> DetailWidget;
+	UGSBOutputPortDetailWidget* DetailWidget;
 	
-	TWeakObjectPtr<UItemStorageComponent> LinkedStorage;
+	UItemStorageComponent* LinkedStorage;
 
 private:
 	UFUNCTION()

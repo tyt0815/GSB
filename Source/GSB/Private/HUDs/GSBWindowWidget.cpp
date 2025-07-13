@@ -20,14 +20,14 @@ void UGSBWindowWidget::NativeConstruct()
 
 void UGSBWindowWidget::CloseWindow()
 {
-	if (GSBOverlay)
-	{
-		GSBOverlay->CloseWindow_Internal(this);
-	}
-	else
-	{
-		OnCloseWindow();
-	}
+	//if (GSBOverlay)
+	//{
+	//	GSBOverlay->CloseWindow_Internal(this);
+	//}
+	//else
+	//{
+	//	OnCloseWindow();
+	//}
 }
 
 void UGSBWindowWidget::OnOpenWindow(UGSBOverlay* InGSBOverlay, UObject* InTargetObject)

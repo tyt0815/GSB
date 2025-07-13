@@ -75,52 +75,5 @@ void AFacility::ConnectFacilityAddon(AFacilityAddon* Addon)
 
 void AFacility::OnShowDetailInteraction(AActor* Interactor)
 {
-	if (DetailWindowBodyClass)
-	{
-		DetailWindowBody = CreateWidget<UGSBWindowBody>(Interactor->GetInstigatorController<APlayerController>(), DetailWindowBodyClass);
-	}
-	else
-	{
-		TRACE_SCREEN_LOG(TEXT("DetailWindowBodyClass가 nullptr입니다."))
-	}
-
-	UGSBWindowSubsystem* WindowManager = GetGameInstance()->GetSubsystem<UGSBWindowSubsystem>();
-	DetailWindow = WindowManager->OpenWindow(this, DetailWindowBody);
-	if (IsValid(DetailWindow))
-	{
-		DetailWindow->ClearWindowHead();
-	}
-}
-
-UGSBWindowHead* AFacility::AttachDetailWindowHead(const TSubclassOf<UGSBWindowHead>& HeadClass)
-{
-	if (HeadClass)
-	{
-		if (UGSBWindowHead* Head = CreateWidget<UGSBWindowHead>(GetWorld()->GetFirstPlayerController(), HeadClass))
-		{
-			AttachDetailWindowHead(Head);
-			return Head;
-		}
-		else
-		{
-			TRACE_SCREEN_LOG(TEXT("WindowHead생성 실패"));
-		}
-	}
-	else
-	{
-		TRACE_SCREEN_LOG(TEXT("WindowHeadClass가 유효하지 않습니다."));
-	}
-	return nullptr;
-}
-
-void AFacility::AttachDetailWindowHead(UGSBWindowHead* Head)
-{
-	if (IsValid(DetailWindow))
-	{
-		DetailWindow->AttachWindowHead(Head);
-	}
-	else
-	{
-		TRACE_SCREEN_LOG(TEXT("DetailWindow가 유효하지 않습니다."));
-	}
+	// TODO
 }

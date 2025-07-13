@@ -39,51 +39,6 @@ void APowerConsumerFacility::OnShowDetailInteraction(AActor* Interactor)
 {
 	Super::OnShowDetailInteraction(Interactor);
 
-	if (UGSBGameInstance* GameInstance = GetGameInstance<UGSBGameInstance>())
-	{
-		if (UClass* PowerStatusClass = GameInstance->GetUserWidgetClass("PowerStatus"))
-		{
-			PowerStatusWidget = Cast<UGSBFacilityPowerStatus>(AttachDetailWindowHead(PowerStatusClass));
-			UpdatePowerStatusWidget();
-			if (!PowerStatusWidget)
-			{
-				TRACE_SCREEN_LOG(TEXT("UGSBFacilityPowerStatus 캐스팅 실패"));
-			}
-		}
-		else
-		{
-			TRACE_SCREEN_LOG(TEXT("PowerStatusClass가 nullptr 입니다."));
-		}
-		if (UClass* PowerSwitchClass = GameInstance->GetUserWidgetClass("PowerSwitch"))
-		{
-			if (UGSBFacilityPowerSwitch* PowerSwitch = Cast<UGSBFacilityPowerSwitch>(AttachDetailWindowHead(PowerSwitchClass)))
-			{
-				PowerSwitch->OnPowerSwitchClicked.BindDynamic(this, &APowerConsumerFacility::HandleOnPowerSwitchClicked);
-				UpdatePowerSwitchWidget(PowerSwitch);
-			}
-			else
-			{
-				TRACE_SCREEN_LOG(TEXT("UGSBFacilityPowerSwitch 캐스팅 실패"));
-			}
-		}
-		else
-		{
-			TRACE_SCREEN_LOG(TEXT("PowerSwitchClass가 nullptr 입니다."));
-		}
-		if (UClass* PowerConsumptionClass = GameInstance->GetUserWidgetClass("PowerConsumption"))
-		{
-			PowerConsumptionWidget = Cast<UGSBPowerConsumption>(AttachDetailWindowHead(PowerConsumptionClass));
-			UpdatePowerConsumptionWidget();
-			if (!PowerConsumptionWidget)
-			{
-				TRACE_SCREEN_LOG(TEXT("UGSBPowerConsumption 캐스팅 실패"));
-			}
-		}
-		else
-		{
-			TRACE_SCREEN_LOG(TEXT("PowerConsumptionClass가 nullptr 입니다."));
-		}
-	}
 }
 
 bool APowerConsumerFacility::IsLinkedToPowerProvider() const

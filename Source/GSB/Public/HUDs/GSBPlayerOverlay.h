@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "HUDs/GSBOverlay.h"
-#include "HUDs/GSBWindowWidget.h"
 #include "GSBPlayerOverlay.generated.h"
 
 class UGSBInteractionList;
@@ -15,14 +14,13 @@ class GSB_API UGSBPlayerOverlay : public UGSBOverlay
 {
 	GENERATED_BODY()
 public:
-	virtual void CloseWindow_Internal(UGSBWindowWidget* WindowWidget) override;
-
-protected:
-	virtual UGSBWindowWidget* OpenWindow_Internal(UObject* InTargetObject) override;
-
-public:
 	virtual void InitializeOverlay() override;
 
+	virtual UGSBWindow* OpenWindow(TSubclassOf<UGSBWindow> WindowClass, const FName& WindowName) override;
+
+	virtual void CloseWindow(UGSBWindow* Window) override;
+
+public:
 	void ShowInteractionList();
 
 	void HideInteractionList();

@@ -226,27 +226,26 @@ void AGSBPlayer::SelectInteractionScrollDown()
 void AGSBPlayer::ToggleInventory()
 {
 	UGSBWindowSubsystem* WindowManager = GetGameInstance()->GetSubsystem<UGSBWindowSubsystem>();
-	if (WindowManager->IsOpened(InventoryWindowWidget))
-	{
-		WindowManager->CloseWindow(InventoryWindowWidget);
-	}
-	else 
-	{
-		if (InventoryWidgetClass)
-		{
-			if (UGSBInventoryWidget* InventoryWidget = CreateWidget<UGSBInventoryWidget>(PlayerController, InventoryWidgetClass))
-			{
-				InventoryWidget->TryLinkStorageComponent(InventoryComponent);
-				InventoryWidget->SetTitle(FText::FromString(TEXT("Inventory")));
-				InventoryWindowWidget = WindowManager->OpenWindow(this, InventoryWidget);
-			}
-		}
-		else
-		{
-			TRACE_SCREEN_LOG(TEXT("InventoryWidgetClass 가 nullptr 입니다."));
-		}
-	}
-	
+	//if (WindowManager->IsOpened(InventoryWindowWidget))
+	//{
+	//	WindowManager->CloseWindow(InventoryWindowWidget);
+	//}
+	//else 
+	//{
+	//	if (InventoryWidgetClass)
+	//	{
+	//		if (UGSBInventoryWidget* InventoryWidget = CreateWidget<UGSBInventoryWidget>(PlayerController, InventoryWidgetClass))
+	//		{
+	//			InventoryWidget->TryLinkStorageComponent(InventoryComponent);
+	//			InventoryWidget->SetTitle(FText::FromString(TEXT("Inventory")));
+	//			InventoryWindowWidget = WindowManager->OpenWindow(this, InventoryWidget);
+	//		}
+	//	}
+	//	else
+	//	{
+	//		TRACE_SCREEN_LOG(TEXT("InventoryWidgetClass 가 nullptr 입니다."));
+	//	}
+	//}
 }
 
 void AGSBPlayer::Esc_Triggered()

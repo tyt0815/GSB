@@ -129,11 +129,6 @@ protected:
 
 	UGSBPlayerOverlay* OverlayWidget;
 
-	UPROPERTY(EditDefaultsOnly, Category = "AGSBPlayer|UI")
-	TSubclassOf<UGSBInventoryWidget> InventoryWidgetClass;
-
-	UGSBWindowWidget* InventoryWindowWidget = nullptr;
-
 	bool IsUIMode() const;
 
 

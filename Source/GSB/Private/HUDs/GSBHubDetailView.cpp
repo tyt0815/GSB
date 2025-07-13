@@ -54,17 +54,17 @@ void UGSBHubDetailView::HandleHubStorageContextMenuCreated(UGSBContextMenu* Cont
 
 void UGSBHubDetailView::HandleContextMenuEntry_MoveItemToInventory(UGSBContextMenuEntry* MenuEntry)
 {
-	UGSBWindowSubsystem* WindowManager = GetGameInstance()->GetSubsystem<UGSBWindowSubsystem>();
-	check(WindowManager);
-	if (UGSBNumberInputDialogBody* DialogBody = WindowManager->OpenNumberInputDialog(MenuEntry->GetTargetObject(), 0))
-	{
-		if (UGSBConfirmationDialog* Dialog = DialogBody->GetParentDialog<UGSBConfirmationDialog>())
-		{
-			Dialog->OnOKButtonClicked.AddDynamic(this, &UGSBHubDetailView::HandleOnDialogOKButtonClicked_MoveItemToInventory);
-		}
-	}
+	//UGSBWindowSubsystem* WindowManager = GetGameInstance()->GetSubsystem<UGSBWindowSubsystem>();
+	//check(WindowManager);
+	//if (UGSBNumberInputDialogBody* DialogBody = WindowManager->OpenNumberInputDialog(MenuEntry->GetTargetObject(), 0))
+	//{
+	//	if (UGSBConfirmationDialog* Dialog = DialogBody->GetParentDialog<UGSBConfirmationDialog>())
+	//	{
+	//		Dialog->OnOKButtonClicked.AddDynamic(this, &UGSBHubDetailView::HandleOnDialogOKButtonClicked_MoveItemToInventory);
+	//	}
+	//}
 
-	MenuEntry->GetParentContextMenu()->CloseContextMenu();
+	//MenuEntry->GetParentContextMenu()->CloseContextMenu();
 }
 
 void UGSBHubDetailView::HandleOnDialogOKButtonClicked_MoveItemToInventory(UGSBConfirmationDialog* ConfirmationDialog)
@@ -91,17 +91,17 @@ void UGSBHubDetailView::HandleInventoryContextMenuCreated(UGSBContextMenu* Conte
 
 void UGSBHubDetailView::HandleContextMenuEntry_MoveItemToHubStorage(UGSBContextMenuEntry* MenuEntry)
 {
-	UGSBWindowSubsystem* WindowManager = GetGameInstance()->GetSubsystem<UGSBWindowSubsystem>();
-	check(WindowManager);
-	if (UGSBNumberInputDialogBody* DialogBody = WindowManager->OpenNumberInputDialog(MenuEntry->GetTargetObject(), 0))
-	{
-		if (UGSBConfirmationDialog* Dialog = DialogBody->GetParentDialog<UGSBConfirmationDialog>())
-		{
-			Dialog->OnOKButtonClicked.AddDynamic(this, &UGSBHubDetailView::HandleOnDialogOKButtonClicked_MoveItemToHubStorage);
-		}
-	}
+	//UGSBWindowSubsystem* WindowManager = GetGameInstance()->GetSubsystem<UGSBWindowSubsystem>();
+	//check(WindowManager);
+	//if (UGSBNumberInputDialogBody* DialogBody = WindowManager->OpenNumberInputDialog(MenuEntry->GetTargetObject(), 0))
+	//{
+	//	if (UGSBConfirmationDialog* Dialog = DialogBody->GetParentDialog<UGSBConfirmationDialog>())
+	//	{
+	//		Dialog->OnOKButtonClicked.AddDynamic(this, &UGSBHubDetailView::HandleOnDialogOKButtonClicked_MoveItemToHubStorage);
+	//	}
+	//}
 
-	MenuEntry->GetParentContextMenu()->CloseContextMenu();
+	//MenuEntry->GetParentContextMenu()->CloseContextMenu();
 }
 
 void UGSBHubDetailView::HandleOnDialogOKButtonClicked_MoveItemToHubStorage(UGSBConfirmationDialog* ConfirmationDialog)

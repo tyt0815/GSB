@@ -5,13 +5,7 @@
 #include "CoreMinimal.h"
 #include "GSBWindowSubsystem.generated.h"
 
-class UGSBWindowWidget;
-class UGSBWindowHead;
-class UGSBWindowBody;
-class UGSBConfirmationDialog;
-class UGSBDialogBody;
-class UGSBNumberInputDialogBody;
-class UGSBContextMenu;
+class UGSBWindow;
 class AGSBHUD;
 
 
@@ -21,22 +15,16 @@ class GSB_API UGSBWindowSubsystem : public UGameInstanceSubsystem
 	GENERATED_BODY()
 
 public:
-	UGSBWindowWidget* OpenWindow(UObject* InTargetObject, UGSBWindowBody* WindowBody);
+	UGSBWindow* OpenWindow(UClass* WindowClass, const FName& WindowName);
 
-	void CloseWindow(UGSBWindowWidget* WindowWidget);
+	void CloseWindow(UGSBWindow* Window);
+
+	bool IsWindowOpened(UGSBWindow* Window);
 
 	void CloseAllWindows();
 
-	UGSBConfirmationDialog* OpenConfirmationDialog(UGSBDialogBody* DialogBody, UObject* InTargetObject);
-
-	UGSBNumberInputDialogBody* OpenNumberInputDialog(UObject* InTargetObject, int32 Number);
-
-	bool IsOpened(UGSBWindowWidget* WindowWidget);
-
-	UGSBContextMenu* OpenContextMenu(UObject* InTargetObject);
-
 private	:
-	TArray<UGSBWindowWidget*> WindowWidgets;
+	AGSBHUD* HUD;
 
-	AGSBHUD* GetHUD() const;
+	AGSBHUD* GetHUD();
 };

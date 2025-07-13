@@ -39,27 +39,6 @@ void ACentralHub::OnShowDetailInteraction(AActor* Interactor)
 {
 	Super::OnShowDetailInteraction(Interactor);
 
-	if (UGSBHubDetailView* HubDetailWidget = Cast<UGSBHubDetailView>(DetailWindowBody))
-	{
-		HubDetailWidget->SetHubStorageAndInventory(GetHubStorageComponent(), Interactor->GetComponentByClass<UItemStorageComponent>());
-	}
-
-	if (UGSBGameInstance* GameInstance = GetGameInstance<UGSBGameInstance>())
-	{
-		if (UClass * PowerStatusClass = GameInstance->GetUserWidgetClass("PowerStatus"))
-		{
-			PowerStatusWidget = Cast<UGSBFacilityPowerStatus>(AttachDetailWindowHead(PowerStatusClass));
-			UpdatePowerStatusWidget();
-			if (!PowerStatusWidget)
-			{
-				TRACE_SCREEN_LOG(TEXT("UGSBFacilityPowerStatus 캐스팅 실패"));
-			}
-		}
-		else
-		{
-			TRACE_SCREEN_LOG(TEXT("PowerStatusClass가 nullptr 입니다."));
-		}
-	}
 }
 
 bool ACentralHub::CanProvidePower()

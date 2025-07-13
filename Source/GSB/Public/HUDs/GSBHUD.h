@@ -7,14 +7,9 @@
 #include "GSBHUD.generated.h"
 
 class UGSBOverlay;
-class UGSBWindowWidget;
-class UGSBWindowBody;
-class UGSBConfirmationDialog;
-class UGSBDialogBody;
-class UGSBNumberInputDialogBody;
-class UGSBContextMenu;
+class UGSBWindow;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FEndBeginPlaySignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEndBeginPlaySignature);
 
 UCLASS()
 class GSB_API AGSBHUD : public AHUD
@@ -25,21 +20,15 @@ public:
 	virtual void BeginPlay() override;
 
 public:
-	UGSBWindowWidget* OpenWindow_Internal(UObject* InTargetObject);
+	UGSBWindow* OpenWindow(UClass* WindowClass, const FName& WindowName);
 
-	void CloseWindow_Internal(UGSBWindowWidget* WindowWidget);
+	void CloseWindow(UGSBWindow* Window);
 
-	UGSBConfirmationDialog* OpenConfirmationDialog_Internal(UGSBDialogBody* Body, UObject* InTargetObject);
+	bool IsWindowOpened(UGSBWindow* Window);
 
-	UGSBNumberInputDialogBody* OpenNumberInputDialog_Internal(UObject* InTargetObject, int32 Number);
+	void CloseAllWindows();
 
-	bool IsOpened_Internal(UGSBWindowWidget* WindowWidget) const;
-
-	void CloseAllWindows_Internal();
-
-	UGSBContextMenu* OpenContextMenu_Internal(UObject* InTargetObject);
-
-	FEndBeginPlaySignature OnEndBeginPlay;
+	FOnEndBeginPlaySignature OnEndBeginPlay;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "AGSBHUD")

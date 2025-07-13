@@ -49,20 +49,20 @@ void UGSBInventoryWidget::AddContextMenuEntry_DropItem(UGSBContextMenu* ContextM
 
 void UGSBInventoryWidget::HandleContextMenuEntry_DropItem(UGSBContextMenuEntry* MenuEntry)
 {
-	UGSBWindowSubsystem* WindowManager = GetGameInstance()->GetSubsystem<UGSBWindowSubsystem>();
-	check(WindowManager);
-	UGSBItemSlotWidget* ItemSlot = Cast<UGSBItemSlotWidget>(MenuEntry->GetTargetObject());
-	check(ItemSlot);
-	FItemStack ItemStack = LinkedItemStorageComponent->GetItemStack(ItemSlot->GetItemData());
-	if (UGSBNumberInputDialogBody* DialogBody = WindowManager->OpenNumberInputDialog(ItemSlot, ItemStack.Stack))
-	{
-		if (UGSBConfirmationDialog* Dialog = DialogBody->GetParentDialog<UGSBConfirmationDialog>())
-		{
-			Dialog->OnOKButtonClicked.AddDynamic(this, &UGSBInventoryWidget::HandleDialogOKButton_DropItem);
-		}
-	}
+	//UGSBWindowSubsystem* WindowManager = GetGameInstance()->GetSubsystem<UGSBWindowSubsystem>();
+	//check(WindowManager);
+	//UGSBItemSlotWidget* ItemSlot = Cast<UGSBItemSlotWidget>(MenuEntry->GetTargetObject());
+	//check(ItemSlot);
+	//FItemStack ItemStack = LinkedItemStorageComponent->GetItemStack(ItemSlot->GetItemData());
+	//if (UGSBNumberInputDialogBody* DialogBody = WindowManager->OpenNumberInputDialog(ItemSlot, ItemStack.Stack))
+	//{
+	//	if (UGSBConfirmationDialog* Dialog = DialogBody->GetParentDialog<UGSBConfirmationDialog>())
+	//	{
+	//		Dialog->OnOKButtonClicked.AddDynamic(this, &UGSBInventoryWidget::HandleDialogOKButton_DropItem);
+	//	}
+	//}
 
-	MenuEntry->GetParentContextMenu()->CloseContextMenu();
+	//MenuEntry->GetParentContextMenu()->CloseContextMenu();
 }
 
 void UGSBInventoryWidget::HandleDialogOKButton_DropItem(UGSBConfirmationDialog* ConfirmationDialog)

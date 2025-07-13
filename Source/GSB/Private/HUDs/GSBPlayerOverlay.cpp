@@ -2,43 +2,39 @@
 
 
 #include "HUDs/GSBPlayerOverlay.h"
-#include "HUDs/GSBWindowWidget.h"
 #include "HUDs/GSBInteractionList.h"
 #include "HUDs/GSBPowerCapacity.h"
-#include "Components/NamedSlot.h"
-#include "Components/CanvasPanel.h"
-#include "Components/CanvasPanelSlot.h"
 #include "PlayerController/GSBPlayerController.h"
-
-UGSBWindowWidget* UGSBPlayerOverlay::OpenWindow_Internal(UObject* InTargetObject)
-{
-	if (UGSBWindowWidget* WindowWidget = Super::OpenWindow_Internal(InTargetObject))
-	{
-		if (WindowWidgets.Num() == 1 && IsValid(PlayerController))
-		{
-			PlayerController->SetUIControlMode(true);
-		}
-		return WindowWidget;
-	}
-
-	return nullptr;
-}
-
-void UGSBPlayerOverlay::CloseWindow_Internal(UGSBWindowWidget* WindowWidget)
-{
-	Super::CloseWindow_Internal(WindowWidget);
-
-	if (WindowWidgets.Num() == 0)
-	{
-		PlayerController->SetUIControlMode(false);
-	}
-}
 
 void UGSBPlayerOverlay::InitializeOverlay()
 {
 	PlayerController = GetOwningPlayer<AGSBPlayerController>();
 
 	HideInteractionList();
+}
+
+UGSBWindow* UGSBPlayerOverlay::OpenWindow(TSubclassOf<UGSBWindow> WindowClass, const FName& WindowName)
+{
+	if (UGSBWindow* Window = Super::OpenWindow(WindowClass, WindowName))
+	{
+		if (OpenedWindows.Num() == 1 && IsValid(PlayerController))
+		{
+			PlayerController->SetUIControlMode(true);
+		}
+		return Window;
+	}
+
+	return nullptr;
+}
+
+void UGSBPlayerOverlay::CloseWindow(UGSBWindow* Window)
+{
+	Super::CloseWindow(Window);
+
+	if (OpenedWindows.Num() == 0)
+	{
+		PlayerController->SetUIControlMode(false);
+	}
 }
 
 

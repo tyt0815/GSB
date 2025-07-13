@@ -2,142 +2,52 @@
 
 
 #include "HUDs/GSBOverlay.h"
-#include "HUDs/GSBWindowWidget.h"
-#include "HUDs/GSBConfirmationDialog.h"
-#include "HUDs/GSBNumberInputDialogBody.h"
-#include "HUDs/GSBContextMenu.h"
-
+#include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
-#include "DebugHeader.h"
+
 
 void UGSBOverlay::InitializeOverlay()
 {
 }
 
-UGSBWindowWidget* UGSBOverlay::OpenWindow_Internal(UObject* InTargetObject)
+UGSBWindow* UGSBOverlay::OpenWindow(TSubclassOf<UGSBWindow> WindowClass, const FName& WindowName)
 {
-	if (WindowWidgetClass)
+	if (UGSBWindow* Window = CreateWidget_GSB<UGSBWindow>(WindowClass, WindowName))
 	{
-		if (UGSBWindowWidget* WindowWidget = CreateWidget<UGSBWindowWidget>(GetOwningPlayer(), WindowWidgetClass))
-		{
-			WindowWidgets.Add(WindowWidget);
-			WindowWidget->OnOpenWindow(this, InTargetObject);
-			UCanvasPanelSlot* CanvasPanelSlot = RootCanvas->AddChildToCanvas(WindowWidget);
-			FAnchors Anchors;
-			Anchors.Minimum = { 0.5,0.5 };
-			Anchors.Maximum = { 0.5,0.5 };
-			CanvasPanelSlot->SetAnchors(Anchors);
-			CanvasPanelSlot->SetPosition({ 0,0 });
-			CanvasPanelSlot->SetAlignment({ 0.5, 0.5f });
-			CanvasPanelSlot->SetAutoSize(true);
-			return WindowWidget;
-		}
-	}
-	else
-	{
-		TRACE_SCREEN_LOG(TEXT("WindowWidgetClass가 nullptr입니다."));
+		OpenedWindows.Add(Window);
+		Window->OnOpened(this);
+		UCanvasPanelSlot* CanvasPanelSlot = RootCanvas->AddChildToCanvas(Window);
+		FAnchors Anchors;
+		Anchors.Minimum = { 0.5,0.5 };
+		Anchors.Maximum = { 0.5,0.5 };
+		CanvasPanelSlot->SetAnchors(Anchors);
+		CanvasPanelSlot->SetPosition({ 0,0 });
+		CanvasPanelSlot->SetAlignment({ 0.5, 0.5f });
+		CanvasPanelSlot->SetAutoSize(true);
+		return Window;
 	}
 	return nullptr;
 }
 
-void UGSBOverlay::CloseWindow_Internal(UGSBWindowWidget* WindowWidget)
+void UGSBOverlay::CloseWindow(UGSBWindow* Window)
 {
-	if (IsValid(WindowWidget))
+	if (IsValid(Window))
 	{
-		WindowWidget->OnCloseWindow();
+		Window->OnClosed();
 	}
-	WindowWidgets.Remove(WindowWidget);
+	OpenedWindows.Remove(Window);
 }
 
-bool UGSBOverlay::IsOpened_Internal(UGSBWindowWidget* WindowWidget) const
+bool UGSBOverlay::IsWindowOpened(UGSBWindow* Window)
 {
-	return WindowWidgets.Contains(WindowWidget);
+	return IsValid(Window) && OpenedWindows.Contains(Window);
 }
 
-void UGSBOverlay::CloseAllWindows_Internal()
+void UGSBOverlay::CloseAllWindows()
 {
-	for (int i = WindowWidgets.Num() - 1; i >= 0; --i)
+	for (UGSBWindow* Window : OpenedWindows)
 	{
-		CloseWindow_Internal(WindowWidgets[i]);
+		CloseWindow(Window);
 	}
-}
-
-UGSBConfirmationDialog* UGSBOverlay::OpenConfirmationDialog_Internal(UGSBDialogBody* DialogBody, UObject* InTargetObject)
-{
-	if (IsValid(DialogBody))
-	{
-		if (UGSBConfirmationDialog* Dialog = OpenConfirmationDialog_Internal(InTargetObject))
-		{
-			Dialog->AttachDialogBody(DialogBody);
-			return Dialog;
-		}
-	}
-	return nullptr;
-}
-
-UGSBNumberInputDialogBody* UGSBOverlay::OpenNumberInputDialog_Internal(UObject* InTargetObject, int Number)
-{
-	if (NumberInputDialogBodyWidgetClass)
-	{
-		if (UGSBNumberInputDialogBody* Body = CreateWidget<UGSBNumberInputDialogBody>(GetOwningPlayer(), NumberInputDialogBodyWidgetClass))
-		{
-			if (UGSBConfirmationDialog* Dialog = OpenConfirmationDialog_Internal(Body, InTargetObject))
-			{
-				Body->SetNumberInput(Number);
-				return Body;
-			}
-		}
-	}
-	else
-	{
-		TRACE_SCREEN_LOG(TEXT("NumberInputDialogBodyWidgetClass가 nullptr 입니다."));
-	}
-	
-	return nullptr;
-}
-
-UGSBContextMenu* UGSBOverlay::OpenContextMenu_Internal(UObject* ContextTarget)
-{
-	if (ContextMenuWidgetClass)
-	{
-		if (UGSBContextMenu* Menu = CreateWidget<UGSBContextMenu>(GetOwningPlayer(), ContextMenuWidgetClass))
-		{
-			Menu->AddToViewport();
-			FVector2D MousePos;
-			if (GetOwningPlayer()->GetMousePosition(MousePos.X, MousePos.Y))
-			{
-				Menu->SetPositionInViewport(MousePos);
-			}
-
-			Menu->SetFocus();
-			Menu->SetContextTarget(ContextTarget);
-			return Menu;
-		}
-	}
-	else
-	{
-		TRACE_SCREEN_LOG(TEXT("ContextMenuWidgetClass가 nullptr 입니다."))
-	}
-	return nullptr;
-}
-
-UGSBConfirmationDialog* UGSBOverlay::OpenConfirmationDialog_Internal(UObject* InTargetObject)
-{
-	if (ConfirmationDialogWidgetClass)
-	{
-		if (UGSBConfirmationDialog* Dialog = CreateWidget<UGSBConfirmationDialog>(GetOwningPlayer(), ConfirmationDialogWidgetClass))
-		{
-			if (UGSBWindowWidget* Window = OpenWindow_Internal(InTargetObject))
-			{
-				Window->AttachWindowBody(Dialog);
-				return Dialog;
-			}
-		}
-	}
-	else
-	{
-		TRACE_SCREEN_LOG(TEXT("ConfirmationDialogWidgetClass가 nullptr입니다"));
-	}
-
-	return nullptr;
+	OpenedWindows.Empty();
 }

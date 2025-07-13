@@ -31,37 +31,22 @@ void AGSBHUD::BeginPlay()
 	OnEndBeginPlay.Broadcast();
 }
 
-UGSBWindowWidget* AGSBHUD::OpenWindow_Internal(UObject* InTargetObject)
+UGSBWindow* AGSBHUD::OpenWindow(UClass* WindowClass, const FName& WindowName)
 {
-	return OverlayWidget->OpenWindow_Internal(InTargetObject);
+	return OverlayWidget->OpenWindow(WindowClass, WindowName);
 }
 
-void AGSBHUD::CloseWindow_Internal(UGSBWindowWidget* WindowWidget)
+void AGSBHUD::CloseWindow(UGSBWindow* Window)
 {
-	OverlayWidget->CloseWindow_Internal(WindowWidget);
+	OverlayWidget->CloseWindow(Window);
 }
 
-UGSBConfirmationDialog* AGSBHUD::OpenConfirmationDialog_Internal(UGSBDialogBody* Body, UObject* InTargetObject)
+bool AGSBHUD::IsWindowOpened(UGSBWindow* Window)
 {
-	return OverlayWidget->OpenConfirmationDialog_Internal(Body, InTargetObject);
+	return OverlayWidget->IsWindowOpened(Window);
 }
 
-UGSBNumberInputDialogBody* AGSBHUD::OpenNumberInputDialog_Internal(UObject* InTargetObject, int32 Number)
+void AGSBHUD::CloseAllWindows()
 {
-	return OverlayWidget->OpenNumberInputDialog_Internal(InTargetObject, Number);
-}
-
-bool AGSBHUD::IsOpened_Internal(UGSBWindowWidget* WindowWidget) const
-{
-	return OverlayWidget->IsOpened_Internal(WindowWidget);
-}
-
-void AGSBHUD::CloseAllWindows_Internal()
-{
-	OverlayWidget->CloseAllWindows_Internal();
-}
-
-UGSBContextMenu* AGSBHUD::OpenContextMenu_Internal(UObject* InTargetObject)
-{
-	return OverlayWidget->OpenContextMenu_Internal(InTargetObject);
+	OverlayWidget->CloseAllWindows();
 }

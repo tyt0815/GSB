@@ -3,83 +3,34 @@
 
 #include "SubSystems/GSBWindowSubsystem.h"
 #include "HUDs/GSBHUD.h"
-#include "HUDs/GSBWindowWidget.h"
-#include "HUDs/GSBWindowHead.h"	
-#include "HUDs/GSBWindowBody.h"
 #include "DebugHeader.h"
 
-UGSBWindowWidget* UGSBWindowSubsystem::OpenWindow(UObject* InTargetObject,UGSBWindowBody* WindowBody)
+UGSBWindow* UGSBWindowSubsystem::OpenWindow(UClass* WindowClass, const FName& WindowName)
 {
-	if (AGSBHUD* HUD = GetHUD())
-	{
-		UGSBWindowWidget* Window = HUD->OpenWindow_Internal(InTargetObject);
-		if (IsValid(WindowBody))
-		{
-			Window->AttachWindowBody(WindowBody);
-		}
-		return Window;
-	}
-	return nullptr;
+	return GetHUD()->OpenWindow(WindowClass, WindowName);
 }
 
-void UGSBWindowSubsystem::CloseWindow(UGSBWindowWidget* WindowWidget)
+void UGSBWindowSubsystem::CloseWindow(UGSBWindow* Window)
 {
-	if (AGSBHUD* HUD = GetHUD())
-	{
-		HUD->CloseWindow_Internal(WindowWidget);
-	}
+	GetHUD()->CloseWindow(Window);
+}
+
+bool UGSBWindowSubsystem::IsWindowOpened(UGSBWindow* Window)
+{
+	return GetHUD()->IsWindowOpened(Window);
 }
 
 void UGSBWindowSubsystem::CloseAllWindows()
 {
-	if (AGSBHUD* HUD = GetHUD())
-	{
-		HUD->CloseAllWindows_Internal();
-	}
+	GetHUD()->CloseAllWindows();
 }
 
-UGSBConfirmationDialog* UGSBWindowSubsystem::OpenConfirmationDialog(UGSBDialogBody* DialogBody, UObject* InTargetObject)
+AGSBHUD* UGSBWindowSubsystem::GetHUD()
 {
-	if (AGSBHUD* HUD = GetHUD())
+	if (!IsValid(HUD))
 	{
-		return HUD->OpenConfirmationDialog_Internal(DialogBody, InTargetObject);
+		HUD = Cast<AGSBHUD>(GetGameInstance()->GetPrimaryPlayerController()->GetHUD());
 	}
-	return nullptr;
-}
-
-UGSBNumberInputDialogBody* UGSBWindowSubsystem::OpenNumberInputDialog(UObject* InTargetObject, int32 Number)
-{
-	if (AGSBHUD* HUD = GetHUD())
-	{
-		return HUD->OpenNumberInputDialog_Internal(InTargetObject, Number);
-	}
-	return nullptr;
-}
-
-bool UGSBWindowSubsystem::IsOpened(UGSBWindowWidget* WindowWidget)
-{
-	if (AGSBHUD* HUD = GetHUD())
-	{
-		return HUD->IsOpened_Internal(WindowWidget);
-	}
-	return false;
-}
-
-UGSBContextMenu* UGSBWindowSubsystem::OpenContextMenu(UObject* InTargetObject)
-{
-	if (AGSBHUD* HUD = GetHUD())
-	{
-		return HUD->OpenContextMenu_Internal(InTargetObject);
-	}
-	return nullptr;
-}
-
-AGSBHUD* UGSBWindowSubsystem::GetHUD() const
-{
-	if (AGSBHUD* HUD = Cast<AGSBHUD>(GetGameInstance()->GetPrimaryPlayerController()->GetHUD()))
-	{
-		return HUD;
-	}
-	SCREEN_LOG_NONE_KEY(TEXT("UGSBWindowSubsystem::GetHUD: AGSBHUD 캐스팅 실패"));
-	return 0;
+	
+	return HUD;
 }

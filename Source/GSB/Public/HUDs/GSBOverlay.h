@@ -4,16 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "Components/CanvasPanel.h"
+#include "HUDs/GSBWindow.h"
+#include "DebugHeader.h"
 #include "GSBOverlay.generated.h"
 
 class UCanvasPanel;
-class UGSBWindowWidget;
-class UGSBWindowBody;
-class UGSBConfirmationDialog;
-class UGSBDialogBody;
-class UGSBNumberInputDialogBody;
-class UGSBContextMenu;
 
 UCLASS()
 class GSB_API UGSBOverlay : public UUserWidget
@@ -23,38 +18,31 @@ class GSB_API UGSBOverlay : public UUserWidget
 public:
 	virtual void InitializeOverlay();
 
-	virtual UGSBWindowWidget* OpenWindow_Internal(UObject* InTargetObject);
+	virtual UGSBWindow* OpenWindow(TSubclassOf<UGSBWindow> WindowClass, const FName& WindowName);
 
-	virtual void CloseWindow_Internal(UGSBWindowWidget* WindowWidget);	
+	virtual void CloseWindow(UGSBWindow* Window);
 
-	bool IsOpened_Internal(UGSBWindowWidget* WindowWidget) const;
+	bool IsWindowOpened(UGSBWindow* Window);
 
-	void CloseAllWindows_Internal();
-
-	UGSBConfirmationDialog* OpenConfirmationDialog_Internal(UGSBDialogBody* DialogBody, UObject* InTargetObject);
-
-	UGSBNumberInputDialogBody* OpenNumberInputDialog_Internal(UObject* InTargetObject, int Number = 0);
-
-	UGSBContextMenu* OpenContextMenu_Internal(UObject* ContextTarget);
+	void CloseAllWindows();
 
 protected:
-
-	UGSBConfirmationDialog* OpenConfirmationDialog_Internal(UObject* InTargetObject);
-
-	UPROPERTY(EditDefaultsOnly, Category = "WindowWidget")
-	TSubclassOf<UGSBWindowWidget> WindowWidgetClass;
-
-	UPROPERTY(EditDefaultsOnly, Category = "WindowWidget")
-	TSubclassOf<UGSBConfirmationDialog> ConfirmationDialogWidgetClass;
-
-	UPROPERTY(EditDefaultsOnly, Category = "WindowWidget")
-	TSubclassOf<UGSBNumberInputDialogBody> NumberInputDialogBodyWidgetClass;
-
-	UPROPERTY(EditDefaultsOnly, Category = "WindowWidget")
-	TSubclassOf<UGSBContextMenu> ContextMenuWidgetClass;
+	template<typename WidgetT>
+	WidgetT* CreateWidget_GSB(TSubclassOf<UUserWidget> UserWidgetClass, FName WidgetName);
 
 	UPROPERTY(meta = (BindWidget))
 	UCanvasPanel* RootCanvas;
 
-	TArray<UGSBWindowWidget*> WindowWidgets;
+	TArray<UGSBWindow*> OpenedWindows;
 };
+
+template<typename WidgetT>
+inline WidgetT* UGSBOverlay::CreateWidget_GSB(TSubclassOf<UUserWidget> UserWidgetClass, FName WidgetName)
+{
+	if (WidgetT* Widget = CreateWidget<WidgetT>(GetOwningPlayer(), UserWidgetClass, WidgetName))
+	{
+		return Widget;
+	}
+	TRACE_SCREEN_LOG(WidgetName.ToString() + TEXT(" 위젯 생성 실패"));
+	return nullptr;
+}

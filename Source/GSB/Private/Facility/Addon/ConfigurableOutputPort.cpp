@@ -57,32 +57,10 @@ void AConfigurableOutputPort::BeginPlay()
 void AConfigurableOutputPort::UpdateSelectedItem(UItemDataAsset* NewData)
 {
 	SelectedItem = NewData;
-	if (DetailWidget.IsValid())
-	{
-		DetailWidget->SetSelectedItem(SelectedItem);
-	}
+
 }
 
 void AConfigurableOutputPort::OnViewDetailInteraction(AActor* Interactor)
 {
-	if (DetailWidgetClass)
-	{
-		if (UGSBWindowSubsystem* WindowManager = GetGameInstance()->GetSubsystem< UGSBWindowSubsystem>())
-		{
-			DetailWidget = CreateWidget<UGSBOutputPortDetailWidget>(Interactor->GetInstigatorController<APlayerController>(), DetailWidgetClass);
-			DetailWidget->SetLinkedOutputPort(this);
-			DetailWidget->TryLinkItemStorageComponent(LinkedStorage.Get());
-			DetailWidget->UpdateStorageWidget();
-			UpdateSelectedItem(SelectedItem);
-			WindowManager->OpenWindow(this, DetailWidget.Get());
-		}
-		else
-		{
-			TRACE_SCREEN_LOG(TEXT("DetailWidgetClass가 nullptr입니다."));
-		}
-	}
-	else
-	{
-		TRACE_SCREEN_LOG(TEXT("DetailWidgetClass가 nullptr입니다."));
-	}
+
 }

@@ -126,27 +126,27 @@ void UGSBStorageWidget::HandleOnConfirmDeleteButtonClicked(UGSBConfirmationDialo
 
 void UGSBStorageWidget::OpenItemSlotContextMenu(UGSBItemSlotWidget* ItemSlotWidget)
 {
-	UGSBWindowSubsystem* WindowManager = GetGameInstance()->GetSubsystem<UGSBWindowSubsystem>();
-	if (UGSBContextMenu* ContextMenuWidget = WindowManager->OpenContextMenu(ItemSlotWidget))
-	{
-		OnStorageContextWidgetCreated.Broadcast(ContextMenuWidget);
-	}
+	//UGSBWindowSubsystem* WindowManager = GetGameInstance()->GetSubsystem<UGSBWindowSubsystem>();
+	//if (UGSBContextMenu* ContextMenuWidget = WindowManager->OpenContextMenu(ItemSlotWidget))
+	//{
+	//	OnStorageContextWidgetCreated.Broadcast(ContextMenuWidget);
+	//}
 }
 
 void UGSBStorageWidget::HandleContextMenuEntry_DeleteItem(UGSBContextMenuEntry* MenuEntry)
 {
-	UGSBWindowSubsystem* WindowManager = GetGameInstance()->GetSubsystem<UGSBWindowSubsystem>();
-	check(WindowManager);
-	UGSBItemSlotWidget* ItemSlot = Cast<UGSBItemSlotWidget>(MenuEntry->GetTargetObject());
-	check(ItemSlot);
-	FItemStack ItemStack = LinkedItemStorageComponent->GetItemStack(ItemSlot->GetItemData());
-	if (UGSBNumberInputDialogBody* DialogBody = WindowManager->OpenNumberInputDialog(ItemSlot, ItemStack.Stack))
-	{
-		if (UGSBConfirmationDialog* Dialog = DialogBody->GetParentDialog<UGSBConfirmationDialog>())
-		{
-			Dialog->OnOKButtonClicked.AddDynamic(this, &UGSBStorageWidget::HandleOnConfirmDeleteButtonClicked);
-		}
-	}
-		
-	MenuEntry->GetParentContextMenu()->CloseContextMenu();
+	//UGSBWindowSubsystem* WindowManager = GetGameInstance()->GetSubsystem<UGSBWindowSubsystem>();
+	//check(WindowManager);
+	//UGSBItemSlotWidget* ItemSlot = Cast<UGSBItemSlotWidget>(MenuEntry->GetTargetObject());
+	//check(ItemSlot);
+	//FItemStack ItemStack = LinkedItemStorageComponent->GetItemStack(ItemSlot->GetItemData());
+	//if (UGSBNumberInputDialogBody* DialogBody = WindowManager->OpenNumberInputDialog(ItemSlot, ItemStack.Stack))
+	//{
+	//	if (UGSBConfirmationDialog* Dialog = DialogBody->GetParentDialog<UGSBConfirmationDialog>())
+	//	{
+	//		Dialog->OnOKButtonClicked.AddDynamic(this, &UGSBStorageWidget::HandleOnConfirmDeleteButtonClicked);
+	//	}
+	//}
+	//	
+	//MenuEntry->GetParentContextMenu()->CloseContextMenu();
 }
