@@ -16,9 +16,7 @@ class GSB_API UGSBPlayerOverlay : public UGSBOverlay
 public:
 	virtual void InitializeOverlay() override;
 
-	virtual UGSBWindow* OpenWindow(TSubclassOf<UGSBWindow> WindowClass, const FName& WindowName) override;
-
-	virtual void CloseWindow(UGSBWindow* Window) override;
+	virtual void UpdatePlayerControllMode() override;
 
 public:
 	void ShowInteractionList();

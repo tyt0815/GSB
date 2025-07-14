@@ -124,11 +124,14 @@ private:
 	///////////////////////////////////////////////////////////
 protected:
 
+	bool IsUIMode() const;
+
+	UFUNCTION()
+	void OnItemSlotAddedToInventory(class UGSBStorage* Storage, class UGSBItemList* ItemList, class UGSBItemSlot* ItemSlot);
+
 	AGSBPlayerHUD* HUD;
 
 	UGSBPlayerOverlay* OverlayWidget;
-
-	bool IsUIMode() const;
 
 	UGSBInventory* InventoryWidget;
 

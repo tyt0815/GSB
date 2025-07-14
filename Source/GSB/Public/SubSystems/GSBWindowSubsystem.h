@@ -7,6 +7,7 @@
 
 class UGSBWindow;
 class AGSBHUD;
+class UGSBContextMenu;
 
 
 UCLASS()
@@ -22,6 +23,10 @@ public:
 	bool IsWindowOpened(UGSBWindow* Window);
 
 	void CloseAllWindows();
+
+	UGSBContextMenu* OpenContextMenu(UClass* ContextMenuClass, const FName& ContextMenuName, UObject* ContextTarget);
+
+	UGSBContextMenu* OpenDefaultContextMenu(const FName& ContextMenuName, UObject* ContextTarget);
 
 private	:
 	AGSBHUD* HUD;

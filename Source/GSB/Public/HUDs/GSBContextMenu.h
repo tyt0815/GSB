@@ -3,15 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "HUDs/GSBWidget.h"
+#include "Blueprint/UserWidget.h"
+#include "HUDs/GSBContextMenuEntry.h"
 #include "GSBContextMenu.generated.h"
 
 class UVerticalBox;
-class UGSBContextMenuEntry;
-class FGSBContextMenuEntryOnClickedSignature;
 
 UCLASS()
-class GSB_API UGSBContextMenu : public UGSBWidget
+class GSB_API UGSBContextMenu : public UUserWidget
 {
 	GENERATED_BODY()
 
@@ -21,27 +20,27 @@ public:
 	virtual void NativeOnFocusChanging(const FWeakWidgetPath& PreviousFocusPath, const FWidgetPath& NewWidgetPath, const FFocusEvent& InFocusEvent) override;
 	
 public:
-	FGSBContextMenuEntryOnClickedSignature* AddContextMenuEntry(const FName LabelText);
+	void OnOpened(UObject* InContextTarget);
+
+	UGSBContextMenuEntry* AddContextMenuEntry(const FString& Label);
 
 	void ClearContextMenuEntries();
 
 	void CloseContextMenu();
 	
-protected:
-	UPROPERTY(EditDefaultsOnly, Category = "UGSBContextMenu")
-	TSubclassOf<UGSBContextMenuEntry> ContextMenuEntryClass;
 
 private:
 	UPROPERTY(meta = (BindWidget))
 	UVerticalBox* EntryList;
 
+	UPROPERTY(EditDefaultsOnly, Category = "SubClasses")
+	TSubclassOf<UGSBContextMenuEntry> ContextMenuEntryClass;
+
+	UObject* ContextTarget;
+
 public:
 	FORCEINLINE UObject* GetContextTarget() const
 	{
-		return GetTargetObject();
-	}
-	FORCEINLINE void SetContextTarget(UObject* ContextTarget)
-	{
-		SetTargetObject(ContextTarget);
+		return ContextTarget;
 	}
 };

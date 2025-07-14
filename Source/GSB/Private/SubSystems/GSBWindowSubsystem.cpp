@@ -25,6 +25,16 @@ void UGSBWindowSubsystem::CloseAllWindows()
 	GetHUD()->CloseAllWindows();
 }
 
+UGSBContextMenu* UGSBWindowSubsystem::OpenContextMenu(UClass* ContextMenuClass, const FName& ContextMenuName, UObject* ContextTarget)
+{
+	return GetHUD()->OpenContextMenu(ContextMenuClass, ContextMenuName, ContextTarget);
+}
+
+UGSBContextMenu* UGSBWindowSubsystem::OpenDefaultContextMenu(const FName& ContextMenuName, UObject* ContextTarget)
+{
+	return GetHUD()->OpenDefaultContextMenu(ContextMenuName, ContextTarget);
+}
+
 AGSBHUD* UGSBWindowSubsystem::GetHUD()
 {
 	if (!IsValid(HUD))

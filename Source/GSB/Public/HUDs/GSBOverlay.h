@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "HUDs/GSBWindow.h"
+#include "HUDs/GSBContextMenu.h"
 #include "DebugHeader.h"
 #include "GSBOverlay.generated.h"
 
@@ -16,19 +17,29 @@ class GSB_API UGSBOverlay : public UUserWidget
 	GENERATED_BODY()
 	
 public:
+
 	virtual void InitializeOverlay();
 
-	virtual UGSBWindow* OpenWindow(TSubclassOf<UGSBWindow> WindowClass, const FName& WindowName);
+	virtual void UpdatePlayerControllMode() {};
 
-	virtual void CloseWindow(UGSBWindow* Window);
+	UGSBWindow* OpenWindow(TSubclassOf<UGSBWindow> WindowClass, const FName& WindowName);
+
+	void CloseWindow(UGSBWindow* Window);
 
 	bool IsWindowOpened(UGSBWindow* Window);
 
 	void CloseAllWindows();
 
+	UGSBContextMenu* OpenContextMenu(TSubclassOf<UGSBContextMenu> ContextMenuClass, const FName& ContextMenuName, UObject* ContextTarget);
+
+	UGSBContextMenu* OpenDefaultContextMenu(const FName& ContextMenuName, UObject* ContextTarget);
+
 protected:
 	template<typename WidgetT>
 	WidgetT* CreateWidget_GSB(TSubclassOf<UUserWidget> UserWidgetClass, FName WidgetName);
+
+	UPROPERTY(EditDefaultsOnly, Category = "Subclasses")
+	TSubclassOf<UGSBContextMenu> DefaultContextMenuClass;
 
 	UPROPERTY(meta = (BindWidget))
 	UCanvasPanel* RootCanvas;

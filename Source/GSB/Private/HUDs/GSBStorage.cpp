@@ -3,7 +3,12 @@
 
 #include "HUDs/GSBStorage.h"
 #include "HUDs/GSBItemList.h"
+#include "HUDs/GSBItemSlot.h"
+#include "HUDs/GSBContextMenu.h"
+#include "HUDs/GSBContextMenuEntry.h"
 #include "Components/ItemStorageComponent.h"
+#include "SubSystems/GSBWindowSubsystem.h"
+#include "DebugHeader.h"
 
 void UGSBStorage::NativeConstruct()
 {
@@ -36,12 +41,7 @@ void UGSBStorage::UnlinkStorageComponent()
 	}
 }
 
-void UGSBStorage::HandleOnItemSlotAdded_OnItemSlotLeftClicked_DropItem(UGSBStorage* StorageWidget, UGSBItemList* ItemListWidget, UGSBItemSlot* ItemSlotWidget)
-{
-	ItemSlotWidget->OnItemSlotLeftClicked.AddDynamic(this, &UGSBStorage::HandleOnItemSlotLeftClicked_DropItem);
-}
-
-void UGSBStorage::HandleOnItemSlotLeftClicked_DropItem(UGSBItemSlot* ItemSlotWidget)
+void UGSBStorage::DropItemByItemSlotWidget(UGSBItemSlot* ItemSlotWidget)
 {
 	FItemStack ItemStack = {};
 	ItemStack.ItemData = ItemSlotWidget->GetItemData();
@@ -56,6 +56,14 @@ int32 UGSBStorage::DropItem(const FItemStack& ItemStack)
 		return LinkedStorageComponent->DropItem(ItemStack);
 	}
 	return 0;
+}
+
+void UGSBStorage::AddItemSlotContextMenuEntry_DropItem(UGSBContextMenu* ContextMenu)
+{
+	if (UGSBContextMenuEntry* Entry = ContextMenu->AddContextMenuEntry(TEXT("버리기")))
+	{
+		UItemDataAsset* ItemData = Cast<UItemDataAsset>(Entry->GetContextTarget());
+	}	
 }
 
 void UGSBStorage::OnLinkedStorageComponent(UItemStorageComponent* StorageComponent)
@@ -81,4 +89,15 @@ void UGSBStorage::AddItemSlot(const FItemStack& ItemStack)
 void UGSBStorage::HandleOnItemSlotAdded(UGSBItemList* InItemList, UGSBItemSlot* ItemSlot)
 {
 	OnItemSlotAdded.Broadcast(this, InItemList, ItemSlot);
+	ItemSlot->OnItemSlotRightClicked.AddDynamic(this, &UGSBStorage::OpenItemSlotContextMenu);
+}
+
+void UGSBStorage::OpenItemSlotContextMenu(UGSBItemSlot* ItemSlot)
+{
+	UGSBWindowSubsystem* WindowManager = GetGameInstance()->GetSubsystem<UGSBWindowSubsystem>();
+
+	if (UGSBContextMenu* ContextMenu = WindowManager->OpenDefaultContextMenu(TEXT("ItemSlotContextMenu"), ItemSlot->GetItemData()))
+	{
+		OnItemSlotContextMenuOpened.Broadcast(ContextMenu);
+	}
 }

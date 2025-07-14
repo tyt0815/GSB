@@ -11,7 +11,7 @@ void UGSBContextMenu::NativeConstruct()
 {
 	Super::NativeConstruct();
 	SetIsFocusable(true);
-	ClearContextMenuEntries();
+	
 }
 
 void UGSBContextMenu::NativeOnFocusChanging(const FWeakWidgetPath& PreviousFocusPath, const FWidgetPath& NewWidgetPath, const FFocusEvent& InFocusEvent)
@@ -24,21 +24,25 @@ void UGSBContextMenu::NativeOnFocusChanging(const FWeakWidgetPath& PreviousFocus
 	}
 }
 
-FGSBContextMenuEntryOnClickedSignature* UGSBContextMenu::AddContextMenuEntry(const FName LabelText)
+void UGSBContextMenu::OnOpened(UObject* InContextTarget)
 {
-	APlayerController* PlayerController = GetOwningPlayer();
+	ClearContextMenuEntries();
+	ContextTarget = InContextTarget;
+	SetFocus();
+}
+
+UGSBContextMenuEntry* UGSBContextMenu::AddContextMenuEntry(const FString& Label)
+{
 	if (ContextMenuEntryClass)
 	{
-		if (UGSBContextMenuEntry* Entry = CreateWidget<UGSBContextMenuEntry>(PlayerController, ContextMenuEntryClass))
-		{
-			EntryList->AddChild(Entry);
-			Entry->OnAddedtoContextMenu(this, FText::FromString(LabelText.ToString()));
-			return &Entry->ContextMenuEntryOnClicked;
-		}
+		UGSBContextMenuEntry* Entry = CreateWidget<UGSBContextMenuEntry>(GetOwningPlayer(), ContextMenuEntryClass, FName(FString::Printf(TEXT("%s_Entry_%s"), *GetName(), *Label)));
+		EntryList->AddChild(Entry);
+		Entry->OnAddedtoContextMenu(this, FText::FromString(Label));
+		return Entry;
 	}
 	else
 	{
-		TRACE_SCREEN_LOG(TEXT("ContextMenuEntryClass가 nullptr입니다."));
+		TRACE_SCREEN_LOG(TEXT("ContextMenuEntryClass가 nullptr 입니다."));
 	}
 	return nullptr;
 }

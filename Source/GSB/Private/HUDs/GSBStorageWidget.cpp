@@ -90,10 +90,10 @@ int32 UGSBStorageWidget::MoveAllItemToStorage(UGSBStorageWidget* To, UItemDataAs
 
 void UGSBStorageWidget::AddDefaultContextMenuEntry(UGSBContextMenu* ContextMenuWidget)
 {
-	if (FGSBContextMenuEntryOnClickedSignature* Signature = ContextMenuWidget->AddContextMenuEntry(TEXT("삭제")))
-	{
-		Signature->AddDynamic(this, &UGSBStorageWidget::HandleContextMenuEntry_DeleteItem);
-	}
+	//if (FGSBContextMenuEntryOnClickedSignature* Signature = ContextMenuWidget->AddContextMenuEntry(TEXT("삭제")))
+	//{
+	//	Signature->AddDynamic(this, &UGSBStorageWidget::HandleContextMenuEntry_DeleteItem);
+	//}
 }
 
 void UGSBStorageWidget::HandleItemSlotLeftClicked(UGSBItemSlotWidget* ItemSlotWidget)

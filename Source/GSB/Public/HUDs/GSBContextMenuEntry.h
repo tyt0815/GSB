@@ -3,41 +3,34 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "HUDs/GSBWidget.h"
+#include "Blueprint/UserWidget.h"
 #include "GSBContextMenuEntry.generated.h"
 
-class UButton;
-class UTextBlock;
 class UGSBContextMenuEntry;
 class UGSBContextMenu;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGSBContextMenuEntryOnClickedSignature, UGSBContextMenuEntry*, MenuEntry);
-
 UCLASS()
-class GSB_API UGSBContextMenuEntry : public UGSBWidget
+class GSB_API UGSBContextMenuEntry : public UUserWidget
 {
 	GENERATED_BODY()
 public:
 	virtual void NativeConstruct() override;
 
 public:
-	FGSBContextMenuEntryOnClickedSignature ContextMenuEntryOnClicked;
-
 	void SetLabelText(const FText& Text);
 
 	void OnAddedtoContextMenu(UGSBContextMenu* InParentContextMenu, const FText& Text);
+
+	UObject* GetContextTarget() const;
 	
 private:
 	UPROPERTY(meta = (BindWidget))
-	UButton* LabelButton;
+	class UButton* LabelButton;
 
 	UPROPERTY(meta = (BindWidget))
-	UTextBlock* LabelText;
+	class UTextBlock* LabelText;
 
 	UGSBContextMenu* ParentContextMenu;
-
-	UFUNCTION()
-	void HandleContextMenuEntryOnClicked();
 
 public:
 	FORCEINLINE UGSBContextMenu* GetParentContextMenu() const

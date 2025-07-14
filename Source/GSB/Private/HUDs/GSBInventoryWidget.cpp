@@ -41,10 +41,10 @@ void UGSBInventoryWidget::UpdateWeightUI()
 
 void UGSBInventoryWidget::AddContextMenuEntry_DropItem(UGSBContextMenu* ContextMenuWidget)
 {
-	if (FGSBContextMenuEntryOnClickedSignature* Signature = ContextMenuWidget->AddContextMenuEntry(TEXT("버리기")))
-	{
-		Signature->AddDynamic(this, &UGSBInventoryWidget::HandleContextMenuEntry_DropItem);
-	}
+	//if (FGSBContextMenuEntryOnClickedSignature* Signature = ContextMenuWidget->AddContextMenuEntry(TEXT("버리기")))
+	//{
+	//	Signature->AddDynamic(this, &UGSBInventoryWidget::HandleContextMenuEntry_DropItem);
+	//}
 }
 
 void UGSBInventoryWidget::HandleContextMenuEntry_DropItem(UGSBContextMenuEntry* MenuEntry)

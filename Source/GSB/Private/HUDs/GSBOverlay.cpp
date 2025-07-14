@@ -24,6 +24,7 @@ UGSBWindow* UGSBOverlay::OpenWindow(TSubclassOf<UGSBWindow> WindowClass, const F
 		CanvasPanelSlot->SetPosition({ 0,0 });
 		CanvasPanelSlot->SetAlignment({ 0.5, 0.5f });
 		CanvasPanelSlot->SetAutoSize(true);
+		UpdatePlayerControllMode();
 		return Window;
 	}
 	return nullptr;
@@ -36,6 +37,7 @@ void UGSBOverlay::CloseWindow(UGSBWindow* Window)
 		Window->OnClosed();
 	}
 	OpenedWindows.Remove(Window);
+	UpdatePlayerControllMode();
 }
 
 bool UGSBOverlay::IsWindowOpened(UGSBWindow* Window)
@@ -50,4 +52,31 @@ void UGSBOverlay::CloseAllWindows()
 		CloseWindow(Window);
 	}
 	OpenedWindows.Empty();
+}
+
+UGSBContextMenu* UGSBOverlay::OpenContextMenu(TSubclassOf<UGSBContextMenu> ContextMenuClass, const FName& ContextMenuName, UObject* ContextTarget)
+{
+	if (UGSBContextMenu* ContextMenu = CreateWidget_GSB<UGSBContextMenu>(ContextMenuClass, ContextMenuName))
+	{
+		ContextMenu->AddToViewport();
+		FVector2D MousePos;
+		if (GetOwningPlayer()->GetMousePosition(MousePos.X, MousePos.Y))
+		{
+			ContextMenu->SetPositionInViewport(MousePos);
+		}
+		ContextMenu->OnOpened(ContextTarget);
+		return ContextMenu;
+	}
+	return nullptr;
+}
+
+UGSBContextMenu* UGSBOverlay::OpenDefaultContextMenu(const FName& ContextMenuName, UObject* ContextTarget)
+{
+	if (DefaultContextMenuClass)
+	{
+		return OpenContextMenu(DefaultContextMenuClass, ContextMenuName, ContextTarget);
+	}
+	
+	TRACE_SCREEN_LOG(TEXT("DefaultContextMenuClass가 nullptr 입니다."));
+	return nullptr;
 }

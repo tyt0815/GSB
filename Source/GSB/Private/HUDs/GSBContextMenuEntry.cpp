@@ -12,7 +12,6 @@ void UGSBContextMenuEntry::NativeConstruct()
 
 	SetIsFocusable(false);
 	LabelButton->SetClickMethod(EButtonClickMethod::MouseDown);
-	LabelButton->OnClicked.AddDynamic(this, &UGSBContextMenuEntry::HandleContextMenuEntryOnClicked);
 }
 
 void UGSBContextMenuEntry::SetLabelText(const FText& Text)
@@ -24,10 +23,9 @@ void UGSBContextMenuEntry::OnAddedtoContextMenu(UGSBContextMenu* InParentContext
 {
 	SetLabelText(Text);
 	ParentContextMenu = InParentContextMenu;
-	SetTargetObject(ParentContextMenu->GetTargetObject());
 }
 
-void UGSBContextMenuEntry::HandleContextMenuEntryOnClicked()
+UObject* UGSBContextMenuEntry::GetContextTarget() const
 {
-	ContextMenuEntryOnClicked.Broadcast(this);
+	return ParentContextMenu->GetContextTarget();
 }

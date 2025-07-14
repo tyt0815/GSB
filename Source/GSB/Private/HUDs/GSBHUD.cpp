@@ -50,3 +50,13 @@ void AGSBHUD::CloseAllWindows()
 {
 	OverlayWidget->CloseAllWindows();
 }
+
+UGSBContextMenu* AGSBHUD::OpenContextMenu(UClass* ContextMenuClass, const FName& ContextMenuName, UObject* ContextTarget)
+{
+	return OverlayWidget->OpenContextMenu(ContextMenuClass, ContextMenuName, ContextTarget);
+}
+
+UGSBContextMenu* AGSBHUD::OpenDefaultContextMenu(const FName& ContextMenuName, UObject* ContextTarget)
+{
+	return OverlayWidget->OpenDefaultContextMenu(ContextMenuName, ContextTarget);
+}

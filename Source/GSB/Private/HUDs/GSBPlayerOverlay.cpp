@@ -13,27 +13,15 @@ void UGSBPlayerOverlay::InitializeOverlay()
 	HideInteractionList();
 }
 
-UGSBWindow* UGSBPlayerOverlay::OpenWindow(TSubclassOf<UGSBWindow> WindowClass, const FName& WindowName)
+void UGSBPlayerOverlay::UpdatePlayerControllMode()
 {
-	if (UGSBWindow* Window = Super::OpenWindow(WindowClass, WindowName))
-	{
-		if (OpenedWindows.Num() == 1 && IsValid(PlayerController))
-		{
-			PlayerController->SetUIControlMode(true);
-		}
-		return Window;
-	}
-
-	return nullptr;
-}
-
-void UGSBPlayerOverlay::CloseWindow(UGSBWindow* Window)
-{
-	Super::CloseWindow(Window);
-
 	if (OpenedWindows.Num() == 0)
 	{
 		PlayerController->SetUIControlMode(false);
+	}
+	else if (OpenedWindows.Num() == 1 && IsValid(PlayerController))
+	{
+		PlayerController->SetUIControlMode(true);
 	}
 }
 

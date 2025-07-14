@@ -17,6 +17,7 @@
 #include "HUDs/GSBPlayerHUD.h"
 #include "HUDs/GSBPlayerOverlay.h"
 #include "HUDs/GSBInventory.h"
+#include "HUDs/GSBItemSlot.h"
 #include "SubSystems/GSBWindowSubsystem.h"
 #include "DebugHeader.h"
 
@@ -239,7 +240,8 @@ void AGSBPlayer::ToggleInventory()
 			InventoryWidget = Cast<UGSBInventory>(Window);
 			if (InventoryWidget)
 			{
-				InventoryWidget->OnItemSlotAdded.AddDynamic(InventoryWidget, &UGSBInventory::HandleOnItemSlotAdded_OnItemSlotLeftClicked_DropItem);
+				InventoryWidget->OnItemSlotAdded.AddDynamic(this, &AGSBPlayer::OnItemSlotAddedToInventory);
+				InventoryWidget->OnItemSlotContextMenuOpened.AddDynamic(InventoryWidget, &UGSBStorage::AddItemSlotContextMenuEntry_DropItem);
 				InventoryWidget->LinkStorageComponent(InventoryComponent);
 			}
 			else
@@ -469,6 +471,11 @@ AActor* AGSBPlayer::TraceInteractableActor()
 bool AGSBPlayer::IsUIMode() const
 {
 	return PlayerController->bShowMouseCursor;
+}
+
+void AGSBPlayer::OnItemSlotAddedToInventory(UGSBStorage* Storage, UGSBItemList* ItemList, UGSBItemSlot* ItemSlot)
+{
+	ItemSlot->OnItemSlotLeftClicked.AddDynamic(Storage, &UGSBStorage::DropItemByItemSlotWidget);
 }
 
 void AGSBPlayer::SetOverlayWidget()

@@ -8,6 +8,7 @@
 
 class UGSBOverlay;
 class UGSBWindow;
+class UGSBContextMenu;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEndBeginPlaySignature);
 
@@ -27,6 +28,10 @@ public:
 	bool IsWindowOpened(UGSBWindow* Window);
 
 	void CloseAllWindows();
+
+	UGSBContextMenu* OpenContextMenu(UClass* ContextMenuClass, const FName& ContextMenuName, UObject* ContextTarget);
+
+	UGSBContextMenu* OpenDefaultContextMenu(const FName& ContextMenuName, UObject* ContextTarget);
 
 	FOnEndBeginPlaySignature OnEndBeginPlay;
 
