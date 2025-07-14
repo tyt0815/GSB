@@ -62,6 +62,7 @@ void UGSBStorage::AddItemSlotContextMenuEntry_DropItem(UGSBContextMenu* ContextM
 {
 	if (UGSBContextMenuEntry* Entry = ContextMenu->AddContextMenuEntry(TEXT("버리기")))
 	{
+		Entry->OnClicked.AddDynamic(this, &UGSBStorage::HandleOnContextMenuEntryClicked_DropItem);
 		UItemDataAsset* ItemData = Cast<UItemDataAsset>(Entry->GetContextTarget());
 	}	
 }
@@ -90,6 +91,14 @@ void UGSBStorage::HandleOnItemSlotAdded(UGSBItemList* InItemList, UGSBItemSlot* 
 {
 	OnItemSlotAdded.Broadcast(this, InItemList, ItemSlot);
 	ItemSlot->OnItemSlotRightClicked.AddDynamic(this, &UGSBStorage::OpenItemSlotContextMenu);
+}
+
+void UGSBStorage::HandleOnContextMenuEntryClicked_DropItem(UGSBContextMenuEntry* Entry)
+{
+	if (UItemDataAsset* ItemData = Cast<UItemDataAsset>(Entry->GetContextTarget()))
+	{
+		DropItem(FItemStack(ItemData, 1));
+	}
 }
 
 void UGSBStorage::OpenItemSlotContextMenu(UGSBItemSlot* ItemSlot)

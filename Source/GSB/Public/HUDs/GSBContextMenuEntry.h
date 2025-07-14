@@ -9,6 +9,8 @@
 class UGSBContextMenuEntry;
 class UGSBContextMenu;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnContextMenuEntryClickedSignature, UGSBContextMenuEntry*, Entry);
+
 UCLASS()
 class GSB_API UGSBContextMenuEntry : public UUserWidget
 {
@@ -22,8 +24,15 @@ public:
 	void OnAddedtoContextMenu(UGSBContextMenu* InParentContextMenu, const FText& Text);
 
 	UObject* GetContextTarget() const;
+
+	void CloseContextMenu();
+
+	FOnContextMenuEntryClickedSignature OnClicked;
 	
 private:
+	UFUNCTION()
+	void HandleOnLabelButtonClicked();
+
 	UPROPERTY(meta = (BindWidget))
 	class UButton* LabelButton;
 

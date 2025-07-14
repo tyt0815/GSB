@@ -7,9 +7,11 @@
 #include "GSBStorage.generated.h"
 
 class UItemStorageComponent;
+class UItemDataAsset;
 class UGSBItemList;
 class UGSBItemSlot;
 class UGSBContextMenu;
+class UGSBContextMenuEntry;
 struct FItemStack;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnStorageAddingItemSlotSignature, UGSBStorage*, Storage, UGSBItemList*, ItemList, UGSBItemSlot*, ItemSlot);
@@ -60,6 +62,10 @@ private:
 
 	UFUNCTION()
 	void HandleOnItemSlotAdded(UGSBItemList* InItemList, UGSBItemSlot* ItemSlot);
+
+
+	UFUNCTION()
+	void HandleOnContextMenuEntryClicked_DropItem(UGSBContextMenuEntry* Entry);
 
 	UFUNCTION()
 	void OpenItemSlotContextMenu(UGSBItemSlot* ItemSlot);
