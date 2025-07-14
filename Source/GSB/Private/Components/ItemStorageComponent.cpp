@@ -2,7 +2,7 @@
 
 
 #include "Components/ItemStorageComponent.h"
-#include "HUDs/GSBStorage.h"
+#include "HUDs/GSBStorageBody.h"
 #include "Items/DroppedItem.h"
 #include "GSBGameInstance.h"
 
@@ -173,7 +173,7 @@ int32 UItemStorageComponent::MoveAllItemTo(UItemStorageComponent* To, UItemDataA
 	return MoveItemTo(To, ItemStack);
 }
 
-void UItemStorageComponent::LinkStorageWidget(UGSBStorage* StorageWidget)
+void UItemStorageComponent::LinkStorageWidget(UGSBStorageBody* StorageWidget)
 {
 	UnlinkStorageWidget();
 	LinkedStorageWidget = StorageWidget;

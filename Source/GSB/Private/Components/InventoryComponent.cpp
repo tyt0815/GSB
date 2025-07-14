@@ -2,7 +2,7 @@
 
 
 #include "Components/InventoryComponent.h"
-#include "HUDs/GSBInventory.h"
+#include "HUDs/GSBInventoryBody.h"
 
 int32 UInventoryComponent::GetAddableStackCount(const FItemStack& ItemStack) const
 {
@@ -55,7 +55,7 @@ void UInventoryComponent::UpdateStorageWidget()
 
 void UInventoryComponent::UpdateInventoryWidget()
 {
-	if (UGSBInventory* InventoryWidget = Cast<UGSBInventory>(LinkedStorageWidget))
+	if (UGSBInventoryBody* InventoryWidget = Cast<UGSBInventoryBody>(LinkedStorageWidget))
 	{
 		InventoryWidget->SetWeight(CurrentWeight, MaxWeight);
 	}

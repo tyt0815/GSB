@@ -16,6 +16,7 @@
 #include "GSBGameInstance.h"
 #include "HUDs/GSBPlayerHUD.h"
 #include "HUDs/GSBPlayerOverlay.h"
+#include "HUDs/GSBInventoryBody.h"
 #include "HUDs/GSBInventory.h"
 #include "HUDs/GSBItemSlot.h"
 #include "SubSystems/GSBWindowSubsystem.h"
@@ -241,14 +242,18 @@ void AGSBPlayer::ToggleInventory()
 			if (InventoryWidget)
 			{
 				InventoryWidget->OnItemSlotAdded.AddDynamic(this, &AGSBPlayer::OnItemSlotAddedToInventory);
-				InventoryWidget->OnItemSlotContextMenuOpened.AddDynamic(InventoryWidget, &UGSBStorage::AddItemSlotContextMenuEntry_DropItem);
+				InventoryWidget->AddItemSlotContextMenuEntry_DropItem();
 				InventoryWidget->LinkStorageComponent(InventoryComponent);
 			}
 			else
 			{
-				TRACE_SCREEN_LOG(TEXT("InventoryWidget 생성 실패"));
+				TRACE_SCREEN_LOG(TEXT("InventoryWidget 캐스팅 실패"));
 				WindowManager->CloseWindow(Window);
 			}
+		}
+		else
+		{
+			TRACE_SCREEN_LOG(TEXT("InventoryWidget 생성 실패"));
 		}
 	}
 }
@@ -473,9 +478,9 @@ bool AGSBPlayer::IsUIMode() const
 	return PlayerController->bShowMouseCursor;
 }
 
-void AGSBPlayer::OnItemSlotAddedToInventory(UGSBStorage* Storage, UGSBItemList* ItemList, UGSBItemSlot* ItemSlot)
+void AGSBPlayer::OnItemSlotAddedToInventory(UGSBStorage* Storage, UGSBStorageBody* StorageBody, UGSBItemList* ItemList, UGSBItemSlot* ItemSlot)
 {
-	ItemSlot->OnItemSlotLeftClicked.AddDynamic(Storage, &UGSBStorage::DropItemByItemSlotWidget);
+	ItemSlot->OnItemSlotLeftClicked.AddDynamic(StorageBody, &UGSBStorageBody::DropItemByItemSlotWidget);
 }
 
 void AGSBPlayer::SetOverlayWidget()

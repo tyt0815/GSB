@@ -6,16 +6,12 @@
 #include "HUDs/GSBWindow.h"
 #include "GSBStorage.generated.h"
 
+class UGSBStorage;
+class UGSBStorageBody;
 class UItemStorageComponent;
-class UItemDataAsset;
-class UGSBItemList;
-class UGSBItemSlot;
-class UGSBContextMenu;
-class UGSBContextMenuEntry;
-struct FItemStack;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnStorageAddingItemSlotSignature, UGSBStorage*, Storage, UGSBItemList*, ItemList, UGSBItemSlot*, ItemSlot);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemSlotContextMenuOpenedSignature, UGSBContextMenu*, ContextMenu);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnStorageAddItemSlotSignature, UGSBStorage*, Storage, UGSBStorageBody*, StorageBody, UGSBItemList*, ItemList, UGSBItemSlot*, ItemSlot);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnStorageOpenItemSlotContextMenuSignature, UGSBStorage*, Storage, UGSBStorageBody*, StorageBody, UGSBContextMenu*, ContextMenu);
 
 UCLASS()
 class GSB_API UGSBStorage : public UGSBWindow
@@ -26,49 +22,22 @@ public:
 
 	virtual void OnClosed() override;
 
-public:
 	void LinkStorageComponent(UItemStorageComponent* StorageComponent);
 
-	void UnlinkStorageComponent();
+	void AddItemSlotContextMenuEntry_DropItem();
 
-	UFUNCTION()
-	void DropItemByItemSlotWidget(UGSBItemSlot* ItemSlotWidget);
+public:
+	FOnStorageAddItemSlotSignature OnItemSlotAdded;
 
-	UFUNCTION()
-	int32 DropItem(const FItemStack& ItemStack);
-
-	UFUNCTION() 
-	void AddItemSlotContextMenuEntry_DropItem(UGSBContextMenu* ContextMenu);
-
-	FOnStorageAddingItemSlotSignature OnItemSlotAdded;
-
-	// ItemSlot을 우클릭시 열리는 Context Menu. ContextTarget은 UItemDataAsset* 이다.
-	FOnItemSlotContextMenuOpenedSignature OnItemSlotContextMenuOpened;
-
-protected:
-	void OnLinkedStorageComponent(UItemStorageComponent* StorageComponent);
-
-	void OnUnlinkedStorageComponent();
-
-	void ClearItemList();
-
-	void AddItemSlot(const struct FItemStack& ItemStack);
-
-	UItemStorageComponent* LinkedStorageComponent;
+	FOnStorageOpenItemSlotContextMenuSignature OnItemSlotContextMenuOpened;
 
 private:
 	UPROPERTY(meta = (BindWidget))
-	UGSBItemList* ItemList;
+	UGSBStorageBody* StorageBody;
 
 	UFUNCTION()
-	void HandleOnItemSlotAdded(UGSBItemList* InItemList, UGSBItemSlot* ItemSlot);
-
-
-	UFUNCTION()
-	void HandleOnContextMenuEntryClicked_DropItem(UGSBContextMenuEntry* Entry);
+	void HandleOnItemSlotAdded(UGSBStorageBody* InStorageBody, UGSBItemList* ItemList, UGSBItemSlot* ItemSlot);
 
 	UFUNCTION()
-	void OpenItemSlotContextMenu(UGSBItemSlot* ItemSlot);
-
-	friend class UItemStorageComponent;
+	void HandleOnItemSlotContextMenuOpened(UGSBStorageBody* InStorageBody, UGSBContextMenu* ContextMenu);
 };

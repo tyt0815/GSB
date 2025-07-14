@@ -7,7 +7,7 @@
 #include "Items/ItemDataAsset.h"
 #include "ItemStorageComponent.generated.h"
 
-class UGSBStorage;
+class UGSBStorageBody;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class GSB_API UItemStorageComponent : public UActorComponent
@@ -53,13 +53,13 @@ protected:
 	// UI
 	/////////////////////////////////////////////////////////////////////////
 public:
-	void LinkStorageWidget(UGSBStorage* StorageWidget);
+	void LinkStorageWidget(UGSBStorageBody* StorageWidget);
 
 	void UnlinkStorageWidget();
 
 	virtual void UpdateStorageWidget();
 
-	UGSBStorage* LinkedStorageWidget;
+	UGSBStorageBody* LinkedStorageWidget;
 
 protected:
 	

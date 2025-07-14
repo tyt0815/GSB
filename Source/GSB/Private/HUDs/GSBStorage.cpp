@@ -2,111 +2,38 @@
 
 
 #include "HUDs/GSBStorage.h"
-#include "HUDs/GSBItemList.h"
-#include "HUDs/GSBItemSlot.h"
-#include "HUDs/GSBContextMenu.h"
-#include "HUDs/GSBContextMenuEntry.h"
-#include "Components/ItemStorageComponent.h"
-#include "SubSystems/GSBWindowSubsystem.h"
-#include "DebugHeader.h"
+#include "HUDs/GSBStorageBody.h"
 
 void UGSBStorage::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	ItemList->OnItemSlotAdded.AddDynamic(this, &UGSBStorage::HandleOnItemSlotAdded);
+	StorageBody->OnItemSlotAdded.AddDynamic(this, &UGSBStorage::HandleOnItemSlotAdded);
+	StorageBody->OnItemSlotContextMenuOpened.AddDynamic(this, &UGSBStorage::HandleOnItemSlotContextMenuOpened);
 }
 
 void UGSBStorage::OnClosed()
 {
-	UnlinkStorageComponent();
-
+	StorageBody->OnClosed();
 	Super::OnClosed();
 }
 
 void UGSBStorage::LinkStorageComponent(UItemStorageComponent* StorageComponent)
 {
-	UnlinkStorageComponent();
-	if (IsValid(StorageComponent))
-	{
-		StorageComponent->LinkStorageWidget(this);
-	}
+	StorageBody->LinkStorageComponent(StorageComponent);
 }
 
-void UGSBStorage::UnlinkStorageComponent()
+void UGSBStorage::AddItemSlotContextMenuEntry_DropItem()
 {
-	if (IsValid(LinkedStorageComponent))
-	{
-		LinkedStorageComponent->UnlinkStorageWidget();
-	}
+	StorageBody->AddItemSlotContextMenuEntry_DropItem();
 }
 
-void UGSBStorage::DropItemByItemSlotWidget(UGSBItemSlot* ItemSlotWidget)
+void UGSBStorage::HandleOnItemSlotAdded(UGSBStorageBody* InStorageBody, UGSBItemList* ItemList, UGSBItemSlot* ItemSlot)
 {
-	FItemStack ItemStack = {};
-	ItemStack.ItemData = ItemSlotWidget->GetItemData();
-	ItemStack.Stack = 1;
-	DropItem(ItemStack);
+	OnItemSlotAdded.Broadcast(this, InStorageBody, ItemList, ItemSlot);
 }
 
-int32 UGSBStorage::DropItem(const FItemStack& ItemStack)
+void UGSBStorage::HandleOnItemSlotContextMenuOpened(UGSBStorageBody* InStorageBody, UGSBContextMenu* ContextMenu)
 {
-	if (IsValid(LinkedStorageComponent))
-	{
-		return LinkedStorageComponent->DropItem(ItemStack);
-	}
-	return 0;
-}
-
-void UGSBStorage::AddItemSlotContextMenuEntry_DropItem(UGSBContextMenu* ContextMenu)
-{
-	if (UGSBContextMenuEntry* Entry = ContextMenu->AddContextMenuEntry(TEXT("버리기")))
-	{
-		Entry->OnClicked.AddDynamic(this, &UGSBStorage::HandleOnContextMenuEntryClicked_DropItem);
-		UItemDataAsset* ItemData = Cast<UItemDataAsset>(Entry->GetContextTarget());
-	}	
-}
-
-void UGSBStorage::OnLinkedStorageComponent(UItemStorageComponent* StorageComponent)
-{
-	LinkedStorageComponent = StorageComponent;
-}
-
-void UGSBStorage::OnUnlinkedStorageComponent()
-{
-	LinkedStorageComponent = nullptr;
-}
-
-void UGSBStorage::ClearItemList()
-{
-	ItemList->ClearItemList();
-}
-
-void UGSBStorage::AddItemSlot(const FItemStack& ItemStack)
-{
-	ItemList->AddItemSlot(ItemStack);
-}
-
-void UGSBStorage::HandleOnItemSlotAdded(UGSBItemList* InItemList, UGSBItemSlot* ItemSlot)
-{
-	OnItemSlotAdded.Broadcast(this, InItemList, ItemSlot);
-	ItemSlot->OnItemSlotRightClicked.AddDynamic(this, &UGSBStorage::OpenItemSlotContextMenu);
-}
-
-void UGSBStorage::HandleOnContextMenuEntryClicked_DropItem(UGSBContextMenuEntry* Entry)
-{
-	if (UItemDataAsset* ItemData = Cast<UItemDataAsset>(Entry->GetContextTarget()))
-	{
-		DropItem(FItemStack(ItemData, 1));
-	}
-}
-
-void UGSBStorage::OpenItemSlotContextMenu(UGSBItemSlot* ItemSlot)
-{
-	UGSBWindowSubsystem* WindowManager = GetGameInstance()->GetSubsystem<UGSBWindowSubsystem>();
-
-	if (UGSBContextMenu* ContextMenu = WindowManager->OpenDefaultContextMenu(TEXT("ItemSlotContextMenu"), ItemSlot->GetItemData()))
-	{
-		OnItemSlotContextMenuOpened.Broadcast(ContextMenu);
-	}
+	OnItemSlotContextMenuOpened.Broadcast(this, InStorageBody, ContextMenu);
 }

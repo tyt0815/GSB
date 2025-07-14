@@ -13,7 +13,9 @@ class UInputAction;
 class USpringArmComponent;
 class UCameraComponent;
 class UInventoryComponent;
+class UGSBStorage;
 class UGSBInventory;
+class UGSBStorageBody;
 class UGSBPlayerOverlay;
 class AGSBPlayerHUD;
 class AGSBPlayerController;
@@ -127,7 +129,7 @@ protected:
 	bool IsUIMode() const;
 
 	UFUNCTION()
-	void OnItemSlotAddedToInventory(class UGSBStorage* Storage, class UGSBItemList* ItemList, class UGSBItemSlot* ItemSlot);
+	void OnItemSlotAddedToInventory(UGSBStorage* Storage, UGSBStorageBody* StorageBody, UGSBItemList* ItemList, UGSBItemSlot* ItemSlot);
 
 	AGSBPlayerHUD* HUD;
 
