@@ -36,6 +36,28 @@ void UGSBStorage::UnlinkStorageComponent()
 	}
 }
 
+void UGSBStorage::HandleOnItemSlotAdded_OnItemSlotLeftClicked_DropItem(UGSBStorage* StorageWidget, UGSBItemList* ItemListWidget, UGSBItemSlot* ItemSlotWidget)
+{
+	ItemSlotWidget->OnItemSlotLeftClicked.AddDynamic(this, &UGSBStorage::HandleOnItemSlotLeftClicked_DropItem);
+}
+
+void UGSBStorage::HandleOnItemSlotLeftClicked_DropItem(UGSBItemSlot* ItemSlotWidget)
+{
+	FItemStack ItemStack = {};
+	ItemStack.ItemData = ItemSlotWidget->GetItemData();
+	ItemStack.Stack = 1;
+	DropItem(ItemStack);
+}
+
+int32 UGSBStorage::DropItem(const FItemStack& ItemStack)
+{
+	if (IsValid(LinkedStorageComponent))
+	{
+		return LinkedStorageComponent->DropItem(ItemStack);
+	}
+	return 0;
+}
+
 void UGSBStorage::OnLinkedStorageComponent(UItemStorageComponent* StorageComponent)
 {
 	LinkedStorageComponent = StorageComponent;

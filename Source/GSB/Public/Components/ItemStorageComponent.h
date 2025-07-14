@@ -35,6 +35,8 @@ public:
 	// @return 제거한 아이템 수
 	virtual int32 UnstoreItem(const FItemStack& Item);
 
+	int32 DropItem(FItemStack ItemStack);
+
 	// @return 옮긴 아이템수
 	int32 MoveItemTo(UItemStorageComponent* To, FItemStack ItemStack);
 

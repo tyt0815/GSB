@@ -3,6 +3,8 @@
 
 #include "Components/ItemStorageComponent.h"
 #include "HUDs/GSBStorage.h"
+#include "Items/DroppedItem.h"
+#include "GSBGameInstance.h"
 
 UItemStorageComponent::UItemStorageComponent()
 {
@@ -136,6 +138,20 @@ int32 UItemStorageComponent::UnstoreItem(const FItemStack& Item)
 	UpdateStorageWidget();
 
 	return StackToRemove;
+}
+
+int32 UItemStorageComponent::DropItem(FItemStack ItemStack)
+{
+	UWorld* World = GetWorld();
+	UGSBGameInstance* GameInst = World->GetGameInstance<UGSBGameInstance>();
+	if (UClass* DroppedItemClass = GameInst->GetActorClass("DroppedItem"))
+	{
+		ItemStack.Stack = UnstoreItem(ItemStack);
+		ADroppedItem* DroppedItem = World->SpawnActor<ADroppedItem>(DroppedItemClass, GetOwner()->GetActorTransform());
+		DroppedItem->UpdateItem(ItemStack);
+		return ItemStack.Stack;
+	}
+	return 0;
 }
 
 int32 UItemStorageComponent::MoveItemTo(UItemStorageComponent* To, FItemStack ItemStack)

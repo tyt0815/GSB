@@ -239,6 +239,7 @@ void AGSBPlayer::ToggleInventory()
 			InventoryWidget = Cast<UGSBInventory>(Window);
 			if (InventoryWidget)
 			{
+				InventoryWidget->OnItemSlotAdded.AddDynamic(InventoryWidget, &UGSBInventory::HandleOnItemSlotAdded_OnItemSlotLeftClicked_DropItem);
 				InventoryWidget->LinkStorageComponent(InventoryComponent);
 			}
 			else

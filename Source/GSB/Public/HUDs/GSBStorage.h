@@ -9,6 +9,7 @@
 class UItemStorageComponent;
 class UGSBItemList;
 class UGSBItemSlot;
+struct FItemStack;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnStorageAddingItemSlotSignature, UGSBStorage*, Storage, UGSBItemList*, ItemList, UGSBItemSlot*, ItemSlot);
 
@@ -26,6 +27,18 @@ public:
 
 	void UnlinkStorageComponent();
 
+	UFUNCTION()
+	void HandleOnItemSlotAdded_OnItemSlotLeftClicked_DropItem(UGSBStorage* StorageWidget, UGSBItemList* ItemListWidget, UGSBItemSlot* ItemSlotWidget);
+
+	UFUNCTION()
+	void HandleOnItemSlotLeftClicked_DropItem(UGSBItemSlot* ItemSlotWidget);
+
+	UFUNCTION()
+	int32 DropItem(const FItemStack& ItemStack);
+
+	FOnStorageAddingItemSlotSignature OnItemSlotAdded;
+
+protected:
 	void OnLinkedStorageComponent(UItemStorageComponent* StorageComponent);
 
 	void OnUnlinkedStorageComponent();
@@ -34,9 +47,6 @@ public:
 
 	void AddItemSlot(const struct FItemStack& ItemStack);
 
-	FOnStorageAddingItemSlotSignature OnItemSlotAdded;
-
-protected:
 	UItemStorageComponent* LinkedStorageComponent;
 
 private:
@@ -45,4 +55,6 @@ private:
 
 	UFUNCTION()
 	void HandleOnItemSlotAdded(UGSBItemList* InItemList, UGSBItemSlot* ItemSlot);
+
+	friend class UItemStorageComponent;
 };
