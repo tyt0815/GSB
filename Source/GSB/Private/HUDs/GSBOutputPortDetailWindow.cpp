@@ -2,7 +2,7 @@
 
 
 #include "HUDs/GSBOutputPortDetailWindow.h"
-#include "HUDs/GSBStorageBody.h"
+#include "HUDs/GSBStorage.h"
 #include "HUDs/GSBItemSlot.h"
 #include "Facility/Addon/ConfigurableOutputPort.h"
 
@@ -29,7 +29,7 @@ void UGSBOutputPortDetailWindow::SetOutputItem(UItemDataAsset* ItemData)
 	OutputItemSlot->SetLabelByItemDataAsset(ItemData);
 }
 
-void UGSBOutputPortDetailWindow::HandleOnItemSlotAdded(UGSBStorageBody* StorageBody, UGSBItemList* ItemList, UGSBItemSlot* ItemSlot)
+void UGSBOutputPortDetailWindow::HandleOnItemSlotAdded(UGSBStorage* StorageBody, UGSBItemList* ItemList, UGSBItemSlot* ItemSlot)
 {
 	ItemSlot->OnItemSlotLeftClicked.AddDynamic(this, &UGSBOutputPortDetailWindow::HandleOnItemSlotLeftClicked);
 }

@@ -3,41 +3,90 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "HUDs/GSBWindow.h"
+#include "Blueprint/UserWidget.h"
 #include "GSBStorage.generated.h"
 
-class UGSBStorage;
-class UGSBStorageBody;
 class UItemStorageComponent;
+class UItemDataAsset;
+class UGSBItemList;
+class UGSBItemSlot;
+class UGSBContextMenu;
+class UGSBContextMenuEntry;
+class UGSBStorage;
+struct FItemStack;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnStorageAddItemSlotSignature, UGSBStorage*, Storage, UGSBStorageBody*, StorageBody, UGSBItemList*, ItemList, UGSBItemSlot*, ItemSlot);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnStorageOpenItemSlotContextMenuSignature, UGSBStorage*, Storage, UGSBStorageBody*, StorageBody, UGSBContextMenu*, ContextMenu);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnStorageBodyAddItemSlotSignature, UGSBStorage*, StorageBody, UGSBItemList*, ItemList, UGSBItemSlot*, ItemSlot);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnStorageBodyOpenItemSlotContextMenuSignature, UGSBStorage*, StorageBody, UGSBContextMenu*, ContextMenu);
 
 UCLASS()
-class GSB_API UGSBStorage : public UGSBWindow
+class GSB_API UGSBStorage : public UUserWidget
 {
 	GENERATED_BODY()
 public:
 	virtual void NativeConstruct() override;
 
-	virtual void OnClosed() override;
+	virtual void NativeDestruct() override;
 
+public:
 	void LinkStorageComponent(UItemStorageComponent* StorageComponent);
+
+	void UnlinkStorageComponent();
+
+	int32 StoreItem(const FItemStack& ItemStack);
+
+	int32 UnstoreItem(const FItemStack& ItemStack);
+
+	int32 MoveItemTo(UItemStorageComponent* To, FItemStack ItemStack);
+
+	int32 MoveAllItemTo(UItemStorageComponent* To, UItemDataAsset* ItemData);
+
+	UFUNCTION()
+	void DropItemByItemSlotWidget(UGSBItemSlot* ItemSlotWidget);
+
+	UFUNCTION()
+	int32 DropItem(const FItemStack& ItemStack);
 
 	void AddItemSlotContextMenuEntry_DropItem();
 
-public:
-	FOnStorageAddItemSlotSignature OnItemSlotAdded;
+	UFUNCTION()
+	void AddItemSlotContextMenuEntry_DropItem_Internal(UGSBStorage* StorageBody, UGSBContextMenu* ContextMenu);
 
-	FOnStorageOpenItemSlotContextMenuSignature OnItemSlotContextMenuOpened;
+	FOnStorageBodyAddItemSlotSignature OnItemSlotAdded;
+
+	// ItemSlot을 우클릭시 열리는 Context Menu. ContextTarget은 UItemDataAsset* 이다.
+	FOnStorageBodyOpenItemSlotContextMenuSignature OnItemSlotContextMenuOpened;
+
+protected:
+	void OnLinkedStorageComponent(UItemStorageComponent* StorageComponent);
+
+	void OnUnlinkedStorageComponent();
+
+	void ClearItemList();
+
+	void AddItemSlot(const struct FItemStack& ItemStack);
+
+	UItemStorageComponent* LinkedStorageComponent;
 
 private:
 	UPROPERTY(meta = (BindWidget))
-	UGSBStorageBody* StorageBody;
+	UGSBItemList* ItemList;
 
 	UFUNCTION()
-	void HandleOnItemSlotAdded(UGSBStorageBody* InStorageBody, UGSBItemList* ItemList, UGSBItemSlot* ItemSlot);
+	void HandleOnItemSlotAdded(UGSBItemList* InItemList, UGSBItemSlot* ItemSlot);
+
 
 	UFUNCTION()
-	void HandleOnItemSlotContextMenuOpened(UGSBStorageBody* InStorageBody, UGSBContextMenu* ContextMenu);
+	void HandleOnContextMenuEntryClicked_DropItem(UGSBContextMenuEntry* Entry);
+
+	UFUNCTION()
+	void OpenItemSlotContextMenu(UGSBItemSlot* ItemSlot);
+
+
+public:
+	FORCEINLINE UItemStorageComponent* GetLinkedStorageComponent() const
+	{
+		return LinkedStorageComponent;
+	}
+
+	friend class UItemStorageComponent;
 };

@@ -82,8 +82,6 @@ private:
 
 	class UGSBPlayerOverlay* Overlay;
 
-	void UpdatePowerStatusWidget();
-
 	UFUNCTION()
 	void SetOverlayWidget();
 };

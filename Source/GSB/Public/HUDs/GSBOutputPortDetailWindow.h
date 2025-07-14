@@ -7,7 +7,7 @@
 #include "GSBOutputPortDetailWindow.generated.h"
 
 class AConfigurableOutputPort;
-class UGSBStorageBody;
+class UGSBStorage;
 class UGSBItemList;
 class UGSBItemSlot;
 
@@ -18,7 +18,6 @@ class GSB_API UGSBOutputPortDetailWindow : public UGSBWindow
 public:
 	virtual void NativeConstruct() override;
 
-
 public:
 	void LinkOutputPort(AConfigurableOutputPort* Port);
 
@@ -26,7 +25,7 @@ public:
 
 private:
 	UFUNCTION()
-	void HandleOnItemSlotAdded(UGSBStorageBody* StorageBody, UGSBItemList* ItemList, UGSBItemSlot* ItemSlot);
+	void HandleOnItemSlotAdded(UGSBStorage* StorageBody, UGSBItemList* ItemList, UGSBItemSlot* ItemSlot);
 
 	UFUNCTION()
 	void HandleOnItemSlotLeftClicked(UGSBItemSlot* ItemSlot);
@@ -35,7 +34,7 @@ private:
 	void HandleOnOutputItemSlotClicked(UGSBItemSlot* ItemSlot);
 
 	UPROPERTY(meta = (BindWidget))
-	UGSBStorageBody* HubStorage;
+	UGSBStorage* HubStorage;
 
 	UPROPERTY(meta = (BindWidget))
 	UGSBItemSlot* OutputItemSlot;

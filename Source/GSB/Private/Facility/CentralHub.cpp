@@ -10,11 +10,9 @@
 #include "Components/ItemStorageComponent.h"
 #include "Items/ItemCrate.h"
 #include "Characters/GSBPlayer.h"
-#include "HUDs/GSBHUD.h"
+#include "HUDs/GSBPlayerHUD.h"
 #include "HUDs/GSBPlayerOverlay.h"
-#include "HUDs/GSBHubDetailView.h"
-#include "HUDs/GSBFacilityPowerStatus.h"
-#include "HUDs/GSBWindowHead.h"
+#include "HUDs/GSBHubDetailWindow.h"
 #include "GSBGameInstance.h"
 #include "DebugHeader.h"
 
@@ -39,6 +37,19 @@ void ACentralHub::OnShowDetailInteraction(AActor* Interactor)
 {
 	Super::OnShowDetailInteraction(Interactor);
 
+	if (UGSBHubDetailWindow* Window = Cast<UGSBHubDetailWindow>(DetailWindow))
+	{
+		Window->LinkHubStorageComponent(StorageComponent);
+
+		if (AGSBPlayer* Player = Cast<AGSBPlayer>(Interactor))
+		{
+			Window->LinkInventoryComponent(Player->GetInventoryComponent());
+		}
+	}
+	else
+	{
+		TRACE_SCREEN_LOG(TEXT("UGSBHubDetailWindow 캐스팅 실패"));
+	}
 }
 
 bool ACentralHub::CanProvidePower()
@@ -59,7 +70,6 @@ void ACentralHub::UnlinkPowerConsumerFacility(APowerConsumerFacility* PowerConsu
 void ACentralHub::UpdatePowerUsage(int32 Addition)
 {
 	PowerProviderComponent->UpdatePowerUsage(Addition);
-	UpdatePowerStatusWidget();
 	if (Overlay)
 	{
 		Overlay->UpdatePowerCapacity(PowerProviderComponent->GetCurrentPowerUsage(), PowerCapacity);
@@ -182,21 +192,6 @@ bool ACentralHub::TrySendItemToOutputPort(AActor* Actor)
 bool ACentralHub::CanReceiveItem(const AInputPort* InputPort)
 {
 	return InputPort->HasToken();
-}
-
-void ACentralHub::UpdatePowerStatusWidget()
-{
-	if (PowerStatusWidget)
-	{
-		if (CanProvidePower())
-		{
-			PowerStatusWidget->SetPowerStatus_Powered();
-		}
-		else
-		{
-			PowerStatusWidget->SetPowerStatus_Unpowered();
-		}
-	}
 }
 
 void ACentralHub::SetOverlayWidget()

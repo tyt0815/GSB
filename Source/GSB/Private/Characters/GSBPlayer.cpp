@@ -16,8 +16,8 @@
 #include "GSBGameInstance.h"
 #include "HUDs/GSBPlayerHUD.h"
 #include "HUDs/GSBPlayerOverlay.h"
-#include "HUDs/GSBInventoryBody.h"
 #include "HUDs/GSBInventory.h"
+#include "HUDs/GSBInventoryWindow.h"
 #include "HUDs/GSBItemSlot.h"
 #include "SubSystems/GSBWindowSubsystem.h"
 #include "DebugHeader.h"
@@ -238,7 +238,7 @@ void AGSBPlayer::ToggleInventory()
 		UClass* InventoryWidgetClass = GameInst->GetUserWidgetClass(TEXT("Inventory"));
 		if (UGSBWindow* Window = WindowManager->OpenWindow(InventoryWidgetClass, TEXT("Inventory")))
 		{
-			InventoryWidget = Cast<UGSBInventory>(Window);
+			InventoryWidget = Cast<UGSBInventoryWindow>(Window);
 			if (InventoryWidget)
 			{
 				InventoryWidget->OnItemSlotAdded.AddDynamic(this, &AGSBPlayer::OnItemSlotAddedToInventory);
@@ -478,9 +478,9 @@ bool AGSBPlayer::IsUIMode() const
 	return PlayerController->bShowMouseCursor;
 }
 
-void AGSBPlayer::OnItemSlotAddedToInventory(UGSBStorage* Storage, UGSBStorageBody* StorageBody, UGSBItemList* ItemList, UGSBItemSlot* ItemSlot)
+void AGSBPlayer::OnItemSlotAddedToInventory(UGSBStorageWindow* Storage, UGSBStorage* StorageBody, UGSBItemList* ItemList, UGSBItemSlot* ItemSlot)
 {
-	ItemSlot->OnItemSlotLeftClicked.AddDynamic(StorageBody, &UGSBStorageBody::DropItemByItemSlotWidget);
+	ItemSlot->OnItemSlotLeftClicked.AddDynamic(StorageBody, &UGSBStorage::DropItemByItemSlotWidget);
 }
 
 void AGSBPlayer::SetOverlayWidget()

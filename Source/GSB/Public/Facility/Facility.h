@@ -6,6 +6,7 @@
 #include "BuildSystem/GridSnapActor.h"
 #include "Interfaces/InteractableActor.h"
 #include "Components/InteractionComponent.h"
+#include "HUDs/GSBWindow.h"
 #include "Facility.generated.h"
 
 class AFacilityAddon;
@@ -62,4 +63,10 @@ protected:
 	//////////////////////////////////////////////////////////////
 	// UI
 	//////////////////////////////////////////////////////////////
+
+protected:
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UGSBWindow> DetailWindowClass;
+
+	UGSBWindow* DetailWindow;
 };

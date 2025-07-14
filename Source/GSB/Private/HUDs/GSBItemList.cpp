@@ -22,8 +22,8 @@ void UGSBItemList::AddItemSlot(const FItemStack& ItemStack)
 
 	if (UGSBItemSlot* ItemSlot = CreateWidget<UGSBItemSlot>(GetOwningPlayer(), ItemSlotClass))
 	{
-		ItemList->AddChild(ItemSlot);
 		ItemSlot->SetLabelByItemStack(ItemStack);
+		ItemList->AddChild(ItemSlot);
 		OnItemSlotAdded.Broadcast(this, ItemSlot);
 	}
 }

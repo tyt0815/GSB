@@ -75,5 +75,19 @@ void AFacility::ConnectFacilityAddon(AFacilityAddon* Addon)
 
 void AFacility::OnShowDetailInteraction(AActor* Interactor)
 {
-	// TODO
+	if (DetailWindowClass)
+	{
+		if (UGSBGameInstance* GameInst = GetGameInstance<UGSBGameInstance>())
+		{
+
+			if (UGSBWindowSubsystem* WindowManager = GameInst->GetSubsystem<UGSBWindowSubsystem>())
+			{
+				DetailWindow = WindowManager->OpenWindow(DetailWindowClass, FName(FacilityName.ToString() + TEXT(" Detail Window")));
+			}
+		}
+	}
+	else
+	{
+		TRACE_SCREEN_LOG(TEXT("DetailWindowClass가 nullptr입니다. :") + FacilityName.ToString());
+	}
 }

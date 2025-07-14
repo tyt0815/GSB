@@ -13,9 +13,9 @@ class UInputAction;
 class USpringArmComponent;
 class UCameraComponent;
 class UInventoryComponent;
+class UGSBStorageWindow;
+class UGSBInventoryWindow;
 class UGSBStorage;
-class UGSBInventory;
-class UGSBStorageBody;
 class UGSBPlayerOverlay;
 class AGSBPlayerHUD;
 class AGSBPlayerController;
@@ -129,13 +129,13 @@ protected:
 	bool IsUIMode() const;
 
 	UFUNCTION()
-	void OnItemSlotAddedToInventory(UGSBStorage* Storage, UGSBStorageBody* StorageBody, UGSBItemList* ItemList, UGSBItemSlot* ItemSlot);
+	void OnItemSlotAddedToInventory(UGSBStorageWindow* Storage, UGSBStorage* StorageBody, UGSBItemList* ItemList, UGSBItemSlot* ItemSlot);
 
 	AGSBPlayerHUD* HUD;
 
 	UGSBPlayerOverlay* OverlayWidget;
 
-	UGSBInventory* InventoryWidget;
+	UGSBInventoryWindow* InventoryWidget;
 
 private:
 	UFUNCTION()
@@ -145,5 +145,10 @@ public:
 	FORCEINLINE UGSBPlayerOverlay* GetOverlayWidget() const
 	{
 		return OverlayWidget;
+	}
+	
+	FORCEINLINE UInventoryComponent* GetInventoryComponent() const
+	{
+		return InventoryComponent;
 	}
 };
