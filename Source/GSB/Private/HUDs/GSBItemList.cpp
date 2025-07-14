@@ -20,8 +20,10 @@ void UGSBItemList::AddItemSlot(const FItemStack& ItemStack)
 	}
 #endif
 
-	UGSBItemSlot* ItemSlot = CreateWidget<UGSBItemSlot>(GetOwningPlayer(), ItemSlotClass, FName(GetName() + TEXT("_ItemSlot")));
-	ItemList->AddChild(ItemSlot);
-	ItemSlot->SetLabelByItemStack(ItemStack);
-	OnItemSlotAdded.Broadcast(this, ItemSlot);
+	if (UGSBItemSlot* ItemSlot = CreateWidget<UGSBItemSlot>(GetOwningPlayer(), ItemSlotClass))
+	{
+		ItemList->AddChild(ItemSlot);
+		ItemSlot->SetLabelByItemStack(ItemStack);
+		OnItemSlotAdded.Broadcast(this, ItemSlot);
+	}
 }

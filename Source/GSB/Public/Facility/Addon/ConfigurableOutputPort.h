@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Facility/Addon/OutputPort.h"
 #include "Interfaces/InteractableActor.h"
-#include "HUDs/GSBOutputPortDetailWidget.h"
+#include "HUDs/GSBOutputPortDetailWindow.h"
 #include "ConfigurableOutputPort.generated.h"
 
 class UInteractionComponent;
@@ -46,10 +46,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	UMeshOverlayHelperComponent* MeshOverlayHelperComponent;
 
-	UPROPERTY(EditDefaultsOnly, Category = "AConfigurableOutputPort")
-	TSubclassOf<UGSBOutputPortDetailWidget> DetailWidgetClass;
+	UPROPERTY(EditDefaultsOnly, Category = "Subclasses")
+	TSubclassOf<UGSBOutputPortDetailWindow> DetailWindowClass;
 
-	UGSBOutputPortDetailWidget* DetailWidget;
+	UGSBOutputPortDetailWindow* DetailWindow;
 	
 	UItemStorageComponent* LinkedStorage;
 
@@ -62,4 +62,6 @@ public:
 	{
 		return SelectedItem;
 	}
+
+	friend class UGSBOutputPortDetailWindow;
 };

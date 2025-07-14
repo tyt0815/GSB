@@ -57,10 +57,20 @@ void AConfigurableOutputPort::BeginPlay()
 void AConfigurableOutputPort::UpdateSelectedItem(UItemDataAsset* NewData)
 {
 	SelectedItem = NewData;
-
+	DetailWindow->SetOutputItem(SelectedItem);
 }
 
 void AConfigurableOutputPort::OnViewDetailInteraction(AActor* Interactor)
 {
-
+	if (DetailWindowClass)
+	{	
+		UGSBWindowSubsystem* WindowManager = GetGameInstance()->GetSubsystem<UGSBWindowSubsystem>();
+		
+		DetailWindow = Cast<UGSBOutputPortDetailWindow>(WindowManager->OpenWindow(DetailWindowClass, TEXT("OutputPortDetailWindow")));
+		DetailWindow->LinkOutputPort(this);
+	}
+	else
+	{
+		TRACE_SCREEN_LOG(TEXT("DetailWindowClass가 nullptr 입니다."));
+	}
 }
