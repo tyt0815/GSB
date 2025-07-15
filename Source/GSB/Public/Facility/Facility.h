@@ -42,7 +42,7 @@ protected:
 	virtual void BeginPlay();
 
 public:
-	void ConnectFacilityAddon(AFacilityAddon* Addon);
+	virtual void ConnectFacilityAddon(AFacilityAddon* Addon);
 
 	virtual bool IsOperating() const { return true; };
 

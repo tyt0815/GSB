@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "HUDs/GSBTransportFacilityDetailWindow.h"
-#include "GSBConveyorBeltDetailWindow.generated.h"
+#include "GSBTriSplitterDetailWindow.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class GSB_API UGSBConveyorBeltDetailWindow : public UGSBTransportFacilityDetailWindow
+class GSB_API UGSBTriSplitterDetailWindow : public UGSBTransportFacilityDetailWindow
 {
 	GENERATED_BODY()
 };

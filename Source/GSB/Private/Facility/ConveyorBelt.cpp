@@ -99,37 +99,6 @@ AActor* AConveyorBelt::GetItemToSend() const
     return ItemSendComponent->GetItemToSend();
 }
 
-void AConveyorBelt::BeginPlay()
-{
-    Super::BeginPlay();
-    
-    ItemReceiveComponent->SetRecevingDirection(TransportComponent->GetStartDirection());
-    ItemSendComponent->SetSendingDirection(TransportComponent->GetEndDirection());
-
-    TransportComponent->OnArrived.AddDynamic(this, &AConveyorBelt::SetItemToSend);
-}
-
-void AConveyorBelt::BeginDeconstruction_Implementation()
-{
-    if (AItemCrate* ItemCrate = Cast<AItemCrate>(ItemReceiveComponent->GetReceivedItem()))
-    {
-        ItemCrate->ConvertToDroppedItem();
-    }
-    if (AItemCrate* ItemCrate = Cast<AItemCrate>(ItemSendComponent->GetItemToSend()))
-    {
-        ItemCrate->ConvertToDroppedItem();
-    }
-    for (AActor* Actor : TransportComponent->GetTransportedActors())
-    {
-        if (AItemCrate* ItemCrate = Cast<AItemCrate>(Actor))
-        {
-            ItemCrate->ConvertToDroppedItem();
-        }
-    }
-
-    Super::BeginDeconstruction_Implementation();
-}
-
 void AConveyorBelt::DeconstructConnectedConveyorChain()
 {
     DeconstructConnectedReceiverConveyorChain(false);
@@ -159,6 +128,37 @@ void AConveyorBelt::DeconstructConnectedSenderConveyorChain(bool bDeconstructSel
     {
         BeginDeconstruction();
     }
+}
+
+void AConveyorBelt::BeginPlay()
+{
+    Super::BeginPlay();
+    
+    ItemReceiveComponent->SetRecevingDirection(TransportComponent->GetStartDirection());
+    ItemSendComponent->SetSendingDirection(TransportComponent->GetEndDirection());
+
+    TransportComponent->OnArrived.AddDynamic(this, &AConveyorBelt::SetItemToSend);
+}
+
+void AConveyorBelt::BeginDeconstruction_Implementation()
+{
+    if (AItemCrate* ItemCrate = Cast<AItemCrate>(ItemReceiveComponent->GetReceivedItem()))
+    {
+        ItemCrate->ConvertToDroppedItem();
+    }
+    if (AItemCrate* ItemCrate = Cast<AItemCrate>(ItemSendComponent->GetItemToSend()))
+    {
+        ItemCrate->ConvertToDroppedItem();
+    }
+    for (AActor* Actor : TransportComponent->GetTransportedActors())
+    {
+        if (AItemCrate* ItemCrate = Cast<AItemCrate>(Actor))
+        {
+            ItemCrate->ConvertToDroppedItem();
+        }
+    }
+
+    Super::BeginDeconstruction_Implementation();
 }
 
 bool AConveyorBelt::TryAutoConnectToItemSender()

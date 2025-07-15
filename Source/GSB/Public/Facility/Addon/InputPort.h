@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Facility/Addon/ItemPort.h"
 #include "Interfaces/ItemReceiver.h"
+#include "Interfaces/ItemSender.h"
 #include "InputPort.generated.h"
 
 class UItemReceiveComponent;
@@ -51,6 +52,8 @@ public:
 	AActor* GetPendingItemFromSender() const;
 
 	AActor* TakeReceivedItem();
+
+	TScriptInterface<IItemSender> GetConnectedItemSender() const;
 
 protected:
 

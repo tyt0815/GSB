@@ -27,6 +27,13 @@ public:
 
 	virtual void RegisterOutputPort(AOutputPort* OutputPort) override;
 
+public:
+	FName GetMiningItemName() const;
+
+	float GetMiningTime() const;
+
+	float GetMiningProgress() const;
+	 
 private:
 	bool TryOccupyMiningPoint();
 

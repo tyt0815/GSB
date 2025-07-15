@@ -49,7 +49,7 @@ void APowerConsumerFacility::OnShowDetailInteraction(AActor* Interactor)
 
 bool APowerConsumerFacility::IsLinkedToPowerProvider() const
 {
-	return IsOn() && IsValidPowerProviderScriptInterface(LinkedPowerProvider);
+	return IsValidPowerProviderScriptInterface(LinkedPowerProvider);
 }
 
 bool APowerConsumerFacility::TryLinkToPowerProvider(IPowerProviderFacility* PowerProvider)
@@ -63,7 +63,7 @@ bool APowerConsumerFacility::TryLinkToPowerProvider(IPowerProviderFacility* Powe
 
 bool APowerConsumerFacility::CanLinkToPowerProvider(IPowerProviderFacility* PowerProvider)
 {
-	return PowerProvider != nullptr;
+	return PowerProvider != nullptr && IsOn();
 }
 
 void APowerConsumerFacility::OnLinkToPowerProvider_Implementation(AActor* PowerProviderActor)

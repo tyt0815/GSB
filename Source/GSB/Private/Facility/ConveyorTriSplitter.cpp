@@ -25,6 +25,66 @@ void AConveyorTriSplitter::RegisterOutputPort(AOutputPort* OutputPort)
 	OutputPortHandler->RegisterActor(OutputPort);
 }
 
+void AConveyorTriSplitter::ConnectFacilityAddon(AFacilityAddon* Addon)
+{
+	Super::ConnectFacilityAddon(Addon);
+
+	if (AInputPort* Inputport = Cast<AInputPort>(Addon))
+	{
+		BackwardInputPort = Inputport;
+	}
+	else if (AOutputPort* OutputPort = Cast<AOutputPort>(Addon))
+	{
+		if (OutputPort->ActorHasTag("Forward"))
+		{
+			ForwardOutputPort = OutputPort;
+		}
+		else if (OutputPort->ActorHasTag("Left"))
+		{
+			LeftOutputPort = OutputPort;
+		}
+		else if (OutputPort->ActorHasTag("Right"))
+		{
+			RightOutputPort = OutputPort;
+		}
+		else
+		{
+			TRACE_SCREEN_LOG(TEXT("OutputPort의 태그를 지정해 주세요.(Forward, Left, Right)"));
+		}
+	}
+}
+
+void AConveyorTriSplitter::DeconstructConnectedConveyorChain()
+{
+	if (IsValid(BackwardInputPort))
+	{
+		DeconstructionFacilityChain(BackwardInputPort->GetConnectedItemSender().GetObject());
+	}
+	if (IsValid(ForwardOutputPort))
+	{
+		DeconstructionFacilityChain(ForwardOutputPort->GetConnectedItemReceiver().GetObject());
+	}
+	if (IsValid(LeftOutputPort))
+	{
+		DeconstructionFacilityChain(LeftOutputPort->GetConnectedItemReceiver().GetObject());
+	}
+	if (IsValid(RightOutputPort))
+	{
+		DeconstructionFacilityChain(RightOutputPort->GetConnectedItemReceiver().GetObject());
+	}
+
+	BeginDeconstruction();
+}
+
+
+void AConveyorTriSplitter::DeconstructConnectedReceiverConveyorChain(bool bDeconstructSelf)
+{
+}
+
+void AConveyorTriSplitter::DeconstructConnectedSenderConveyorChain(bool bDeconstructSelf)
+{
+}
+
 void AConveyorTriSplitter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -73,4 +133,12 @@ bool AConveyorTriSplitter::HandleOutputPort(AActor* Actor)
 bool AConveyorTriSplitter::CanReceiveItem(const AInputPort* InputPort)
 {
 	return !GetWorldTimerManager().IsTimerActive(TransportTimerHandler) && !CurrentTransportedItemData;
+}
+
+void AConveyorTriSplitter::DeconstructionFacilityChain(UObject* Object)
+{
+	if (IsValid(Object) && Object->Implements<UChainDeconstrutableFacility>())
+	{
+		Cast<IChainDeconstrutableFacility>(Object)->DeconstructConnectedConveyorChain();
+	}
 }

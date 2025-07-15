@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Facility/Addon/ItemPort.h"
+#include "Interfaces/ItemReceiver.h"
 #include "Interfaces/ItemSender.h"
 #include "OutputPort.generated.h"
 
@@ -38,6 +39,8 @@ private:
 	virtual bool TrySendItem() override;
 
 public:
+	TScriptInterface<IItemReceiver> GetConnectedItemReceiver() const;
+
 	bool IsConnectedToReceiver();
 
 	void AutoConnectItemReceiver();

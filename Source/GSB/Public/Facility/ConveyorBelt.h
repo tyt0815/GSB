@@ -6,6 +6,7 @@
 #include "Facility/ConstructibleFacility.h"
 #include "Interfaces/ItemReceiver.h"
 #include "Interfaces/ItemSender.h"
+#include "Interfaces/ChainDeconstrutableFacility.h"
 #include "ConveyorBelt.generated.h"
 
 class UItemReceiveComponent;
@@ -13,7 +14,11 @@ class UItemSendComponent;
 class USplineTransportComponent;
 
 UCLASS()
-class GSB_API AConveyorBelt : public AConstructibleFacility, public IItemReceiver, public IItemSender
+class GSB_API AConveyorBelt : 
+	public AConstructibleFacility,
+	public IItemReceiver,
+	public IItemSender,
+	public IChainDeconstrutableFacility
 {
 	GENERATED_BODY()
 	
@@ -46,14 +51,19 @@ public:
 	virtual void DisconnectItemReceiver() override;
 
 	virtual AActor* GetItemToSend() const override;
+	////////////////////////////////////////////////////////////
+	// IChainDeconstrutableFacility Functions
+	////////////////////////////////////////////////////////////
+	virtual void DeconstructConnectedConveyorChain() override;
+
+	virtual void DeconstructConnectedReceiverConveyorChain(bool bDeconstructSelf) override;
+
+	virtual void DeconstructConnectedSenderConveyorChain(bool bDeconstructSelf) override;
 
 protected:
 	virtual void BeginPlay() override;
 
 	virtual void BeginDeconstruction_Implementation() override;
-
-public:
-	void DeconstructConnectedConveyorChain();
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
@@ -67,10 +77,6 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	AActor* DebugPayload;
-
-	void DeconstructConnectedReceiverConveyorChain(bool bDeconstructSelf);
-
-	void DeconstructConnectedSenderConveyorChain(bool bDeconstructSelf);
 
 private:
 	bool TryAutoConnectToItemSender();

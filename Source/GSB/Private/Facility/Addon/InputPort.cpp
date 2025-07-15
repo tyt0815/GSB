@@ -118,3 +118,8 @@ AActor* AInputPort::TakeReceivedItem()
 {
     return ItemReceiver->TakeReceivedItem();
 }
+
+TScriptInterface<IItemSender> AInputPort::GetConnectedItemSender() const
+{
+    return ItemReceiver->GetConnectedItemSender();
+}

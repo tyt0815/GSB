@@ -62,6 +62,11 @@ void AOutputPort::BeginPlay()
 	ItemSender->SetSendingDirection(GetActorForwardVector());
 }
 
+TScriptInterface<IItemReceiver> AOutputPort::GetConnectedItemReceiver() const
+{
+	return ItemSender->GetConnectedItemReceiver();
+}
+
 bool AOutputPort::IsConnectedToReceiver()
 {
 	return ItemSender->IsConnectedToItemReceiver();

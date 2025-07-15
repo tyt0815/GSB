@@ -53,6 +53,21 @@ void AMiningFacility::RegisterOutputPort(AOutputPort* OutputPort)
 	ConnectedOutputPort = OutputPort;
 }
 
+FName AMiningFacility::GetMiningItemName() const
+{
+	return FName(OccupiedMiningPoint->GetMineableItem()->Name.ToString());
+}
+
+float AMiningFacility::GetMiningTime() const
+{
+	return OccupiedMiningPoint->GetMiningTime();
+}
+
+float AMiningFacility::GetMiningProgress() const
+{
+	return FMath::Clamp(CurrentMiningTime / OccupiedMiningPoint->GetMiningTime(), 0, 1);
+}
+
 bool AMiningFacility::TryOccupyMiningPoint()
 {
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;

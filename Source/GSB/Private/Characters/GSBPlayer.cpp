@@ -190,6 +190,7 @@ void AGSBPlayer::ToggleCombatAndBuildMode()
 		break;
 	case EGamePlayMode::EGPM_Build:
 		SetGamePlayMode(EGamePlayMode::EGPM_Combat);
+		FacilityBuilder->CancelPreview();
 		break;
 	default:
 		SCREEN_LOG_NONE_KEY(TEXT("정의 되지 않은 case(AGSBPlayer::ToggleCombatAndBuildMode)"));
