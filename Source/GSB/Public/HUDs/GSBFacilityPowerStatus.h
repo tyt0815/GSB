@@ -3,13 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "HUDs/GSBWindowHead.h"
+#include "Blueprint/UserWidget.h"
 #include "GSBFacilityPowerStatus.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnFacilityPowerSwitchClickedSignature);
 
 UCLASS()
-class GSB_API UGSBFacilityPowerStatus : public UGSBWindowHead
+class GSB_API UGSBFacilityPowerStatus : public UUserWidget
 {
 	GENERATED_BODY()
 public:

@@ -6,7 +6,6 @@
 #include "Components/ItemStorageComponent.h"
 #include "Components/MeshOverlayHelperComponent.h"
 #include "Interfaces/HubFacility.h"
-#include "HUDs/GSBOutputPortDetailWidget.h"
 #include "SubSystems/GSBWindowSubsystem.h"
 #include "DebugHeader.h"
 

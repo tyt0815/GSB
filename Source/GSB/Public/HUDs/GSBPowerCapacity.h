@@ -3,13 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "HUDs/GSBWidget.h"
+#include "Blueprint/UserWidget.h"
 #include "GSBPowerCapacity.generated.h"
 
 class UTextBlock;
 
 UCLASS()
-class GSB_API UGSBPowerCapacity : public UGSBWidget
+class GSB_API UGSBPowerCapacity : public UUserWidget
 {
 	GENERATED_BODY()
 public:
