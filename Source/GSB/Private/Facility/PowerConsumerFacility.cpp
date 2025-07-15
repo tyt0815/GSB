@@ -207,18 +207,6 @@ void APowerConsumerFacility::UpdatePowerConsumptionWidget()
 	if (UGSBPoweredFacilityDetailWindow* Window = Cast<UGSBPoweredFacilityDetailWindow>(DetailWindow))
 	{
 		Window->SetPowerConsumption(GetTotalPowerUsage());
-		if (!IsOn())
-		{
-			Window->SetPowerStatus_TurnedOff();
-		}
-		else if (IsOperating())
-		{
-			Window->SetPowerStatus_Powered();
-		}
-		else
-		{
-			Window->SetPowerStatus_Unpowered();
-		}
 	}
 }
 

@@ -20,13 +20,13 @@ void APowerRelayFacility::BeginConstruction_Implementation()
 {
 	Super::BeginConstruction_Implementation();
 
-	PowerProviderComponent->SetPowerInfluenceAreaVisibility(false);
 	SetPowerInfluenceAreaVisibility(false);
 }
 
 void APowerRelayFacility::OnLinkToPowerProvider_Implementation(AActor* PowerProviderActor)
 {
 	Super::OnLinkToPowerProvider_Implementation(PowerProviderActor);
+	PowerProviderComponent->LinkFacilitiesInPowerInfluenceArea();
 	if (LinkedPowerProvider)
 	{
 		LinkedPowerProvider->UpdatePowerUsage(PowerProviderComponent->GetCurrentPowerUsage());
@@ -101,8 +101,5 @@ bool APowerRelayFacility::TryLinkPowerConsumerFacility(APowerConsumerFacility* P
 
 void APowerRelayFacility::UnlinkPowerConsumerFacility(APowerConsumerFacility* PowerConsumer)
 {
-	if (PowerProviderComponent->IsLinkedPowerConsumerFacility(PowerConsumer))
-	{
-		PowerProviderComponent->UnlinkPowerConsumerFacility(PowerConsumer);
-	}
+	PowerProviderComponent->UnlinkPowerConsumerFacility(PowerConsumer);
 }

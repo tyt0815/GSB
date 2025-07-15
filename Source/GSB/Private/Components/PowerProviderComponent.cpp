@@ -56,10 +56,9 @@ void UPowerProviderComponent::LinkFacilitiesInPowerInfluenceArea()
 
 void UPowerProviderComponent::UnlinkAllPowerConsumerFacility()
 {
-	TArray<APowerConsumerFacility*> LinkedFacilitiesCopy = LinkedPowerConsumerFacilities;
-	for (APowerConsumerFacility* LinkedFacility : LinkedFacilitiesCopy)
+	for (int i = LinkedPowerConsumerFacilities.Num() - 1; i >= 0; --i)
 	{
-		LinkedFacility->UnlinkFromPowerProvider();
+		UnlinkPowerConsumerFacility(LinkedPowerConsumerFacilities[i]);
 	}
 }
 

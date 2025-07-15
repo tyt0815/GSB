@@ -37,6 +37,7 @@ public:
 	void SetPowerInfluenceAreaVisibility(bool bVisibility, bool bPropagateToChildren = false);
 
 private:
+	UPROPERTY(VisibleAnywhere)
 	TArray<APowerConsumerFacility*> LinkedPowerConsumerFacilities;
 
 	// 직접적으로 값을 변경하는것은 금지. UpdatePowerUsage를 통해 값을 변경한다.

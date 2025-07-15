@@ -17,6 +17,7 @@ AMiningFacility::AMiningFacility()
 
 void AMiningFacility::CompleteConstruction_Implementation()
 {
+	Super::CompleteConstruction_Implementation();
 	TryOccupyMiningPoint();
 }
 
