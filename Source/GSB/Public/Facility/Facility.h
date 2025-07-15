@@ -22,6 +22,8 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override final;
 
+	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
+
 	virtual void GetInteractionDescriptions(TArray<FString>& Descriptions) override;
 
 	virtual void Interaction(int32 Index, AActor* Interactor) override;
@@ -29,6 +31,10 @@ public:
 	virtual int32 GetNumInteractions() const override;
 
 	virtual bool IsInteractable() const override;
+
+	virtual bool IsInteractionListDirty() const override;
+
+	virtual void ClearInteractionListDirtyFlag() override;
 
 	virtual void SetHighlighInteractableActor(bool bVisibility) override;
 
@@ -41,6 +47,8 @@ public:
 	virtual bool IsOperating() const { return true; };
 
 protected:
+	virtual void AddDefaultInteractions();
+
 	virtual void Tick_OnOperating(float DeltaSecond) {};
 
 	UFUNCTION()

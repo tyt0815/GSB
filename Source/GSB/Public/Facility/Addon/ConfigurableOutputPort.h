@@ -30,6 +30,10 @@ public:
 
 	virtual void SetHighlighInteractableActor(bool bVisibility) override;
 
+	virtual bool IsInteractionListDirty() const override;
+
+	virtual void ClearInteractionListDirtyFlag() override;
+
 protected:
 	virtual void BeginPlay() override;
 

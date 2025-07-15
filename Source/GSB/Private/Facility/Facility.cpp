@@ -29,6 +29,16 @@ void AFacility::Tick(float DeltaSeconds)
 	}
 }
 
+void AFacility::EndPlay(EEndPlayReason::Type EndPlayReason)
+{
+	if (IsValid(DetailWindow))
+	{
+		DetailWindow->Close();
+	}
+
+	Super::EndPlay(EndPlayReason);
+}
+
 void AFacility::GetInteractionDescriptions(TArray<FString>& Descriptions)
 {
 	InteractionComponent->GetInteractionDescriptions(Descriptions);
@@ -49,6 +59,16 @@ bool AFacility::IsInteractable() const
 	return InteractionComponent->IsInteractable();
 }
 
+bool AFacility::IsInteractionListDirty() const
+{
+	return InteractionComponent->IsInteractionListDirty();
+}
+
+void AFacility::ClearInteractionListDirtyFlag()
+{
+	InteractionComponent->ClearInteractionListDirtyFlag();
+}
+
 void AFacility::SetHighlighInteractableActor(bool bVisibility)
 {
 	MeshOverlayHelperComponent->SetOutlineVisibility(bVisibility);
@@ -59,7 +79,7 @@ void AFacility::BeginPlay()
 {
 	Super::BeginPlay();
 
-	InteractionComponent->AddInteractionDynamic(FacilityName.ToString(), this, &AFacility::OnShowDetailInteraction);
+	AddDefaultInteractions();
 
 	MeshOverlayHelperComponent->AddHighlightTarget(StaticMeshComponent);
 }
@@ -68,6 +88,11 @@ void AFacility::ConnectFacilityAddon(AFacilityAddon* Addon)
 {
 	ConnectedAddons.AddUnique(Addon);
 	Addon->OnConnectedToFacility();
+}
+
+void AFacility::AddDefaultInteractions()
+{
+	InteractionComponent->AddInteractionDynamic(FacilityName.ToString(), this, &AFacility::OnShowDetailInteraction);
 }
 
 void AFacility::OnShowDetailInteraction(AActor* Interactor)

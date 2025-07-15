@@ -31,4 +31,8 @@ public:
 	virtual bool IsInteractable() const = 0;
 
 	virtual void SetHighlighInteractableActor(bool bHighlight) = 0;
+
+	virtual bool IsInteractionListDirty() const = 0;
+
+	virtual void ClearInteractionListDirtyFlag() = 0;
 };

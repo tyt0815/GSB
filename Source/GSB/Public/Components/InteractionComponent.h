@@ -8,6 +8,13 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FComponentOnInteractionSignature, AActor*, Interactor);
 
+struct FInteractionData
+{
+	TArray<FString> InteractionDescriptions;
+
+	TArray<FComponentOnInteractionSignature> OnInteractionDelegates;
+};
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class GSB_API UInteractionComponent : public UBoxComponent
 {
@@ -27,33 +34,47 @@ public:
 
 	FComponentOnInteractionSignature& AddInteraction_Internal(const FString& Description);
 
+	void RemoveInteractionAt(int32 i);
+
+	void ClearInteractions();
+
 	void ActivateInteraction();
 
 	void DeactivateInteraction();
 
-private:
-	TArray<FString> InteractionDescriptions;
+	
 
-	TArray<FComponentOnInteractionSignature> OnInteractionDelegates;
+private:
+	FInteractionData InteractionData;
 
 	bool bInteractable = true;
+
+	bool bInteractionListDirty = true;
 
 public:
 	FORCEINLINE void GetInteractionDescriptions(TArray<FString>& InDescriptions) const
 	{
-		InDescriptions = InteractionDescriptions;
+		InDescriptions = InteractionData.InteractionDescriptions;
 	}
 	FORCEINLINE int32 GetNumInteractions() const
 	{
-		return InteractionDescriptions.Num();
+		return InteractionData.InteractionDescriptions.Num();
 	}
 	FORCEINLINE void SetDescriptionAt(int32 Index, const FString& Description)
 	{
-		InteractionDescriptions[Index] = Description;
+		InteractionData.InteractionDescriptions[Index] = Description;
 	}
 	FORCEINLINE bool IsInteractable() const
 	{
 		return bInteractable;
+	}
+	FORCEINLINE void ClearInteractionListDirtyFlag()
+	{
+		bInteractionListDirty = false;
+	}
+	FORCEINLINE bool IsInteractionListDirty() const
+	{
+		return bInteractionListDirty;
 	}
 };
 

@@ -400,7 +400,7 @@ void AGSBPlayer::UpdateInteractableActor(AActor* Candidate)
 {
 	if (IsValid(InteractableActor.GetObject()))
 	{
-		if (InteractableActor.GetObject() == Candidate && InteractableActor->IsInteractable())
+		if (InteractableActor.GetObject() == Candidate && InteractableActor->IsInteractable() && !InteractableActor->IsInteractionListDirty())
 		{
 			return;
 		}
@@ -416,6 +416,7 @@ void AGSBPlayer::UpdateInteractableActor(AActor* Candidate)
 		InteractableActor->SetHighlighInteractableActor(true);
 		TArray<FString> Descriptions;
 		InteractableActor->GetInteractionDescriptions(Descriptions);
+		InteractableActor->ClearInteractionListDirtyFlag();
 		OverlayWidget->ShowInteractionList();
 		OverlayWidget->UpdateInteractionList(Descriptions);
 		SelectedInteractionIndex = 0;

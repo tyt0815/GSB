@@ -20,6 +20,8 @@ class GSB_API AConveyorBelt : public AConstructibleFacility, public IItemReceive
 public:
 	AConveyorBelt();
 
+	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
+
 	virtual void Tick_OnOperating(float DeltaTime) override;
 
 	virtual void CompleteConstruction_Implementation() override;
@@ -50,6 +52,9 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+public:
+	void DeconstructConnectedConveyorChain();
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	USplineTransportComponent* TransportComponent;
@@ -62,6 +67,10 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	AActor* DebugPayload;
+
+	void DeconstructConnectedReceiverConveyorChain(bool bDeconstructSelf);
+
+	void DeconstructConnectedSenderConveyorChain(bool bDeconstructSelf);
 
 private:
 	bool TryAutoConnectToItemSender();

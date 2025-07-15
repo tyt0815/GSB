@@ -43,6 +43,16 @@ void AConfigurableOutputPort::SetHighlighInteractableActor(bool bVisibility)
 	MeshOverlayHelperComponent->SetHighlightVisibility(bVisibility);
 }
 
+bool AConfigurableOutputPort::IsInteractionListDirty() const
+{
+	return InteractionComponent->IsInteractionListDirty();
+}
+
+void AConfigurableOutputPort::ClearInteractionListDirtyFlag()
+{
+	InteractionComponent->ClearInteractionListDirtyFlag();
+}
+
 void AConfigurableOutputPort::BeginPlay()
 {
 	Super::BeginPlay();

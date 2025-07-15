@@ -7,6 +7,7 @@
 #include "Components/InteractionComponent.h"
 #include "Interfaces/ItemPickupActor.h"
 #include "NiagaraComponent.h"
+#include "GSBGameInstance.h"
 
 #define DEFAULT_ITEM_NAME TEXT("DroppedItem")
 
@@ -60,6 +61,16 @@ void ADroppedItem::SetHighlighInteractableActor(bool bHighlight)
 	}
 }
 
+bool ADroppedItem::IsInteractionListDirty() const
+{
+	return InteractionComponent->IsInteractionListDirty();
+}
+
+void ADroppedItem::ClearInteractionListDirtyFlag()
+{
+	InteractionComponent->ClearInteractionListDirtyFlag();
+}
+
 void ADroppedItem::BeginPlay()
 {
 	Super::BeginPlay();
@@ -68,6 +79,34 @@ void ADroppedItem::BeginPlay()
 	UpdateItem(ItemStack);
 
 	DefaultNiagara = NiagaraComponent->GetAsset();
+}
+
+ADroppedItem* ADroppedItem::CreateDroppedItem(UObject* WorldContext, UItemDataAsset* ItemData, FVector Location)
+{
+	FItemStack ItemStack = {};
+	ItemStack.ItemData = ItemData;
+	ItemStack.Stack = 1;
+	return CreateDroppedItem(WorldContext, ItemStack, Location);
+}
+
+ADroppedItem* ADroppedItem::CreateDroppedItem(UObject* WorldContext, const FItemStack& ItemStack, FVector Location)
+{
+	if (IsValid(ItemStack.ItemData) && ItemStack.Stack > 0)
+	{
+		if (UWorld* World = WorldContext->GetWorld())
+		{
+			if (UGSBGameInstance* GameInst = World->GetGameInstance<UGSBGameInstance>())
+			{
+				if (ADroppedItem* DroppedItem = World->SpawnActor<ADroppedItem>(GameInst->GetActorClass(TEXT("DroppedItem")), Location, FRotator::ZeroRotator))
+				{
+					DroppedItem->UpdateItem(ItemStack);
+					return DroppedItem;
+				}
+			}
+		}
+	}
+	
+	return nullptr;
 }
 
 void ADroppedItem::UpdateItem(const FItemStack& NewItemStack)

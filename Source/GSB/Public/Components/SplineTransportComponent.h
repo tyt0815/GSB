@@ -33,6 +33,8 @@ public:
 	// 수송중인 액터가 하나라도 있을 경우 true
 	bool IsTransporting() const;
 
+	TArray<AActor*> GetTransportedActors() const;
+
 	FComponentOnArrivedSignature OnArrived;
 
 private:

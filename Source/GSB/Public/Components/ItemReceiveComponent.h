@@ -62,4 +62,8 @@ public:
 	{
 		RecevingDirection = NewDirection.GetSafeNormal();
 	}
+	FORCEINLINE TScriptInterface<IItemSender> GetConnectedItemSender() const
+	{
+		return ConnectedItemSender;
+	}
 };

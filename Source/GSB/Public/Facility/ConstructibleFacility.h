@@ -15,6 +15,9 @@ public:
 	virtual bool IsOperating() const override;
 
 protected:
+	virtual void AddDefaultInteractions() override;
+
+protected:
 	virtual void BeginPlay() override;
 
 public:
@@ -35,6 +38,9 @@ public:
 	virtual void BeginConstruction_Implementation();
 
 protected:
+	UFUNCTION()
+	void HandleCancelConstruction(AActor* Interactor);
+
 	UFUNCTION()
 	void HandleDeconstructRequest(AActor* Interactor);
 

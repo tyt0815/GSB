@@ -22,6 +22,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "ItemData")
 	TSubclassOf<AActor> ItemClass;
+
+
+
 };
 
 USTRUCT(BlueprintType)

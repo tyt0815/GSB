@@ -13,17 +13,17 @@ UInteractionComponent::UInteractionComponent()
 
 void UInteractionComponent::Interaction(int32 Index, AActor* Interactor)
 {
-	if (OnInteractionDelegates.IsValidIndex(Index))
+	if (InteractionData.OnInteractionDelegates.IsValidIndex(Index))
 	{
-		OnInteractionDelegates[Index].Broadcast(Interactor);
+		InteractionData.OnInteractionDelegates[Index].Broadcast(Interactor);
 	}
 }
 
 int32 UInteractionComponent::GetInteractionIndex(const FString& Description)
 {
-	for (int32 i = 0; i < InteractionDescriptions.Num(); ++i)
+	for (int32 i = 0; i < InteractionData.InteractionDescriptions.Num(); ++i)
 	{
-		if (InteractionDescriptions[i] == Description)
+		if (InteractionData.InteractionDescriptions[i] == Description)
 		{
 			return i;
 		}
@@ -33,9 +33,28 @@ int32 UInteractionComponent::GetInteractionIndex(const FString& Description)
 
 FComponentOnInteractionSignature& UInteractionComponent::AddInteraction_Internal(const FString& Description)
 {
-	InteractionDescriptions.Add(Description);
-	OnInteractionDelegates.Add({});
-	return OnInteractionDelegates.Last();
+	InteractionData.InteractionDescriptions.Add(Description);
+	InteractionData.OnInteractionDelegates.Add({});
+	bInteractionListDirty = true;
+	return InteractionData.OnInteractionDelegates.Last();
+}
+
+void UInteractionComponent::RemoveInteractionAt(int32 i)
+{
+	if (InteractionData.InteractionDescriptions.IsValidIndex(i))
+	{
+		InteractionData.InteractionDescriptions.RemoveAt(i);
+		InteractionData.OnInteractionDelegates.RemoveAt(i);
+		bInteractionListDirty = true;
+	}
+}
+
+void UInteractionComponent::ClearInteractions()
+{
+	for (int i = GetNumInteractions() - 1; i >= 0; --i)
+	{
+		RemoveInteractionAt(i);
+	}
 }
 
 void UInteractionComponent::ActivateInteraction()

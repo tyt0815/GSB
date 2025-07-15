@@ -86,3 +86,13 @@ bool USplineTransportComponent::IsTransporting() const
 	return IsActive() && ActiveTransports.Num() > 0;
 }
 
+TArray<AActor*> USplineTransportComponent::GetTransportedActors() const
+{
+	TArray<AActor*> TransportedItems;
+	for (auto Pair : ActiveTransports)
+	{
+		TransportedItems.Add(Pair.Key);
+	}
+	return TransportedItems;
+}
+

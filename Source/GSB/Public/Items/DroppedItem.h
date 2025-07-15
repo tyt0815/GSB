@@ -31,10 +31,18 @@ public:
 
 	virtual void SetHighlighInteractableActor(bool bHighlight) override;
 
+	virtual bool IsInteractionListDirty() const override;
+
+	virtual void ClearInteractionListDirtyFlag() override;
+
 protected:
 	virtual void BeginPlay() override;
 
 public:
+	static ADroppedItem* CreateDroppedItem(UObject* WorldContext, UItemDataAsset* ItemData, FVector Location);
+
+	static ADroppedItem* CreateDroppedItem(UObject* WorldContext, const struct FItemStack& ItemStack, FVector Location);
+
 	void UpdateItem(const FItemStack& NewItemStack);
 
 protected:

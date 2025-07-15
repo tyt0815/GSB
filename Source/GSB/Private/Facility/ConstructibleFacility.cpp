@@ -11,11 +11,15 @@ bool AConstructibleFacility::IsOperating() const
 	return Super::IsOperating() && IsConstructed();
 }
 
+void AConstructibleFacility::AddDefaultInteractions()
+{
+	Super::AddDefaultInteractions();
+	InteractionComponent->AddInteractionDynamic(TEXT("철거"), this, &AConstructibleFacility::HandleDeconstructRequest);
+}
+
 void AConstructibleFacility::BeginPlay()
 {
 	Super::BeginPlay();
-
-	InteractionComponent->AddInteractionDynamic(TEXT("철거"), this, &AConstructibleFacility::HandleDeconstructRequest);
 
 	BeginConstruction();
 }
@@ -47,6 +51,10 @@ float AConstructibleFacility::GetDeconstructionProgress() const
 
 void AConstructibleFacility::BeginConstruction_Implementation()
 {
+	InteractionComponent->ClearInteractions();
+
+	InteractionComponent->AddInteractionDynamic(TEXT("건설 취소"), this, &AConstructibleFacility::HandleCancelConstruction);
+
 	if (ConstructionTime == 0)
 	{
 		CompleteConstruction();
@@ -57,6 +65,10 @@ void AConstructibleFacility::BeginConstruction_Implementation()
 		ConstructionDelegate.BindUFunction(this, TEXT("CompleteConstruction"));
 		GetWorldTimerManager().SetTimer(ConstructionTimer, ConstructionDelegate, ConstructionTime, false);
 	}
+}
+void AConstructibleFacility::HandleCancelConstruction(AActor* Interactor)
+{
+	Destroy();
 }
 void AConstructibleFacility::HandleDeconstructRequest(AActor* Interactor)
 {
@@ -71,6 +83,11 @@ void AConstructibleFacility::HandleDeconstructRequest(AActor* Interactor)
 }
 void AConstructibleFacility::BeginDeconstruction_Implementation()
 {
+	if (IsValid(DetailWindow))
+	{
+		DetailWindow->Close();
+	}
+
 	InteractionComponent->DeactivateInteraction();
 	SetHighlighInteractableActor(false);
 	if (DeconstructionTime == 0)
@@ -92,6 +109,9 @@ void AConstructibleFacility::CompleteConstruction_Implementation()
 	{
 		Addon->CompleteConstruction();
 	}
+
+	InteractionComponent->ClearInteractions();
+	AddDefaultInteractions();
 }
 
 void AConstructibleFacility::CompleteDeconstruction_Implementation()

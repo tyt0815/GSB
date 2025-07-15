@@ -8,6 +8,7 @@
 #include "Components/ItemReceiveComponent.h"
 #include "Components/ItemSendComponent.h"
 #include "Items/ItemCrate.h"
+#include "Items/DroppedItem.h"
 #include "DebugHeader.h"
 
 AConveyorBelt::AConveyorBelt()
@@ -22,6 +23,27 @@ AConveyorBelt::AConveyorBelt()
     ItemSendComponent = CreateDefaultSubobject<UItemSendComponent>(TEXT("ItemSend"));
 
     FacilityName = TEXT("컨베이어 벨트");
+}
+
+void AConveyorBelt::EndPlay(EEndPlayReason::Type EndPlayReason)
+{
+    if (AItemCrate* ItemCrate = Cast<AItemCrate>(ItemReceiveComponent->GetReceivedItem()))
+    {
+        ItemCrate->ConvertToDroppedItem();
+    }
+    if (AItemCrate* ItemCrate = Cast<AItemCrate>(ItemSendComponent->GetItemToSend()))
+    {
+        ItemCrate->ConvertToDroppedItem();
+    }
+    for (AActor* Actor : TransportComponent->GetTransportedActors())
+    {
+        if (AItemCrate* ItemCrate = Cast<AItemCrate>(Actor))
+        {
+            ItemCrate->ConvertToDroppedItem();
+        }
+    }    
+
+    Super::EndPlay(EndPlayReason);
 }
 
 void AConveyorBelt::Tick_OnOperating(float DeltaTime)
@@ -106,6 +128,37 @@ void AConveyorBelt::BeginPlay()
     ItemSendComponent->SetSendingDirection(TransportComponent->GetEndDirection());
 
     TransportComponent->OnArrived.AddDynamic(this, &AConveyorBelt::SetItemToSend);
+}
+
+void AConveyorBelt::DeconstructConnectedConveyorChain()
+{
+    DeconstructConnectedReceiverConveyorChain(false);
+    DeconstructConnectedSenderConveyorChain(false);
+    BeginDeconstruction();
+}
+
+void AConveyorBelt::DeconstructConnectedReceiverConveyorChain(bool bDeconstructSelf)
+{
+    if (AConveyorBelt* Receiver = Cast<AConveyorBelt>(ItemSendComponent->GetConnectedItemReceiver().GetObject()))
+    {
+        Receiver->DeconstructConnectedReceiverConveyorChain(true);
+    }
+    if (bDeconstructSelf)
+    {
+        BeginDeconstruction();
+    }
+}
+
+void AConveyorBelt::DeconstructConnectedSenderConveyorChain(bool bDeconstructSelf)
+{
+    if (AConveyorBelt* Sender = Cast<AConveyorBelt>(ItemReceiveComponent->GetConnectedItemSender().GetObject()))
+    {
+        Sender->DeconstructConnectedSenderConveyorChain(true);
+    }
+    if (bDeconstructSelf)
+    {
+        BeginDeconstruction();
+    }
 }
 
 bool AConveyorBelt::TryAutoConnectToItemSender()
