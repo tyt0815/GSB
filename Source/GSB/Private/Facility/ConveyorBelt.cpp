@@ -25,27 +25,6 @@ AConveyorBelt::AConveyorBelt()
     FacilityName = TEXT("컨베이어 벨트");
 }
 
-void AConveyorBelt::EndPlay(EEndPlayReason::Type EndPlayReason)
-{
-    if (AItemCrate* ItemCrate = Cast<AItemCrate>(ItemReceiveComponent->GetReceivedItem()))
-    {
-        ItemCrate->ConvertToDroppedItem();
-    }
-    if (AItemCrate* ItemCrate = Cast<AItemCrate>(ItemSendComponent->GetItemToSend()))
-    {
-        ItemCrate->ConvertToDroppedItem();
-    }
-    for (AActor* Actor : TransportComponent->GetTransportedActors())
-    {
-        if (AItemCrate* ItemCrate = Cast<AItemCrate>(Actor))
-        {
-            ItemCrate->ConvertToDroppedItem();
-        }
-    }    
-
-    Super::EndPlay(EndPlayReason);
-}
-
 void AConveyorBelt::Tick_OnOperating(float DeltaTime)
 {
     Super::Tick_OnOperating(DeltaTime);
@@ -71,7 +50,7 @@ void AConveyorBelt::CompleteConstruction_Implementation()
 
 bool AConveyorBelt::CanReceiveItem() const
 {
-    return ItemReceiveComponent->CanReceiveItem();
+    return IsOperating() && ItemReceiveComponent->CanReceiveItem();
 }
 
 void AConveyorBelt::OnConnectedToItemSender(AActor* NewSender)
@@ -128,6 +107,27 @@ void AConveyorBelt::BeginPlay()
     ItemSendComponent->SetSendingDirection(TransportComponent->GetEndDirection());
 
     TransportComponent->OnArrived.AddDynamic(this, &AConveyorBelt::SetItemToSend);
+}
+
+void AConveyorBelt::BeginDeconstruction_Implementation()
+{
+    if (AItemCrate* ItemCrate = Cast<AItemCrate>(ItemReceiveComponent->GetReceivedItem()))
+    {
+        ItemCrate->ConvertToDroppedItem();
+    }
+    if (AItemCrate* ItemCrate = Cast<AItemCrate>(ItemSendComponent->GetItemToSend()))
+    {
+        ItemCrate->ConvertToDroppedItem();
+    }
+    for (AActor* Actor : TransportComponent->GetTransportedActors())
+    {
+        if (AItemCrate* ItemCrate = Cast<AItemCrate>(Actor))
+        {
+            ItemCrate->ConvertToDroppedItem();
+        }
+    }
+
+    Super::BeginDeconstruction_Implementation();
 }
 
 void AConveyorBelt::DeconstructConnectedConveyorChain()
