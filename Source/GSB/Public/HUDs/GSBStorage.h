@@ -4,16 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Items/ItemDataAsset.h"
 #include "GSBStorage.generated.h"
 
 class UItemStorageComponent;
 class UItemDataAsset;
+class UGSBNumberInputDialog;
 class UGSBItemList;
 class UGSBItemSlot;
 class UGSBContextMenu;
 class UGSBContextMenuEntry;
 class UGSBStorage;
-struct FItemStack;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnStorageBodyAddItemSlotSignature, UGSBStorage*, StorageBody, UGSBItemList*, ItemList, UGSBItemSlot*, ItemSlot);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnStorageBodyOpenItemSlotContextMenuSignature, UGSBStorage*, StorageBody, UGSBContextMenu*, ContextMenu);
@@ -40,11 +41,15 @@ public:
 
 	int32 MoveAllItemTo(UItemStorageComponent* To, UItemDataAsset* ItemData);
 
+	FItemStack GetItemStack(UItemDataAsset* ItemData);
+
 	UFUNCTION()
 	void DropItemByItemSlotWidget(UGSBItemSlot* ItemSlotWidget);
 
 	UFUNCTION()
 	int32 DropItem(const FItemStack& ItemStack);
+
+	int32 DropAllItem(UItemDataAsset* ItemData);
 
 	void AddItemSlotContextMenuEntry_DropItem();
 
@@ -74,9 +79,11 @@ private:
 	UFUNCTION()
 	void HandleOnItemSlotAdded(UGSBItemList* InItemList, UGSBItemSlot* ItemSlot);
 
-
 	UFUNCTION()
 	void HandleOnContextMenuEntryClicked_DropItem(UGSBContextMenuEntry* Entry);
+
+	UFUNCTION()
+	void HandleOnNumberInputDialogOKButtonClicked_DropItem(UGSBNumberInputDialog* Dialog);
 
 	UFUNCTION()
 	void OpenItemSlotContextMenu(UGSBItemSlot* ItemSlot);

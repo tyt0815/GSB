@@ -30,6 +30,21 @@ UGSBWindow* UGSBOverlay::OpenWindow(TSubclassOf<UGSBWindow> WindowClass, const F
 	return nullptr;
 }
 
+UGSBNumberInputDialog* UGSBOverlay::OpenNumberInputDialog(TSubclassOf<UGSBNumberInputDialog> NumberInputDialogClass, const FName& DialogName, UObject* TargetObject)
+{
+	if (UGSBNumberInputDialog* Dialog = Cast<UGSBNumberInputDialog>(OpenWindow(NumberInputDialogClass, DialogName)))
+	{
+		Dialog->SetTargetObject(TargetObject);
+		return Dialog;
+	}
+	return nullptr;
+}
+
+UGSBNumberInputDialog* UGSBOverlay::OpenDefaultNumberInputDialog(const FName& DialogName, UObject* TargetObject)
+{
+	return OpenNumberInputDialog(DefaultNumberInputDialogClass, DialogName, TargetObject);
+}
+
 void UGSBOverlay::CloseWindow(UGSBWindow* Window)
 {
 	if (IsValid(Window))

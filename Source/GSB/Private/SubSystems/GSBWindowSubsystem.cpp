@@ -10,6 +10,16 @@ UGSBWindow* UGSBWindowSubsystem::OpenWindow(UClass* WindowClass, const FName& Wi
 	return GetHUD()->OpenWindow(WindowClass, WindowName);
 }
 
+UGSBNumberInputDialog* UGSBWindowSubsystem::OpenNumberInputDialog(UClass* NumberInputDialogClass, const FName& DialogName, UObject* TargetObject)
+{
+	return GetHUD()->OpenNumberInputDialog(NumberInputDialogClass, DialogName, TargetObject);
+}
+
+UGSBNumberInputDialog* UGSBWindowSubsystem::OpenDefaultNumberInputDialog(const FName& DialogName, UObject* TargetObject)
+{
+	return GetHUD()->OpenDefaultNumberInputDialog(DialogName, TargetObject);
+}
+
 void UGSBWindowSubsystem::CloseWindow(UGSBWindow* Window)
 {
 	GetHUD()->CloseWindow(Window);

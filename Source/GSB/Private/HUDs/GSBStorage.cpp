@@ -2,6 +2,7 @@
 
 
 #include "HUDs/GSBStorage.h"
+#include "HUDs/GSBNumberInputDialog.h"
 #include "HUDs/GSBItemList.h"
 #include "HUDs/GSBItemSlot.h"
 #include "HUDs/GSBContextMenu.h"
@@ -67,6 +68,11 @@ int32 UGSBStorage::MoveAllItemTo(UItemStorageComponent* To, UItemDataAsset* Item
 	return LinkedStorageComponent->MoveAllItemTo(To,ItemData);
 }
 
+FItemStack UGSBStorage::GetItemStack(UItemDataAsset* ItemData)
+{
+	return LinkedStorageComponent->GetItemStack(ItemData);
+}
+
 void UGSBStorage::DropItemByItemSlotWidget(UGSBItemSlot* ItemSlotWidget)
 {
 	FItemStack ItemStack = {};
@@ -84,6 +90,11 @@ int32 UGSBStorage::DropItem(const FItemStack& ItemStack)
 	return 0;
 }
 
+int32 UGSBStorage::DropAllItem(UItemDataAsset* ItemData)
+{
+	return DropItem(LinkedStorageComponent->GetItemStack(ItemData));
+}
+
 void UGSBStorage::AddItemSlotContextMenuEntry_DropItem()
 {
 	OnItemSlotContextMenuOpened.AddDynamic(this, &UGSBStorage::AddItemSlotContextMenuEntry_DropItem_Internal);
@@ -94,7 +105,6 @@ void UGSBStorage::AddItemSlotContextMenuEntry_DropItem_Internal(UGSBStorage* Sto
 	if (UGSBContextMenuEntry* Entry = ContextMenu->AddContextMenuEntry(TEXT("버리기")))
 	{
 		Entry->OnClicked.AddDynamic(this, &UGSBStorage::HandleOnContextMenuEntryClicked_DropItem);
-		UItemDataAsset* ItemData = Cast<UItemDataAsset>(Entry->GetContextTarget());
 	}
 }
 
@@ -128,7 +138,21 @@ void UGSBStorage::HandleOnContextMenuEntryClicked_DropItem(UGSBContextMenuEntry*
 {
 	if (UItemDataAsset* ItemData = Cast<UItemDataAsset>(Entry->GetContextTarget()))
 	{
-		DropItem(FItemStack(ItemData, 1));
+		UGSBWindowSubsystem* WindowManager = GetGameInstance()->GetSubsystem<UGSBWindowSubsystem>();
+		if (UGSBNumberInputDialog* Dialog = WindowManager->OpenDefaultNumberInputDialog(TEXT("DropItemDialog"), ItemData))
+		{
+			Dialog->SetNumberInput(GetItemStack(ItemData).Stack);
+			Dialog->OnOKButtonClicked.AddDynamic(this, &UGSBStorage::HandleOnNumberInputDialogOKButtonClicked_DropItem);
+		}
+	}
+	Entry->CloseContextMenu();
+}
+
+void UGSBStorage::HandleOnNumberInputDialogOKButtonClicked_DropItem(UGSBNumberInputDialog* Dialog)
+{
+	if (UItemDataAsset* ItemData = Cast<UItemDataAsset>(Dialog->GetTargetObject()))
+	{
+		DropItem({ ItemData, Dialog->GetNumber() });
 	}
 }
 

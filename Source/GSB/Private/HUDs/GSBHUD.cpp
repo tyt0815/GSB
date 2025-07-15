@@ -36,6 +36,16 @@ UGSBWindow* AGSBHUD::OpenWindow(UClass* WindowClass, const FName& WindowName)
 	return OverlayWidget->OpenWindow(WindowClass, WindowName);
 }
 
+UGSBNumberInputDialog* AGSBHUD::OpenNumberInputDialog(UClass* NumberInputDialogClass, const FName& DialogName, UObject* TargetObject)
+{
+	return OverlayWidget->OpenNumberInputDialog(NumberInputDialogClass, DialogName, TargetObject);
+}
+
+UGSBNumberInputDialog* AGSBHUD::OpenDefaultNumberInputDialog(const FName& DialogName, UObject* TargetObject)
+{
+	return OverlayWidget->OpenDefaultNumberInputDialog(DialogName, TargetObject);
+}
+
 void AGSBHUD::CloseWindow(UGSBWindow* Window)
 {
 	OverlayWidget->CloseWindow(Window);

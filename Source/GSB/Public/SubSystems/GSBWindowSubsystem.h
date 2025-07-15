@@ -8,7 +8,7 @@
 class UGSBWindow;
 class AGSBHUD;
 class UGSBContextMenu;
-
+class UGSBNumberInputDialog;
 
 UCLASS()
 class GSB_API UGSBWindowSubsystem : public UGameInstanceSubsystem
@@ -17,6 +17,10 @@ class GSB_API UGSBWindowSubsystem : public UGameInstanceSubsystem
 
 public:
 	UGSBWindow* OpenWindow(UClass* WindowClass, const FName& WindowName);
+
+	UGSBNumberInputDialog* OpenNumberInputDialog(UClass* NumberInputDialogClass, const FName& DialogName, UObject* TargetObject);
+
+	UGSBNumberInputDialog* OpenDefaultNumberInputDialog(const FName& DialogName, UObject* TargetObject);
 
 	void CloseWindow(UGSBWindow* Window);
 

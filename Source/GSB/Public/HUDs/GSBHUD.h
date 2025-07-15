@@ -9,6 +9,7 @@
 class UGSBOverlay;
 class UGSBWindow;
 class UGSBContextMenu;
+class UGSBNumberInputDialog;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEndBeginPlaySignature);
 
@@ -22,6 +23,10 @@ public:
 
 public:
 	UGSBWindow* OpenWindow(UClass* WindowClass, const FName& WindowName);
+
+	UGSBNumberInputDialog* OpenNumberInputDialog(UClass* NumberInputDialogClass, const FName& DialogName, UObject* TargetObject);
+
+	UGSBNumberInputDialog* OpenDefaultNumberInputDialog(const FName& DialogName, UObject* TargetObject);
 
 	void CloseWindow(UGSBWindow* Window);
 

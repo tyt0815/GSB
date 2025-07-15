@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "HUDs/GSBWindow.h"
+#include "HUDs/GSBNumberInputDialog.h"
 #include "HUDs/GSBContextMenu.h"
 #include "DebugHeader.h"
 #include "GSBOverlay.generated.h"
@@ -24,6 +25,10 @@ public:
 
 	UGSBWindow* OpenWindow(TSubclassOf<UGSBWindow> WindowClass, const FName& WindowName);
 
+	UGSBNumberInputDialog* OpenNumberInputDialog(TSubclassOf<UGSBNumberInputDialog> NumberInputDialogClass, const FName& DialogName, UObject* TargetObject);
+	
+	UGSBNumberInputDialog* OpenDefaultNumberInputDialog(const FName& DialogName, UObject* TargetObject);
+
 	void CloseWindow(UGSBWindow* Window);
 
 	bool IsWindowOpened(UGSBWindow* Window);
@@ -40,6 +45,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Subclasses")
 	TSubclassOf<UGSBContextMenu> DefaultContextMenuClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Subclasses")
+	TSubclassOf<UGSBNumberInputDialog> DefaultNumberInputDialogClass;
 
 	UPROPERTY(meta = (BindWidget))
 	UCanvasPanel* RootCanvas;
