@@ -6,7 +6,7 @@
 #include "BuildSystem/GridSnapActor.h"
 #include "Interfaces/InteractableActor.h"
 #include "Components/InteractionComponent.h"
-#include "HUDs/GSBWindow.h"
+#include "HUDs/GSBFacilityDetailWindow.h"
 #include "Facility.generated.h"
 
 class AFacilityAddon;
@@ -63,10 +63,22 @@ protected:
 	//////////////////////////////////////////////////////////////
 	// UI
 	//////////////////////////////////////////////////////////////
+public:
+	void UnlinkFacilityDetailWindow();
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
-	TSubclassOf<UGSBWindow> DetailWindowClass;
+	TSubclassOf<UGSBFacilityDetailWindow> DetailWindowClass;
 
-	UGSBWindow* DetailWindow;
+	UGSBFacilityDetailWindow* DetailWindow;
+
+
+	//////////////////////////////////////////////////////////////
+	// inline 함수
+	//////////////////////////////////////////////////////////////
+public:
+	FORCEINLINE FName GetFacilityName() const
+	{
+		return FacilityName;
+	}
 };

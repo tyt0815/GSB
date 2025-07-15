@@ -22,8 +22,6 @@ public:
 
 	void LinkStorageComponent(UItemStorageComponent* StorageComponent);
 
-	void AddItemSlotContextMenuEntry_DropItem();
-
 public:
 	FOnStorageAddItemSlotSignature OnItemSlotAdded;
 

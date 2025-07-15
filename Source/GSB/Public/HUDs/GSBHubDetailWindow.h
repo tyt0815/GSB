@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "HUDs/GSBWindow.h"
+#include "HUDs/GSBFacilityDetailWindow.h"
 #include "GSBHubDetailWindow.generated.h"
 
 class UGSBStorage;
@@ -12,7 +12,7 @@ class UGSBItemList;
 class UGSBItemSlot;
 
 UCLASS()
-class GSB_API UGSBHubDetailWindow : public UGSBWindow
+class GSB_API UGSBHubDetailWindow : public UGSBFacilityDetailWindow
 {
 	GENERATED_BODY()
 public:

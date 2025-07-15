@@ -6,12 +6,14 @@
 #include "HUDs/GSBWindowHead.h"
 #include "GSBFacilityPowerStatus.generated.h"
 
-class UTextBlock;
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnFacilityPowerSwitchClickedSignature);
 
 UCLASS()
 class GSB_API UGSBFacilityPowerStatus : public UGSBWindowHead
 {
 	GENERATED_BODY()
+public:
+	virtual void NativeConstruct() override;
 
 public:
 	void SetPowerStatus_Powered();
@@ -19,8 +21,21 @@ public:
 	void SetPowerStatus_Unpowered();
 
 	void SetPowerStatus_TurnedOff();
+
+	void SetPowerConsumption(int32 Value);
+
+	FOnFacilityPowerSwitchClickedSignature OnPowerSwitchClicked;
 	
 private	:
 	UPROPERTY(meta = (BindWidget))
-	UTextBlock* PowerStatusText;
+	class UTextBlock* PowerStatusText;
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* PowerSwitch;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* PowerConsumption;
+
+	UFUNCTION()
+	void HandleOnPowerSwitchClicked();
 };

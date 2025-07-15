@@ -60,7 +60,7 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TScriptInterface<IPowerProviderFacility> LinkedPowerProvider = nullptr;
 
-	void UpdatePowerWidget();
+	void UpdatePowerWidgets();
 
 	void UpdatePowerStatusWidget();
 
@@ -71,9 +71,7 @@ protected:
 private:
 
 	UFUNCTION()
-	void HandleOnPowerSwitchClicked(UGSBFacilityPowerSwitch* PowerSwtichWidget);
-
-	void UpdatePowerSwitchWidget(UGSBFacilityPowerSwitch* PowerSwtichWidget);
+	void HandleOnPowerSwitchClicked();
 
 	UPROPERTY(EditAnywhere, Category = "APowerConsumerFacility|Link to PowerProvider")
 	int32 PowerConsumption = 10;

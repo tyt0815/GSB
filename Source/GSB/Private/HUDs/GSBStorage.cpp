@@ -100,12 +100,9 @@ void UGSBStorage::AddItemSlotContextMenuEntry_DropItem()
 	OnItemSlotContextMenuOpened.AddDynamic(this, &UGSBStorage::AddItemSlotContextMenuEntry_DropItem_Internal);
 }
 
-void UGSBStorage::AddItemSlotContextMenuEntry_DropItem_Internal(UGSBStorage* StorageBody, UGSBContextMenu* ContextMenu)
+void UGSBStorage::AddItemSlotContextMenuEntry_DeleteItem()
 {
-	if (UGSBContextMenuEntry* Entry = ContextMenu->AddContextMenuEntry(TEXT("버리기")))
-	{
-		Entry->OnClicked.AddDynamic(this, &UGSBStorage::HandleOnContextMenuEntryClicked_DropItem);
-	}
+	OnItemSlotContextMenuOpened.AddDynamic(this, &UGSBStorage::AddItemSlotContextMenuEntry_DeleteItem_Internal);
 }
 
 void UGSBStorage::OnLinkedStorageComponent(UItemStorageComponent* StorageComponent)
@@ -134,6 +131,22 @@ void UGSBStorage::HandleOnItemSlotAdded(UGSBItemList* InItemList, UGSBItemSlot* 
 	ItemSlot->OnItemSlotRightClicked.AddDynamic(this, &UGSBStorage::OpenItemSlotContextMenu);
 }
 
+void UGSBStorage::AddItemSlotContextMenuEntry_DropItem_Internal(UGSBStorage* StorageBody, UGSBContextMenu* ContextMenu)
+{
+	if (UGSBContextMenuEntry* Entry = ContextMenu->AddContextMenuEntry(TEXT("버리기")))
+	{
+		Entry->OnClicked.AddDynamic(this, &UGSBStorage::HandleOnContextMenuEntryClicked_DropItem);
+	}
+}
+
+void UGSBStorage::AddItemSlotContextMenuEntry_DeleteItem_Internal(UGSBStorage* StorageBody, UGSBContextMenu* ContextMenu)
+{
+	if (UGSBContextMenuEntry* Entry = ContextMenu->AddContextMenuEntry(TEXT("삭제")))
+	{
+		Entry->OnClicked.AddDynamic(this, &UGSBStorage::HandleOnContextMenuEntryClicked_DeleteItem);
+	}
+}
+
 void UGSBStorage::HandleOnContextMenuEntryClicked_DropItem(UGSBContextMenuEntry* Entry)
 {
 	if (UItemDataAsset* ItemData = Cast<UItemDataAsset>(Entry->GetContextTarget()))
@@ -148,11 +161,32 @@ void UGSBStorage::HandleOnContextMenuEntryClicked_DropItem(UGSBContextMenuEntry*
 	Entry->CloseContextMenu();
 }
 
+void UGSBStorage::HandleOnContextMenuEntryClicked_DeleteItem(UGSBContextMenuEntry* Entry)
+{
+	if (UItemDataAsset* ItemData = Cast<UItemDataAsset>(Entry->GetContextTarget()))
+	{
+		UGSBWindowSubsystem* WindowManager = GetGameInstance()->GetSubsystem<UGSBWindowSubsystem>();
+		if (UGSBNumberInputDialog* Dialog = WindowManager->OpenDefaultNumberInputDialog(TEXT("DeleteItemDialog"), ItemData))
+		{
+			Dialog->OnOKButtonClicked.AddDynamic(this, &UGSBStorage::HandleOnNumberInputDialogOKButtonClicked_DeleteItem);
+		}
+	}
+	Entry->CloseContextMenu();
+}
+
 void UGSBStorage::HandleOnNumberInputDialogOKButtonClicked_DropItem(UGSBNumberInputDialog* Dialog)
 {
 	if (UItemDataAsset* ItemData = Cast<UItemDataAsset>(Dialog->GetTargetObject()))
 	{
 		DropItem({ ItemData, Dialog->GetNumber() });
+	}
+}
+
+void UGSBStorage::HandleOnNumberInputDialogOKButtonClicked_DeleteItem(UGSBNumberInputDialog* Dialog)
+{
+	if (UItemDataAsset* ItemData = Cast<UItemDataAsset>(Dialog->GetTargetObject()))
+	{
+		UnstoreItem({ ItemData, Dialog->GetNumber() });
 	}
 }
 

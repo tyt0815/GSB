@@ -53,8 +53,7 @@ public:
 
 	void AddItemSlotContextMenuEntry_DropItem();
 
-	UFUNCTION()
-	void AddItemSlotContextMenuEntry_DropItem_Internal(UGSBStorage* StorageBody, UGSBContextMenu* ContextMenu);
+	void AddItemSlotContextMenuEntry_DeleteItem();
 
 	FOnStorageBodyAddItemSlotSignature OnItemSlotAdded;
 
@@ -80,10 +79,22 @@ private:
 	void HandleOnItemSlotAdded(UGSBItemList* InItemList, UGSBItemSlot* ItemSlot);
 
 	UFUNCTION()
+	void AddItemSlotContextMenuEntry_DropItem_Internal(UGSBStorage* StorageBody, UGSBContextMenu* ContextMenu);
+
+	UFUNCTION()
+	void AddItemSlotContextMenuEntry_DeleteItem_Internal(UGSBStorage* StorageBody, UGSBContextMenu* ContextMenu);
+
+	UFUNCTION()
 	void HandleOnContextMenuEntryClicked_DropItem(UGSBContextMenuEntry* Entry);
 
 	UFUNCTION()
+	void HandleOnContextMenuEntryClicked_DeleteItem(UGSBContextMenuEntry* Entry);
+
+	UFUNCTION()
 	void HandleOnNumberInputDialogOKButtonClicked_DropItem(UGSBNumberInputDialog* Dialog);
+
+	UFUNCTION()
+	void HandleOnNumberInputDialogOKButtonClicked_DeleteItem(UGSBNumberInputDialog* Dialog);
 
 	UFUNCTION()
 	void OpenItemSlotContextMenu(UGSBItemSlot* ItemSlot);

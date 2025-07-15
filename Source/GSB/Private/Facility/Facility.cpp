@@ -79,10 +79,13 @@ void AFacility::OnShowDetailInteraction(AActor* Interactor)
 	{
 		if (UGSBGameInstance* GameInst = GetGameInstance<UGSBGameInstance>())
 		{
-
 			if (UGSBWindowSubsystem* WindowManager = GameInst->GetSubsystem<UGSBWindowSubsystem>())
 			{
-				DetailWindow = WindowManager->OpenWindow(DetailWindowClass, FName(FacilityName.ToString() + TEXT(" Detail Window")));
+				DetailWindow = Cast<UGSBFacilityDetailWindow>(WindowManager->OpenWindow(DetailWindowClass, FName(FacilityName.ToString() + TEXT(" Detail Window"))));
+				if (DetailWindow)
+				{
+					DetailWindow->OnLinkedToFacility(this);
+				}
 			}
 		}
 	}
@@ -90,4 +93,13 @@ void AFacility::OnShowDetailInteraction(AActor* Interactor)
 	{
 		TRACE_SCREEN_LOG(TEXT("DetailWindowClass가 nullptr입니다. :") + FacilityName.ToString());
 	}
+}
+
+void AFacility::UnlinkFacilityDetailWindow()
+{
+	if (DetailWindow)
+	{
+		DetailWindow->OnUnlinkedFromFacility();
+	}
+	DetailWindow = nullptr;
 }

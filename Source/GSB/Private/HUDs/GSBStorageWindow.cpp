@@ -10,16 +10,13 @@ void UGSBStorageWindow::NativeConstruct()
 
 	StorageBody->OnItemSlotAdded.AddDynamic(this, &UGSBStorageWindow::HandleOnItemSlotAdded);
 	StorageBody->OnItemSlotContextMenuOpened.AddDynamic(this, &UGSBStorageWindow::HandleOnItemSlotContextMenuOpened);
+	StorageBody->AddItemSlotContextMenuEntry_DropItem();
+	StorageBody->AddItemSlotContextMenuEntry_DeleteItem();
 }
 
 void UGSBStorageWindow::LinkStorageComponent(UItemStorageComponent* StorageComponent)
 {
 	StorageBody->LinkStorageComponent(StorageComponent);
-}
-
-void UGSBStorageWindow::AddItemSlotContextMenuEntry_DropItem()
-{
-	StorageBody->AddItemSlotContextMenuEntry_DropItem();
 }
 
 void UGSBStorageWindow::HandleOnItemSlotAdded(UGSBStorage* InStorageBody, UGSBItemList* ItemList, UGSBItemSlot* ItemSlot)

@@ -12,5 +12,4 @@ UCLASS()
 class GSB_API UGSBInventoryWindow : public UGSBStorageWindow
 {
 	GENERATED_BODY()
-
 };

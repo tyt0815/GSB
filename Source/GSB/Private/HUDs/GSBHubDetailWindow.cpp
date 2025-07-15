@@ -13,6 +13,10 @@ void UGSBHubDetailWindow::NativeConstruct()
 
 	HubStorage->OnItemSlotAdded.AddDynamic(this, &UGSBHubDetailWindow::HandleOnHubStorageItemSlotAdded);
 	Inventory->OnItemSlotAdded.AddDynamic(this, &UGSBHubDetailWindow::HandleOnInventoryItemSlotAdded);
+
+	HubStorage->AddItemSlotContextMenuEntry_DeleteItem();
+	Inventory->AddItemSlotContextMenuEntry_DropItem();
+	Inventory->AddItemSlotContextMenuEntry_DeleteItem();
 }
 
 void UGSBHubDetailWindow::LinkHubStorageComponent(UItemStorageComponent* HubStorageComponent)

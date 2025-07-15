@@ -62,7 +62,7 @@ void APowerRelayFacility::UpdatePowerUsage(int32 Addition)
 	{
 		LinkedPowerProvider->UpdatePowerUsage(Addition);
 	}
-	UpdatePowerWidget();
+	UpdatePowerWidgets();
 }
 
 
