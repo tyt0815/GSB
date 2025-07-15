@@ -170,18 +170,12 @@ bool ACentralHub::TrySendItemToOutputPort(AActor* Actor)
 	UItemDataAsset* SelectedItem = OutputPort->GetSelectedItem();
 	if (OutputPort->IsConnectedToReceiver())
 	{
-		FItemStack ItemStack;
-		ItemStack.ItemData = SelectedItem;
-		ItemStack.Stack = 1;
-		if (StorageComponent->UnstoreItem(ItemStack) == 1)
+		if (StorageComponent->GetItemStack(SelectedItem).Stack > 0)
 		{
-			if (OutputPort->TryCreateAndSendItemCrate(ItemStack.ItemData))
+			if (OutputPort->TryCreateAndSendItemCrate(SelectedItem))
 			{
+				StorageComponent->UnstoreItem({ SelectedItem, 1 });
 				return true;
-			}
-			else
-			{
-				StorageComponent->StoreItem(ItemStack);
 			}
 		}
 	}
