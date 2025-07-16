@@ -11,8 +11,6 @@
 AMiningFacility::AMiningFacility()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
-	FacilityName = TEXT("채굴기");
 }
 
 void AMiningFacility::CompleteConstruction_Implementation()

@@ -58,7 +58,7 @@ protected:
 template<typename WidgetT>
 inline WidgetT* UGSBOverlay::CreateWidget_GSB(TSubclassOf<UUserWidget> UserWidgetClass, FName WidgetName)
 {
-	if (WidgetT* Widget = CreateWidget<WidgetT>(GetOwningPlayer(), UserWidgetClass, WidgetName))
+	if (WidgetT* Widget = CreateWidget<WidgetT>(GetOwningPlayer(), UserWidgetClass, NAME_None))
 	{
 		return Widget;
 	}

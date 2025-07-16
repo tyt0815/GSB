@@ -14,7 +14,7 @@ class GSB_API UGSBFacilityName : public UUserWidget
 {
 	GENERATED_BODY()
 public:
-	void SetFacilityName(const FName& InFacilityName);
+	void SetFacilityName(const FText InFacilityName);
 
 private:
 	UPROPERTY(meta = (BindWidget))

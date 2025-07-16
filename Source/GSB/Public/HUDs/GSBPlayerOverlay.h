@@ -28,11 +28,18 @@ public:
 	void UpdateInteractionList(const TArray<FString>& Descriptions);
 
 	void UpdatePowerCapacity(int32 CurrentPowerUsage, int32 TotalPowerCapacity);
+
+	void SwitchToBuildModeUI();
+
+	void SwitchToCombatModeUI();
 	
 private:
 
 	UPROPERTY(meta = (BindWidget))
 	UGSBInteractionList* InteractionListWidget;
+
+	UPROPERTY(meta = (BindWidget))
+	UVerticalBox* BuildableFacilityList;
 
 	UPROPERTY(meta = (BindWidget))
 	class UGSBPowerCapacity* PowerCapacity;

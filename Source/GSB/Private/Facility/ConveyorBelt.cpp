@@ -21,8 +21,6 @@ AConveyorBelt::AConveyorBelt()
 
     ItemReceiveComponent = CreateDefaultSubobject<UItemReceiveComponent>(TEXT("ItemReceive"));
     ItemSendComponent = CreateDefaultSubobject<UItemSendComponent>(TEXT("ItemSend"));
-
-    FacilityName = TEXT("컨베이어 벨트");
 }
 
 void AConveyorBelt::Tick_OnOperating(float DeltaTime)

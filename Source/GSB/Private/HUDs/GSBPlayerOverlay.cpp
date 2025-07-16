@@ -5,6 +5,7 @@
 #include "HUDs/GSBInteractionList.h"
 #include "HUDs/GSBPowerCapacity.h"
 #include "PlayerController/GSBPlayerController.h"
+#include "Components/VerticalBox.h"
 
 void UGSBPlayerOverlay::InitializeOverlay()
 {
@@ -49,4 +50,14 @@ void UGSBPlayerOverlay::UpdateInteractionList(const TArray<FString>& Description
 void UGSBPlayerOverlay::UpdatePowerCapacity(int32 CurrentPowerUsage, int32 TotalPowerCapacity)
 {
 	PowerCapacity->UpdatePowerCapacity(CurrentPowerUsage, TotalPowerCapacity);
+}
+
+void UGSBPlayerOverlay::SwitchToBuildModeUI()
+{
+	BuildableFacilityList->SetVisibility(ESlateVisibility::Visible);
+}
+
+void UGSBPlayerOverlay::SwitchToCombatModeUI()
+{
+	BuildableFacilityList->SetVisibility(ESlateVisibility::Hidden);
 }

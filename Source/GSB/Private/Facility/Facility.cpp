@@ -1,5 +1,6 @@
 #include "Facility/Facility.h"
 #include "Facility/Addon/FacilityAddon.h"
+#include "Facility/GSBFacilityDataAsset.h"
 #include "Interfaces/InteractableActor.h"
 #include "Components/MeshOverlayHelperComponent.h"
 #include "SubSystems/GSBWindowSubsystem.h"
@@ -90,9 +91,14 @@ void AFacility::ConnectFacilityAddon(AFacilityAddon* Addon)
 	Addon->OnConnectedToFacility();
 }
 
+FText AFacility::GetFacilityName() const
+{
+	return IsValid(FacilityData) ? FacilityData->FacilityName : FText::FromString(TEXT("FacilityName_None"));
+}
+
 void AFacility::AddDefaultInteractions()
 {
-	InteractionComponent->AddInteractionDynamic(FacilityName.ToString(), this, &AFacility::OnShowDetailInteraction);
+	InteractionComponent->AddInteractionDynamic(GetFacilityName().ToString(), this, &AFacility::OnShowDetailInteraction);
 }
 
 void AFacility::OnShowDetailInteraction(AActor* Interactor)
@@ -103,7 +109,7 @@ void AFacility::OnShowDetailInteraction(AActor* Interactor)
 		{
 			if (UGSBWindowSubsystem* WindowManager = GameInst->GetSubsystem<UGSBWindowSubsystem>())
 			{
-				DetailWindow = Cast<UGSBFacilityDetailWindow>(WindowManager->OpenWindow(DetailWindowClass, FName(FacilityName.ToString() + TEXT(" Detail Window"))));
+				DetailWindow = Cast<UGSBFacilityDetailWindow>(WindowManager->OpenWindow(DetailWindowClass, FName(GetFacilityName().ToString() + TEXT(" Detail Window"))));
 				if (DetailWindow)
 				{
 					DetailWindow->OnLinkedToFacility(this);
@@ -113,7 +119,7 @@ void AFacility::OnShowDetailInteraction(AActor* Interactor)
 	}
 	else
 	{
-		TRACE_SCREEN_LOG(TEXT("DetailWindowClass가 nullptr입니다. :") + FacilityName.ToString());
+		TRACE_SCREEN_LOG(TEXT("DetailWindowClass가 nullptr입니다. :") + GetFacilityName().ToString());
 	}
 }
 

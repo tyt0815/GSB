@@ -4,7 +4,7 @@
 #include "HUDs/GSBFacilityName.h"
 #include "Components/TextBlock.h"
 
-void UGSBFacilityName::SetFacilityName(const FName& InFacilityName)
+void UGSBFacilityName::SetFacilityName(const FText InFacilityName)
 {
-	FacilityName->SetText(FText::FromString(InFacilityName.ToString()));
+	FacilityName->SetText(InFacilityName);
 }

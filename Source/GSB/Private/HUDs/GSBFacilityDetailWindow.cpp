@@ -11,7 +11,7 @@ void UGSBFacilityDetailWindow::OnClosed()
 	Super::OnClosed();
 }
 
-void UGSBFacilityDetailWindow::SetFacilityName(const FName& InFacilityName)
+void UGSBFacilityDetailWindow::SetFacilityName(const FText InFacilityName)
 {
 	FacilityName->SetFacilityName(InFacilityName);
 }

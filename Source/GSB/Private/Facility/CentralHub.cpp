@@ -29,8 +29,6 @@ ACentralHub::ACentralHub()
 	StorageComponent = CreateDefaultSubobject<UItemStorageComponent>(TEXT("Storage"));
 	InputPortHandler = CreateDefaultSubobject<URetryPrioritizedActorRequestHandlerComponent>(TEXT("InputPortHandler"));
 	OutputPortHandler = CreateDefaultSubobject<URetryPrioritizedActorRequestHandlerComponent>(TEXT("OutputPortHandler"));
-
-	FacilityName = TEXT("중앙 허브");
 }
 
 void ACentralHub::OnShowDetailInteraction(AActor* Interactor)

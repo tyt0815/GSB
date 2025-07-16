@@ -97,7 +97,6 @@ void AGSBPlayer::BeginPlay()
 	PlayerController = GetController<AGSBPlayerController>();
 	if (PlayerController)
 	{
-		SetGamePlayMode_Combat();
 		HUD = Cast<AGSBPlayerHUD>(PlayerController->GetHUD());
 		if (HUD)
 		{
@@ -111,6 +110,7 @@ void AGSBPlayer::BeginPlay()
 		{
 			TRACE_SCREEN_LOG(TEXT("HUD 캐스팅 실패"));
 		}
+		SetGamePlayMode_Combat();
 	}
 	else
 	{
@@ -331,6 +331,11 @@ void AGSBPlayer::SetGamePlayMode_Combat()
 	{
 		PlayerController->ActivateCombatInputContext();
 	}
+
+	if (OverlayWidget)
+	{
+		OverlayWidget->SwitchToCombatModeUI();
+	}
 }
 
 void AGSBPlayer::SetGamePlayMode_Build()
@@ -340,6 +345,11 @@ void AGSBPlayer::SetGamePlayMode_Build()
 	if (PlayerController)
 	{
 		PlayerController->ActivateBuildInputContext();
+	}
+
+	if (OverlayWidget)
+	{
+		OverlayWidget->SwitchToBuildModeUI();
 	}
 }
 

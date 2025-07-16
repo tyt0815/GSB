@@ -46,6 +46,8 @@ public:
 
 	virtual bool IsOperating() const { return true; };
 
+	FText GetFacilityName() const;
+
 protected:
 	virtual void AddDefaultInteractions();
 
@@ -63,8 +65,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	UMeshOverlayHelperComponent* MeshOverlayHelperComponent;
 
-	UPROPERTY(EditAnywhere)
-	FName FacilityName = FName(TEXT("FacilityName_None"));
+	UPROPERTY(EditDefaultsOnly, Category = "GSB")
+	class UGSBFacilityDataAsset* FacilityData;
 
 	TArray<AFacilityAddon*> ConnectedAddons;
 
@@ -85,8 +87,8 @@ protected:
 	// inline 함수
 	//////////////////////////////////////////////////////////////
 public:
-	FORCEINLINE FName GetFacilityName() const
+	FORCEINLINE class UGSBFacilityDataAsset* GetFacilityData() const
 	{
-		return FacilityName;
+		return FacilityData;
 	}
 };

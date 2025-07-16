@@ -16,7 +16,7 @@ public:
 	virtual void OnClosed() override;
 
 public:
-	void SetFacilityName(const FName& InFacilityName);
+	void SetFacilityName(const FText InFacilityName);
 
 	void UnlinkFacility();
 
