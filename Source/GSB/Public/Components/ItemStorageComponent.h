@@ -37,6 +37,8 @@ public:
 
 	int32 DropItem(FItemStack ItemStack);
 
+	void DropAllItems();
+
 	// @return 옮긴 아이템수
 	int32 MoveItemTo(UItemStorageComponent* To, FItemStack ItemStack);
 

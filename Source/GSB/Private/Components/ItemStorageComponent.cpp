@@ -160,6 +160,14 @@ int32 UItemStorageComponent::DropItem(FItemStack ItemStack)
 	return 0;
 }
 
+void UItemStorageComponent::DropAllItems()
+{
+	for (int i = StoredItems.Num() - 1; i >= 0; --i)
+	{
+		DropItem(StoredItems[i]);
+	}
+}
+
 int32 UItemStorageComponent::MoveItemTo(UItemStorageComponent* To, FItemStack ItemStack)
 {
 	int32 MovedItemNum = 0;

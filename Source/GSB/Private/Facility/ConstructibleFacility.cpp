@@ -4,6 +4,7 @@
 #include "Facility/ConstructibleFacility.h"
 #include "Facility/Addon/FacilityAddon.h"
 #include "Interfaces/PowerProviderFacility.h"
+#include "Components/ItemStorageComponent.h"
 #include "DebugHeader.h"
 
 bool AConstructibleFacility::IsOperating() const
@@ -112,9 +113,17 @@ void AConstructibleFacility::CompleteConstruction_Implementation()
 
 	InteractionComponent->ClearInteractions();
 	AddDefaultInteractions();
+
 }
 
 void AConstructibleFacility::CompleteDeconstruction_Implementation()
 {
+	TArray<UItemStorageComponent*> ItemStorageComponents;
+	GetComponents(ItemStorageComponents);
+	for (UItemStorageComponent* ItemStorage : ItemStorageComponents)
+	{
+		ItemStorage->DropAllItems();
+	}
+
 	Destroy();
 }

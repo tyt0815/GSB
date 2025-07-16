@@ -7,15 +7,14 @@
 #include "Interfaces/InputPortHandler.h"
 #include "PowerGenerator.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class GSB_API APowerGenerator : public AHubLinkedFacility,
 	public IInputPortHandler
 {
 	GENERATED_BODY()
 public:
+	APowerGenerator();
+
 	virtual void OnLinkToPowerProvider_Implementation(AActor* PowerProviderActor) override;
 
 	virtual void OnUnlinkFromPowerProvider_Implementation() override;
@@ -27,6 +26,9 @@ public:
 
 protected:
 	class ACentralHub* GetCentralHub() const;
+
+	UPROPERTY(VisibleAnywhere)
+	class UItemStorageComponent* ItemStorageComponent;
 
 	UPROPERTY(EditAnywhere, Category = "GSB")
 	class UItemDataAsset* ConsumingItemData;
@@ -61,7 +63,5 @@ private:
 	FTimerHandle GeneratingTimerHandle;
 
 	UPROPERTY(EditAnywhere, Category = "GSB")
-	int32 MaxStack = 50;	
-
-	int32 StoredItemStack = 0;
+	int32 MaxStack = 50;
 };

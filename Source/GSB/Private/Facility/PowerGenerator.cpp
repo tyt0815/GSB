@@ -4,17 +4,24 @@
 #include "Facility/PowerGenerator.h"
 #include "Facility/Addon/InputPort.h"
 #include "Facility/CentralHub.h"
+#include "Components/ItemStorageComponent.h"
 #include "Subsystems/GSBFacilitySubsystem.h"
 #include "Items/ItemCrate.h"
 
 constexpr int32 GENERATED_POWER_AMOUNT = 100;
 
+APowerGenerator::APowerGenerator()
+{
+	ItemStorageComponent = CreateDefaultSubobject<UItemStorageComponent>(TEXT("ItemStorage"));
+	ItemStorageComponent->SetStorageSize(1);
+}
+
 void APowerGenerator::OnLinkToPowerProvider_Implementation(AActor* PowerProviderActor)
 {
 	Super::OnLinkToPowerProvider_Implementation(PowerProviderActor);	
-	if (!TryBeginGeneraingPower())
+	if (!TryResumeGeneratingPower())
 	{
-		TryResumeGeneratingPower();
+		TryBeginGeneraingPower();
 	}
 }
 
@@ -52,7 +59,9 @@ bool APowerGenerator::CanReceiveItem(const AInputPort* InputPort)
 {
 	if (AItemCrate* ItemCrate = Cast<AItemCrate>(InputPort->GetPendingItemFromSender()))
 	{
-		return ItemCrate->GetItemData() == ConsumingItemData && StoredItemStack < MaxStack;
+		return ItemCrate->GetItemData() == ConsumingItemData &&
+			ItemStorageComponent->GetItemStack(ConsumingItemData).Stack < MaxStack &&
+			IsConstructed();
 	}
 	return false;
 }
@@ -60,15 +69,15 @@ bool APowerGenerator::CanReceiveItem(const AInputPort* InputPort)
 void APowerGenerator::OnReceiveItem(AActor* Item, AInputPort* InputPort)
 {
 	Item->Destroy();
-	++StoredItemStack;
+	ItemStorageComponent->StoreItem({ ConsumingItemData, 1 });
 	TryBeginGeneraingPower();
 }
 
 bool APowerGenerator::TryBeginGeneraingPower()
 {
-	if (StoredItemStack > 0 && !IsGeneratingPower())
+	if (ItemStorageComponent->GetItemStack(ConsumingItemData).Stack > 0 && !IsGeneratingPower())
 	{
-		--StoredItemStack;
+		ItemStorageComponent->UnstoreItem({ ConsumingItemData, 1 });
 		AddPowerToCentralHub();
 		FTimerDelegate EndGeneratingPowerDelegate;
 		EndGeneratingPowerDelegate.BindUFunction(this, TEXT("EndGeneratingPower"));
