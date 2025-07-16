@@ -74,6 +74,4 @@ private:
 
 	UFUNCTION()
 	bool CanReceiveItem(const class AInputPort* InputPort);
-
-	void DeconstructionFacilityChain(UObject* Object);
 };

@@ -26,11 +26,11 @@ void APowerRelayFacility::BeginConstruction_Implementation()
 void APowerRelayFacility::OnLinkToPowerProvider_Implementation(AActor* PowerProviderActor)
 {
 	Super::OnLinkToPowerProvider_Implementation(PowerProviderActor);
-	PowerProviderComponent->LinkFacilitiesInPowerInfluenceArea();
 	if (LinkedPowerProvider)
 	{
 		LinkedPowerProvider->UpdatePowerUsage(PowerProviderComponent->GetCurrentPowerUsage());
 	}
+	PowerProviderComponent->LinkFacilitiesInPowerInfluenceArea();
 }
 
 void APowerRelayFacility::OnUnlinkFromPowerProvider_Implementation()

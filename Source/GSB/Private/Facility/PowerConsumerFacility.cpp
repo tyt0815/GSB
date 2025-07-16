@@ -68,7 +68,6 @@ bool APowerConsumerFacility::CanLinkToPowerProvider(IPowerProviderFacility* Powe
 
 void APowerConsumerFacility::OnLinkToPowerProvider_Implementation(AActor* PowerProviderActor)
 {
-	UnlinkFromPowerProvider();
 	LinkedPowerProvider = TScriptInterface<IPowerProviderFacility>(PowerProviderActor);
 	if (LinkedPowerProvider)
 	{

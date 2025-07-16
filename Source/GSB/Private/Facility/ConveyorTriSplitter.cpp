@@ -58,19 +58,19 @@ void AConveyorTriSplitter::DeconstructConnectedConveyorChain()
 {
 	if (IsValid(BackwardInputPort))
 	{
-		DeconstructionFacilityChain(BackwardInputPort->GetConnectedItemSender().GetObject());
+		BackwardInputPort->DeconstructConnectedConveyorBeltChain();
 	}
 	if (IsValid(ForwardOutputPort))
 	{
-		DeconstructionFacilityChain(ForwardOutputPort->GetConnectedItemReceiver().GetObject());
+		ForwardOutputPort->DeconstructConnectedConveyorBeltChain();
 	}
 	if (IsValid(LeftOutputPort))
 	{
-		DeconstructionFacilityChain(LeftOutputPort->GetConnectedItemReceiver().GetObject());
+		LeftOutputPort->DeconstructConnectedConveyorBeltChain();
 	}
 	if (IsValid(RightOutputPort))
 	{
-		DeconstructionFacilityChain(RightOutputPort->GetConnectedItemReceiver().GetObject());
+		RightOutputPort->DeconstructConnectedConveyorBeltChain();
 	}
 
 	BeginDeconstruction();
@@ -133,12 +133,4 @@ bool AConveyorTriSplitter::HandleOutputPort(AActor* Actor)
 bool AConveyorTriSplitter::CanReceiveItem(const AInputPort* InputPort)
 {
 	return !GetWorldTimerManager().IsTimerActive(TransportTimerHandler) && !CurrentTransportedItemData;
-}
-
-void AConveyorTriSplitter::DeconstructionFacilityChain(UObject* Object)
-{
-	if (IsValid(Object) && Object->Implements<UChainDeconstrutableFacility>())
-	{
-		Cast<IChainDeconstrutableFacility>(Object)->DeconstructConnectedConveyorChain();
-	}
 }

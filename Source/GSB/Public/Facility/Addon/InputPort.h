@@ -55,6 +55,8 @@ public:
 
 	TScriptInterface<IItemSender> GetConnectedItemSender() const;
 
+	void DeconstructConnectedConveyorBeltChain();
+
 protected:
 
 	UPROPERTY(VisibleAnywhere)

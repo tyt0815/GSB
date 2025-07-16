@@ -50,6 +50,24 @@ void ACrossPassConveyorBelt::RegisterOutputPort(AOutputPort* OutputPort)
 	}
 }
 
+void ACrossPassConveyorBelt::DeconstructConnectedConveyorChain()
+{
+	for (auto Pair : PortSet)
+	{
+		FItemPortSet& ItemPortSet = Pair.Value;
+		if (IsValid(ItemPortSet.InputPort))
+		{
+			ItemPortSet.InputPort->DeconstructConnectedConveyorBeltChain();
+		}
+		if (IsValid(ItemPortSet.OutputPort))
+		{
+			ItemPortSet.OutputPort->DeconstructConnectedConveyorBeltChain();
+		}
+	}
+
+	BeginDeconstruction();
+}
+
 void ACrossPassConveyorBelt::BeginPlay()
 {
 	Super::BeginPlay();

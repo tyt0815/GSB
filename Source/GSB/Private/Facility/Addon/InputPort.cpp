@@ -5,6 +5,7 @@
 #include "Components/ItemReceiveComponent.h"
 #include "Components/SplineTransportComponent.h"
 #include "Interfaces/InputPortHandler.h"
+#include "Interfaces/ChainDeconstrutableFacility.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "DebugHeader.h"
 
@@ -122,4 +123,12 @@ AActor* AInputPort::TakeReceivedItem()
 TScriptInterface<IItemSender> AInputPort::GetConnectedItemSender() const
 {
     return ItemReceiver->GetConnectedItemSender();
+}
+
+void AInputPort::DeconstructConnectedConveyorBeltChain()
+{
+    if (IChainDeconstrutableFacility* CDF = Cast<IChainDeconstrutableFacility>(ItemReceiver->GetConnectedItemSender().GetObject()))
+    {
+        CDF->DeconstructConnectedConveyorChain();
+    }
 }

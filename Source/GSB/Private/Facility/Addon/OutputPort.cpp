@@ -4,6 +4,7 @@
 #include "Facility/Addon/OutputPort.h"
 #include "Components/ItemSendComponent.h"
 #include "Interfaces/OutputPortHandler.h"
+#include "Interfaces/ChainDeconstrutableFacility.h"
 #include "Items/ItemCrate.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "GSBGameInstance.h"
@@ -135,4 +136,12 @@ bool AOutputPort::TryCreateAndSendItemCrate(UItemDataAsset* ItemData)
 		}
 	}
 	return false;
+}
+
+void AOutputPort::DeconstructConnectedConveyorBeltChain()
+{
+	if (IChainDeconstrutableFacility* CDF = Cast<IChainDeconstrutableFacility>(ItemSender->GetConnectedItemReceiver().GetObject()))
+	{
+		CDF->DeconstructConnectedConveyorChain();
+	}
 }

@@ -6,6 +6,7 @@
 #include "Facility/ConstructibleFacility.h"
 #include "Interfaces/InputPortHandler.h"
 #include "Interfaces/OutputPortHandler.h"
+#include "Interfaces/ChainDeconstrutableFacility.h"
 #include "CrossPassConveyorBelt.generated.h"
 
 class UItemDataAsset;
@@ -15,7 +16,10 @@ class AInputPort;
 class AOutputPort;
 
 UCLASS()
-class GSB_API ACrossPassConveyorBelt : public AConstructibleFacility, public IInputPortHandler, public IOutputPortHandler
+class GSB_API ACrossPassConveyorBelt : public AConstructibleFacility,
+	public IInputPortHandler,
+	public IOutputPortHandler,
+	public IChainDeconstrutableFacility
 {
 	GENERATED_BODY()
 public:
@@ -24,6 +28,16 @@ public:
 	virtual void RegisterInputPort(AInputPort* InputPort) override;
 
 	virtual void RegisterOutputPort(AOutputPort* OutputPort) override;
+
+	///////////////////////////////////////////////////////////////
+	// IChainDeconstrutableFacility
+	///////////////////////////////////////////////////////////////
+
+	virtual void DeconstructConnectedConveyorChain() override;
+
+	virtual void DeconstructConnectedReceiverConveyorChain(bool bDeconstructSelf) override {};
+
+	virtual void DeconstructConnectedSenderConveyorChain(bool bDeconstructSelf) override {};
 
 protected:
 	virtual void BeginPlay() override;

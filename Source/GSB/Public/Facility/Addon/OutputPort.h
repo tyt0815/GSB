@@ -47,6 +47,8 @@ public:
 
 	bool TryCreateAndSendItemCrate(UItemDataAsset* ItemData);
 
+	void DeconstructConnectedConveyorBeltChain();
+
 protected:
 	UPROPERTY(VisibleAnywhere)
 	UItemSendComponent* ItemSender;
