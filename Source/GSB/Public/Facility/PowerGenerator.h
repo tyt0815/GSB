@@ -15,6 +15,8 @@ class GSB_API APowerGenerator : public AHubLinkedFacility,
 public:
 	APowerGenerator();
 
+	virtual void OnShowDetailInteraction(AActor* Interactor) override;
+
 	virtual void OnLinkToPowerProvider_Implementation(AActor* PowerProviderActor) override;
 
 	virtual void OnUnlinkFromPowerProvider_Implementation() override;
@@ -22,7 +24,7 @@ public:
 	virtual void RegisterInputPort(AInputPort* InInputPort) override;
 
 public:
-
+	float GetRemainingPowerTimeProgress() const;
 
 protected:
 	class ACentralHub* GetCentralHub() const;
@@ -55,6 +57,8 @@ private:
 
 	bool IsGeneratingPower() const;
 
+	void UpdateConsumingItemSlotWidget();
+
 	AInputPort* ConnectedInputPort;
 
 	UPROPERTY(EditAnywhere, Category = "GSB")
@@ -64,4 +68,6 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "GSB")
 	int32 MaxStack = 50;
+
+	friend class UGSBPowerGeneratorDetailWindow;
 };

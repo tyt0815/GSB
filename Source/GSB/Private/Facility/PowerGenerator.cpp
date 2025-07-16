@@ -5,8 +5,9 @@
 #include "Facility/Addon/InputPort.h"
 #include "Facility/CentralHub.h"
 #include "Components/ItemStorageComponent.h"
-#include "Subsystems/GSBFacilitySubsystem.h"
+#include "HUDs/GSBPowerGeneratorDetailWindow.h"
 #include "Items/ItemCrate.h"
+#include "Subsystems/GSBFacilitySubsystem.h"
 
 constexpr int32 GENERATED_POWER_AMOUNT = 100;
 
@@ -14,6 +15,21 @@ APowerGenerator::APowerGenerator()
 {
 	ItemStorageComponent = CreateDefaultSubobject<UItemStorageComponent>(TEXT("ItemStorage"));
 	ItemStorageComponent->SetStorageSize(1);
+}
+
+void APowerGenerator::OnShowDetailInteraction(AActor* Interactor)
+{
+	Super::OnShowDetailInteraction(Interactor);
+
+	if (UGSBPowerGeneratorDetailWindow* PGDW = Cast<UGSBPowerGeneratorDetailWindow>(DetailWindow))
+	{
+		if (IsValid(ConsumingItemData))
+		{
+			PGDW->SetConsumingItem(ConsumingItemData->Name);
+		}
+		PGDW->SetGeneratingTime(GeneratingTime);
+	}
+	UpdateConsumingItemSlotWidget();
 }
 
 void APowerGenerator::OnLinkToPowerProvider_Implementation(AActor* PowerProviderActor)
@@ -36,6 +52,11 @@ void APowerGenerator::RegisterInputPort(AInputPort* InInputPort)
 	ConnectedInputPort = InInputPort;
 	ConnectedInputPort->OnCanReceiveItemCalled.BindDynamic(this, &APowerGenerator::CanReceiveItem);
 	ConnectedInputPort->OnReceivedItemDelegate.AddDynamic(this, &APowerGenerator::OnReceiveItem);
+}
+
+float APowerGenerator::GetRemainingPowerTimeProgress() const
+{
+	return GetWorldTimerManager().GetTimerRemaining(GeneratingTimerHandle) / GeneratingTime;
 }
 
 ACentralHub* APowerGenerator::GetCentralHub() const
@@ -70,6 +91,7 @@ void APowerGenerator::OnReceiveItem(AActor* Item, AInputPort* InputPort)
 {
 	Item->Destroy();
 	ItemStorageComponent->StoreItem({ ConsumingItemData, 1 });
+	UpdateConsumingItemSlotWidget();
 	TryBeginGeneraingPower();
 }
 
@@ -78,6 +100,7 @@ bool APowerGenerator::TryBeginGeneraingPower()
 	if (ItemStorageComponent->GetItemStack(ConsumingItemData).Stack > 0 && !IsGeneratingPower())
 	{
 		ItemStorageComponent->UnstoreItem({ ConsumingItemData, 1 });
+		UpdateConsumingItemSlotWidget();
 		AddPowerToCentralHub();
 		FTimerDelegate EndGeneratingPowerDelegate;
 		EndGeneratingPowerDelegate.BindUFunction(this, TEXT("EndGeneratingPower"));
@@ -116,4 +139,12 @@ bool APowerGenerator::TryResumeGeneratingPower()
 bool APowerGenerator::IsGeneratingPower() const
 {
 	return GetWorldTimerManager().IsTimerActive(GeneratingTimerHandle);
+}
+
+void APowerGenerator::UpdateConsumingItemSlotWidget()
+{
+	if (UGSBPowerGeneratorDetailWindow* PGDW = Cast<UGSBPowerGeneratorDetailWindow>(DetailWindow))
+	{
+		PGDW->SetConsumingItemSlot(ItemStorageComponent->GetItemStack(ConsumingItemData));
+	}
 }
