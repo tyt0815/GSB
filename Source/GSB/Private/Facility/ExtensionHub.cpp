@@ -2,7 +2,7 @@
 
 
 #include "Facility/ExtensionHub.h"
-#include "GSBGameInstance.h"
+#include "SubSystems/GSBFacilitySubsystem.h"
 #include "DebugHeader.h"	
 
 AExtensionHub::AExtensionHub()
@@ -38,9 +38,11 @@ void AExtensionHub::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UGSBGameInstance* GameInst = Cast<UGSBGameInstance>(GetGameInstance());
-	if (GameInst)
+	if (UGameInstance* GameInst = GetGameInstance())
 	{
-		GameInst->AddHub(this);
+		if (UGSBFacilitySubsystem* FacilityManager = Cast<UGSBFacilitySubsystem>(GameInst->GetSubsystem<UGSBFacilitySubsystem>()))
+		{
+			FacilityManager->AddHub(this);
+		}
 	}
 }

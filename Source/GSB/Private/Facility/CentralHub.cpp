@@ -13,7 +13,7 @@
 #include "HUDs/GSBPlayerHUD.h"
 #include "HUDs/GSBPlayerOverlay.h"
 #include "HUDs/GSBHubDetailWindow.h"
-#include "GSBGameInstance.h"
+#include "SubSystems/GSBFacilitySubsystem.h"
 #include "DebugHeader.h"
 
 ACentralHub::ACentralHub()
@@ -98,10 +98,14 @@ UItemStorageComponent* ACentralHub::GetHubStorageComponent()
 void ACentralHub::BeginPlay()
 {
 	Super::BeginPlay();
-	UGSBGameInstance* GameInst = Cast<UGSBGameInstance>(GetGameInstance());
-	if (GameInst)
+	
+	if (UGameInstance* GameInst = GetGameInstance())
 	{
-		GameInst->AddHub(this);
+		if (UGSBFacilitySubsystem* FacilityManager = Cast<UGSBFacilitySubsystem>(GameInst->GetSubsystem<UGSBFacilitySubsystem>()))
+		{
+			FacilityManager->AddHub(this);
+			FacilityManager->SetCentralHub(this);
+		}
 	}
 
 	PowerProviderComponent->SetPowerInfluenceAreaMeshComponent(PowerInfluenceAreaStaticMeshComponent);

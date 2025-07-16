@@ -11,6 +11,7 @@
 class UItemReceiveComponent;
 
 DECLARE_DYNAMIC_DELEGATE_RetVal_OneParam(bool, FCanReceiveItemSignature, const class AInputPort*, InputPort);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInputPortRecievedItemSignature, AActor*, Item, class AInputPort*, InputPort);
 
 UCLASS()
 class GSB_API AInputPort : public AItemPort, public IItemReceiver
@@ -56,6 +57,8 @@ public:
 	TScriptInterface<IItemSender> GetConnectedItemSender() const;
 
 	void DeconstructConnectedConveyorBeltChain();
+
+	FOnInputPortRecievedItemSignature OnReceivedItemDelegate;
 
 protected:
 

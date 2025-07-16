@@ -56,6 +56,7 @@ void AInputPort::OnReceiveItem(AActor* Item)
 	{
         ItemReceiver->OnReceiveItem(Item);
 	}
+    OnReceivedItemDelegate.Broadcast(Item, this);
 }
 
 FVector AInputPort::GetReceivingDirection() const

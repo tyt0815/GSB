@@ -3,7 +3,7 @@
 
 #include "Facility/PowerDistributor.h"
 #include "Facility/PowerDistributorLinkedFacility.h"
-#include "GSBGameInstance.h"
+#include "SubSystems/GSBFacilitySubsystem.h"
 #include "DebugHeader.h"
 
 APowerDistributor::APowerDistributor()
@@ -24,9 +24,11 @@ void APowerDistributor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UGSBGameInstance* GameInst = Cast<UGSBGameInstance>(GetGameInstance());
-	if (GameInst)
+	if (UGameInstance* GameInst = GetGameInstance())
 	{
-		GameInst->AddPowerDistributor(this);
+		if (UGSBFacilitySubsystem* FacilityManager = Cast<UGSBFacilitySubsystem>(GameInst->GetSubsystem<UGSBFacilitySubsystem>()))
+		{
+			FacilityManager->AddPowerDistributor(this);
+		}
 	}
 }

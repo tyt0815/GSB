@@ -5,7 +5,7 @@
 #include "BuildSystem/FacilityGhostActor.h"
 #include "Facility/ConstructibleFacility.h"
 #include "Facility/MiningPoint.h"
-#include "GSBGameInstance.h"
+#include "SubSystems/GSBFacilitySubsystem.h"
 #include "GSBDefines.h"
 #include "DebugHeader.h"
 
@@ -114,9 +114,12 @@ void AFacilityBuilder::CancelPreview()
 		FacilityGhost->Destroy();
 	}
 
-	if (UGSBGameInstance* GameInst = Cast<UGSBGameInstance>(GetGameInstance()))
+	if (UGameInstance* GameInst = GetGameInstance())
 	{
-		GameInst->SetPowerInfluenceVisibility(false);
+		if (UGSBFacilitySubsystem* FacilityManager = GameInst->GetSubsystem<UGSBFacilitySubsystem>())
+		{
+			FacilityManager->SetPowerInfluenceVisibility(false);
+		}
 	}
 
 	DestroyAllConveyorBeltGhosts();
@@ -371,9 +374,12 @@ AFacilityGhostActor* AFacilityBuilder::SpawnFacilityGhost(const TSubclassOf<ACon
 	{
 		if (bVisiblePowerInfluenceArea)
 		{
-			if (UGSBGameInstance* GameInst = Cast<UGSBGameInstance>(GetGameInstance()))
+			if (UGameInstance* GameInst = GetGameInstance())
 			{
-				GameInst->SetPowerInfluenceVisibilityByFacility(TempFacility, true);
+				if (UGSBFacilitySubsystem* FacilityManager = GameInst->GetSubsystem<UGSBFacilitySubsystem>())
+				{
+					FacilityManager->SetPowerInfluenceVisibilityByFacility(TempFacility, true);
+				}
 			}
 		}
 
