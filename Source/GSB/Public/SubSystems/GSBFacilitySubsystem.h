@@ -17,6 +17,8 @@ class GSB_API UGSBFacilitySubsystem : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
 public:
+	static UGSBFacilitySubsystem* Get(const UObject* WorldContext);
+
 	void SetFacilityPowerInfluenceVisibility(TScriptInterface<IPowerProviderFacility> PowerProvider, bool bVisibility);
 
 	void SetAllHubsPowerInfluenceVisibility(bool bVisibility);

@@ -8,6 +8,11 @@
 #include "Facility/PowerDistributor.h"
 #include "DebugHeader.h"
 
+UGSBFacilitySubsystem* UGSBFacilitySubsystem::Get(const UObject* WorldContext)
+{	
+	return WorldContext->GetWorld()->GetGameInstance()->GetSubsystem<UGSBFacilitySubsystem>();
+}
+
 void UGSBFacilitySubsystem::SetFacilityPowerInfluenceVisibility(TScriptInterface<IPowerProviderFacility> PowerProvider, bool bVisibility)
 {
 	if (IsValid(PowerProvider.GetObject()))

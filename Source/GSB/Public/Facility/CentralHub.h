@@ -47,6 +47,9 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+public:
+	void UpdatePowerCapacity(int32 Addition);
+
 protected:
 	UPROPERTY(VisibleAnywhere)
 	UPowerProviderComponent* PowerProviderComponent;
@@ -84,4 +87,6 @@ private:
 
 	UFUNCTION()
 	void SetOverlayWidget();
+
+	void UpdatePowerCapacityWidget();
 };

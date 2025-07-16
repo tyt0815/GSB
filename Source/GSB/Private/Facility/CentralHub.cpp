@@ -68,10 +68,7 @@ void ACentralHub::UnlinkPowerConsumerFacility(APowerConsumerFacility* PowerConsu
 void ACentralHub::UpdatePowerUsage(int32 Addition)
 {
 	PowerProviderComponent->UpdatePowerUsage(Addition);
-	if (Overlay)
-	{
-		Overlay->UpdatePowerCapacity(PowerProviderComponent->GetCurrentPowerUsage(), PowerCapacity);
-	}
+	UpdatePowerCapacityWidget();
 }
 
 void ACentralHub::SetPowerInfluenceAreaVisibility(bool bVisibilty)
@@ -137,6 +134,12 @@ void ACentralHub::BeginPlay()
 
 }
 
+void ACentralHub::UpdatePowerCapacity(int32 Addition)
+{
+	PowerCapacity += Addition;
+	UpdatePowerCapacityWidget();
+}
+
 bool ACentralHub::TryReceiveItemFromInputPort(AActor* Actor)
 {
 	AInputPort* InputPort = Cast<AInputPort>(Actor);
@@ -193,5 +196,13 @@ bool ACentralHub::CanReceiveItem(const AInputPort* InputPort)
 void ACentralHub::SetOverlayWidget()
 {
 	Overlay = Cast<UGSBPlayerOverlay>(GSBHUD->GetOverlayWidget());
-	UpdatePowerUsage(0);
+	UpdatePowerCapacityWidget();
+}
+
+void ACentralHub::UpdatePowerCapacityWidget()
+{
+	if (Overlay)
+	{
+		Overlay->UpdatePowerCapacity(PowerProviderComponent->GetCurrentPowerUsage(), PowerCapacity);
+	}
 }

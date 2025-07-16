@@ -26,10 +26,16 @@ public:
 
 
 protected:
+	class ACentralHub* GetCentralHub() const;
+
 	UPROPERTY(EditAnywhere, Category = "GSB")
 	class UItemDataAsset* ConsumingItemData;
 
-private	:
+private:
+	void AddPowerToCentralHub();
+
+	void SubtractPowerToCentralHub();
+
 	UFUNCTION()
 	bool CanReceiveItem(const class AInputPort* InputPort);
 
@@ -40,6 +46,10 @@ private	:
 
 	UFUNCTION()
 	void EndGeneratingPower();
+
+	void PauseGeneratingPower();
+
+	bool TryResumeGeneratingPower();
 
 	bool IsGeneratingPower() const;
 
