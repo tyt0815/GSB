@@ -15,8 +15,6 @@ class GSB_API APowerGenerator : public AHubLinkedFacility,
 public:
 	APowerGenerator();
 
-	virtual void OnShowDetailInteraction(AActor* Interactor) override;
-
 	virtual void OnLinkToPowerProvider_Implementation(AActor* PowerProviderActor) override;
 
 	virtual void OnUnlinkFromPowerProvider_Implementation() override;
@@ -56,8 +54,6 @@ private:
 	bool TryResumeGeneratingPower();
 
 	bool IsGeneratingPower() const;
-
-	void UpdateConsumingItemSlotWidget();
 
 	AInputPort* ConnectedInputPort;
 
