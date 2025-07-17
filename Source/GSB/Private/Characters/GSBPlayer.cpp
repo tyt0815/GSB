@@ -438,8 +438,8 @@ int32 AGSBPlayer::PickupItem(const FItemStack& ItemStack)
 
 AActor* AGSBPlayer::TraceInteractableActor()
 {
-	float TraceDistance = 1000;
-	FVector Start = CameraComponent->GetComponentLocation();
+	float TraceDistance = 500;
+	FVector Start = SpringArmComponent->GetComponentLocation();
 	FVector End = Start + CameraComponent->GetForwardVector() * TraceDistance;
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_GameTraceChannel7));
