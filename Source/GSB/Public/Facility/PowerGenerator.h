@@ -62,8 +62,5 @@ private:
 
 	FTimerHandle GeneratingTimerHandle;
 
-	UPROPERTY(EditAnywhere, Category = "GSB")
-	int32 MaxStack = 50;
-
 	friend class UGSBPowerGeneratorDetailWindow;
 };

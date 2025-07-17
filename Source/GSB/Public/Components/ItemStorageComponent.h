@@ -25,6 +25,8 @@ protected:
 public:
 	virtual int32 GetAddableStackCount(const FItemStack& ItemStack) const;
 
+	int32 GetAddableStackCount(UItemDataAsset* ItemData) const;
+
 	FItemStack GetItemStack(UItemDataAsset* ItemData) const;
 
 	int32 FindStoredItemIndex(UItemDataAsset* ItemData) const;
@@ -45,11 +47,17 @@ public:
 	int32 MoveAllItemTo(UItemStorageComponent* To, UItemDataAsset* ItemData);
 
 protected:
-	UPROPERTY(VisibleAnywhere, Category = "ItemStorage")
+	UPROPERTY(VisibleAnywhere, Category = "GSB")
 	TArray<FItemStack> StoredItems;
 
-	UPROPERTY(EditAnywhere, Category = "ItemStorage")
+	UPROPERTY(EditAnywhere, Category = "GSB")
 	int32 StorageSize = 50;
+
+	// 아이템의 MaxStackCount과 별개로, Storage의 MaxStackCount을 설정한다. 
+	// 최종적인 MaxStackCount은 Min(ItemStorageComponent::MaxStackCount, UItemDataAsset::MaxStackCount) 이다.
+	// MaxStackCount이 0 이하 일시, UItemDataAsset::MaxStackCount을 따라간다.
+	UPROPERTY(EditAnywhere, Category = "GSB")
+	int32 MaxStackCount = 0;
 
 	/////////////////////////////////////////////////////////////////////////
 	// UI

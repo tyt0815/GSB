@@ -33,15 +33,29 @@ int32 UItemStorageComponent::GetAddableStackCount(const FItemStack& ItemStack) c
 	}
 
 	int32 Index = FindStoredItemIndex(ItemStack.ItemData);
+	int32 FinalMaxStackCount = MaxStackCount > 0 ? 
+		FMath::Min(ItemStack.ItemData->MaxStackCount, MaxStackCount) : ItemStack.ItemData->MaxStackCount;
 	if (StoredItems.IsValidIndex(Index))
 	{
-		return FMath::Clamp(ItemStack.Stack, 0, ItemStack.ItemData->MaxStackCount - StoredItems[Index].Stack);
+		return FMath::Clamp(ItemStack.Stack, 0, FinalMaxStackCount - StoredItems[Index].Stack);
 	}
 	else if(StoredItems.Num() < StorageSize)
 	{
-		return FMath::Clamp(ItemStack.Stack, 0, ItemStack.ItemData->MaxStackCount);
+		return FMath::Clamp(ItemStack.Stack, 0, FinalMaxStackCount);
 	}
 
+	return 0;
+}
+
+int32 UItemStorageComponent::GetAddableStackCount(UItemDataAsset* ItemData) const
+{
+	if (IsValid(ItemData))
+	{
+		FItemStack ItemStack = {};
+		ItemStack.ItemData = ItemData;
+		ItemStack.Stack = FMath::Max(ItemData->MaxStackCount, MaxStackCount);
+		return GetAddableStackCount(ItemStack);
+	}
 	return 0;
 }
 
@@ -104,7 +118,7 @@ int32 UItemStorageComponent::StoreItem(const FItemStack& Item)
 		Index = StoredItems.Add(NewStack);
 	}
 
-	int32 StackToStore = GetAddableStackCount(Item);	
+	int32 StackToStore = GetAddableStackCount(Item);
 	
 	StoredItems[Index].Stack += StackToStore;
 

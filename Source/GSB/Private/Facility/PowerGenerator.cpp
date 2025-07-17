@@ -65,7 +65,7 @@ bool APowerGenerator::CanReceiveItem(const AInputPort* InputPort)
 	if (AItemCrate* ItemCrate = Cast<AItemCrate>(InputPort->GetPendingItemFromSender()))
 	{
 		return ItemCrate->GetItemData() == ConsumingItemData &&
-			ItemStorageComponent->GetItemStack(ConsumingItemData).Stack < MaxStack &&
+			ItemStorageComponent->GetAddableStackCount(ConsumingItemData) > 0 &&
 			IsConstructed();
 	}
 	return false;
