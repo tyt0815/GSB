@@ -92,8 +92,11 @@ void AGSBPlayerController::SetUIControlMode(bool bUI)
 
 void AGSBPlayerController::EnterUIControlMode()
 {
+	SetShowMouseCursor(true);
+
 	FInputModeGameAndUI InputMode;
 	InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::LockInFullscreen);
+	InputMode.SetHideCursorDuringCapture(false);
 	SetInputMode(InputMode);
 
 	StoreInputMappingContexts(CurrentInputMappingContexts);
@@ -103,6 +106,8 @@ void AGSBPlayerController::EnterUIControlMode()
 
 void AGSBPlayerController::ExitUIControlMode()
 {
+	SetShowMouseCursor(false);
+
 	FInputModeGameOnly InputMode;
 	SetInputMode(InputMode);
 

@@ -2,9 +2,15 @@
 
 
 #include "HUDs/GSBInventory.h"
+#include "Components/InventoryComponent.h"
 #include "Components/TextBlock.h"
 
 void UGSBInventory::SetWeight(int32 CurrentWeight, int32 MaxWeight)
 {
 	Weight->SetText(FText::FromString(FString::Printf(TEXT("(%d/%d)"), CurrentWeight, MaxWeight)));
+}
+
+void UGSBInventory::LinkInventoryComponent(UInventoryComponent* InventoryComponent)
+{
+	LinkStorageComponent(InventoryComponent);
 }

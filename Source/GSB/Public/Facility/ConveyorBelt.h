@@ -60,6 +60,9 @@ public:
 
 	virtual void DeconstructConnectedSenderConveyorChain(bool bDeconstructSelf) override;
 
+public:
+	bool IsTransporting() const;
+
 protected:
 	virtual void BeginPlay() override;
 

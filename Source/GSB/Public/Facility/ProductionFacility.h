@@ -39,6 +39,8 @@ public:
 
 	float GetProductionProgress() const;
 
+	float GetProductionTime() const;
+
 protected:
 	struct FProductionRecipe* FindProductionRecipe();
 	
@@ -77,4 +79,14 @@ private:
 
 	UFUNCTION()
 	bool CanReceiveItem(const AInputPort* InputPort);
+
+public:
+	FORCEINLINE UItemStorageComponent* GetInputStorageComponent() const
+	{
+		return InputStorageComponent;
+	}
+	FORCEINLINE UItemStorageComponent* GetOutputStorageComponent() const
+	{
+		return OutputStorageComponent;
+	}
 };

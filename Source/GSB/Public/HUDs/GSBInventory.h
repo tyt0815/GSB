@@ -16,6 +16,8 @@ class GSB_API UGSBInventory : public UGSBStorage
 public:
 	void SetWeight(int32 CurrentWeight, int32 MaxWeight);
 
+	void LinkInventoryComponent(class UInventoryComponent* InventoryComponent);
+
 private:
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* Weight;

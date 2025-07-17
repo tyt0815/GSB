@@ -48,7 +48,7 @@ void AConveyorBelt::CompleteConstruction_Implementation()
 
 bool AConveyorBelt::CanReceiveItem() const
 {
-    return IsOperating() && ItemReceiveComponent->CanReceiveItem();
+    return IsOperating() && !IsTransporting();
 }
 
 void AConveyorBelt::OnConnectedToItemSender(AActor* NewSender)
@@ -125,6 +125,14 @@ void AConveyorBelt::DeconstructConnectedSenderConveyorChain(bool bDeconstructSel
     {
         TryBeginDeconstruction();
     }
+}
+
+bool AConveyorBelt::IsTransporting() const
+{
+    return IsValid(ItemReceiveComponent->GetReceivedItem()) ||
+        TransportComponent->IsTransporting() ||
+        IsValid(ItemSendComponent->GetItemToSend())
+        ;
 }
 
 void AConveyorBelt::BeginPlay()

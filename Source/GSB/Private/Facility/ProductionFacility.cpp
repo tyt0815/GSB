@@ -8,6 +8,7 @@
 #include "Facility/Addon/OutputPort.h"
 #include "Items/ProductionRecipeSetDataAsset.h"
 #include "Items/ItemCrate.h"
+#include "HUDs/GSBProductionFacilityDetailWindow.h"
 #include "DebugHeader.h"
 
 AProductionFacility::AProductionFacility()
@@ -21,6 +22,7 @@ AProductionFacility::AProductionFacility()
 	OutputPortHandler = CreateDefaultSubobject<URetryPrioritizedActorRequestHandlerComponent>(TEXT("OutputPortHandler"));
 	
 }
+
 void AProductionFacility::RegisterInputPort(AInputPort* InputPort)
 {
 	InputPortHandler->RegisterActor(InputPort);
@@ -48,9 +50,14 @@ void AProductionFacility::HandleReceivedItem(const FItemStack& ItemStack)
 
 float AProductionFacility::GetProductionProgress() const
 {
-	return ProducingItem == nullptr ?
-		0 : GetWorldTimerManager().GetTimerRemaining(ProducingTimerHandle) / GetWorldTimerManager().GetTimerRate(ProducingTimerHandle)
+	return ProducingItem == nullptr || GetProductionTime() == 0 ?
+		0 : GetWorldTimerManager().GetTimerElapsed(ProducingTimerHandle) / GetProductionTime()
 		;
+}
+
+float AProductionFacility::GetProductionTime() const
+{
+	return FMath::Max(0, GetWorldTimerManager().GetTimerRate(ProducingTimerHandle));
 }
 
 FProductionRecipe* AProductionFacility::FindProductionRecipe()

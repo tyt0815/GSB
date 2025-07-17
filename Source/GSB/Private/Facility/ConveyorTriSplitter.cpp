@@ -117,16 +117,18 @@ bool AConveyorTriSplitter::HandleInputPort(AActor* Actor)
 
 bool AConveyorTriSplitter::HandleOutputPort(AActor* Actor)
 {
-	AOutputPort* OutputPort = Cast<AOutputPort>(Actor);
-	check(OutputPort);
-	if (CurrentTransportedItemData && OutputPort->IsConnectedToReceiver())
+	if (AOutputPort* OutputPort = Cast<AOutputPort>(Actor))
 	{
-		if (OutputPort->TryCreateAndSendItemCrate(CurrentTransportedItemData))
+		if (CurrentTransportedItemData && OutputPort->IsConnectedToReceiver())
 		{
-			CurrentTransportedItemData = nullptr;
-			return true;
+			if (OutputPort->TryCreateAndSendItemCrate(CurrentTransportedItemData))
+			{
+				CurrentTransportedItemData = nullptr;
+				return true;
+			}
 		}
 	}
+	
 	return false;
 }
 
