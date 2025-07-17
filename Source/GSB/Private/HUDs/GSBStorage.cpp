@@ -63,9 +63,19 @@ int32 UGSBStorage::MoveItemTo(UItemStorageComponent* To, FItemStack ItemStack)
 	return LinkedStorageComponent->MoveItemTo(To, ItemStack);
 }
 
+int32 UGSBStorage::MoveItemTo(UGSBStorage* To, FItemStack ItemStack)
+{
+	return MoveItemTo(To->LinkedStorageComponent, ItemStack);
+}
+
 int32 UGSBStorage::MoveAllItemTo(UItemStorageComponent* To, UItemDataAsset* ItemData)
 {
 	return LinkedStorageComponent->MoveAllItemTo(To,ItemData);
+}
+
+int32 UGSBStorage::MoveAllItemTo(UGSBStorage* To, UItemDataAsset* ItemData)
+{
+	return MoveAllItemTo(To->LinkedStorageComponent, ItemData);
 }
 
 FItemStack UGSBStorage::GetItemStack(UItemDataAsset* ItemData)

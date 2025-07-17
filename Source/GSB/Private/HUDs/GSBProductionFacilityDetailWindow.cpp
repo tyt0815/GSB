@@ -3,10 +3,20 @@
 
 #include "HUDs/GSBProductionFacilityDetailWindow.h"
 #include "HUDs/GSBInventory.h"
+#include "HUDs/GSBItemSlot.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 #include "Characters/GSBPlayer.h"
 #include "Facility/ProductionFacility.h"
+
+void UGSBProductionFacilityDetailWindow::NativeConstruct()
+{
+	Super::NativeConstruct();
+
+	Inventory->OnItemSlotAdded.AddDynamic(this, &UGSBProductionFacilityDetailWindow::HandleOnInventoryItemSlotAdded);
+	InputStorage->OnItemSlotAdded.AddDynamic(this, &UGSBProductionFacilityDetailWindow::HandleOnInputStorageItemSlotAdded);
+	OutputStorage->OnItemSlotAdded.AddDynamic(this, &UGSBProductionFacilityDetailWindow::HandleOnOutputStorageItemSlotAdded);
+}
 
 void UGSBProductionFacilityDetailWindow::NativeTick(const FGeometry& MyGeometry, float Seconds)
 {
@@ -33,4 +43,34 @@ void UGSBProductionFacilityDetailWindow::OnLinkedToFacility(AFacility* Facility)
 	{
 		Inventory->LinkInventoryComponent(Player->GetInventoryComponent());
 	}
+}
+
+void UGSBProductionFacilityDetailWindow::HandleOnInventoryItemSlotAdded(UGSBStorage* StorageBody, UGSBItemList* ItemList, UGSBItemSlot* ItemSlot)
+{
+	ItemSlot->OnItemSlotLeftClicked.AddDynamic(this, &UGSBProductionFacilityDetailWindow::HandleOnInventoryItemSlotLeftClicked);
+}
+
+void UGSBProductionFacilityDetailWindow::HandleOnInventoryItemSlotLeftClicked(UGSBItemSlot* ItemSlotWidget)
+{
+	Inventory->MoveAllItemTo(InputStorage, ItemSlotWidget->GetItemData());
+}
+
+void UGSBProductionFacilityDetailWindow::HandleOnInputStorageItemSlotAdded(UGSBStorage* StorageBody, UGSBItemList* ItemList, UGSBItemSlot* ItemSlot)
+{
+	ItemSlot->OnItemSlotLeftClicked.AddDynamic(this, &UGSBProductionFacilityDetailWindow::HandleOnInputStorageItemSlotLeftClicked);
+}
+
+void UGSBProductionFacilityDetailWindow::HandleOnInputStorageItemSlotLeftClicked(UGSBItemSlot* ItemSlotWidget)
+{
+	InputStorage->MoveAllItemTo(Inventory, ItemSlotWidget->GetItemData());
+}
+
+void UGSBProductionFacilityDetailWindow::HandleOnOutputStorageItemSlotAdded(UGSBStorage* StorageBody, UGSBItemList* ItemList, UGSBItemSlot* ItemSlot)
+{
+	ItemSlot->OnItemSlotLeftClicked.AddDynamic(this, &UGSBProductionFacilityDetailWindow::HandleOnOutputStorageItemSlotLeftClicked);
+}
+
+void UGSBProductionFacilityDetailWindow::HandleOnOutputStorageItemSlotLeftClicked(UGSBItemSlot* ItemSlotWidget)
+{
+	OutputStorage->MoveAllItemTo(Inventory, ItemSlotWidget->GetItemData());
 }

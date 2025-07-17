@@ -39,7 +39,11 @@ public:
 
 	int32 MoveItemTo(UItemStorageComponent* To, FItemStack ItemStack);
 
+	int32 MoveItemTo(UGSBStorage* To, FItemStack ItemStack);
+
 	int32 MoveAllItemTo(UItemStorageComponent* To, UItemDataAsset* ItemData);
+
+	int32 MoveAllItemTo(UGSBStorage* To, UItemDataAsset* ItemData);
 
 	FItemStack GetItemStack(UItemDataAsset* ItemData);
 

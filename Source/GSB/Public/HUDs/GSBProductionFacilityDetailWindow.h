@@ -7,12 +7,17 @@
 #include "GSBProductionFacilityDetailWindow.generated.h"
 
 class UItemStorageComponent;
+class UGSBStorage;
+class UGSBItemList;
+class UGSBItemSlot;
 
 UCLASS()
 class GSB_API UGSBProductionFacilityDetailWindow : public UGSBPoweredFacilityDetailWindow
 {
 	GENERATED_BODY()
 public:
+	virtual void NativeConstruct() override;
+
 	virtual void NativeTick(const FGeometry& MyGeometry, float Seconds) override;
 
 	virtual void OnLinkedToFacility(AFacility* Facility) override;
@@ -33,4 +38,22 @@ private:
 
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* ProductionTime;
+
+	UFUNCTION()
+	void HandleOnInventoryItemSlotAdded(UGSBStorage* StorageBody, UGSBItemList* ItemList, UGSBItemSlot* ItemSlot);
+
+	UFUNCTION()
+	void HandleOnInventoryItemSlotLeftClicked(UGSBItemSlot* ItemSlotWidget);
+
+	UFUNCTION()
+	void HandleOnInputStorageItemSlotAdded(UGSBStorage* StorageBody, UGSBItemList* ItemList, UGSBItemSlot* ItemSlot);
+
+	UFUNCTION()
+	void HandleOnInputStorageItemSlotLeftClicked(UGSBItemSlot* ItemSlotWidget);
+
+	UFUNCTION()
+	void HandleOnOutputStorageItemSlotAdded(UGSBStorage* StorageBody, UGSBItemList* ItemList, UGSBItemSlot* ItemSlot);
+
+	UFUNCTION()
+	void HandleOnOutputStorageItemSlotLeftClicked(UGSBItemSlot* ItemSlotWidget);
 };
