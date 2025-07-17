@@ -30,7 +30,16 @@ public:
 	UInputAction* JumpInputAction;
 
 	UPROPERTY(EditDefaultsOnly)
-	UInputAction* ToggleCombatAndBuildModeInputAction;
+	UInputAction* ToggleInventoryInputAction;
+
+	UPROPERTY(EditDefaultsOnly)
+	UInputAction* EscInputAction;
+
+	//////////////////////////////////////////////////////////
+	// Interaction Inputs
+	//////////////////////////////////////////////////////////
+	UPROPERTY(EditDefaultsOnly)
+	UInputMappingContext* InteractionInputMapping;
 
 	UPROPERTY(EditDefaultsOnly)
 	UInputAction* InteractionInputAction;
@@ -40,14 +49,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	UInputAction* SelectInteractionScrollDownInputAction;
-
-	UPROPERTY(EditDefaultsOnly)
-	UInputAction* ToggleInventoryInputAction;
-
-	UPROPERTY(EditDefaultsOnly)
-	UInputAction* EscInputAction;
-
-
 
 	//////////////////////////////////////////////////////////
 	// Build Inputs
@@ -73,6 +74,9 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	UInputAction* PreviewMiningFacilityInputAction;
 
+	UPROPERTY(EditDefaultsOnly)
+	UInputAction* SwitchToCombatModeInputAction;
+
 	//////////////////////////////////////////////////////////
 	// Combat Inputs
 	//////////////////////////////////////////////////////////
@@ -87,4 +91,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	UInputAction* Ability3InputAction;
+
+	UPROPERTY(EditDefaultsOnly)
+	UInputAction* SwitchToBuildModeInputAction;
 };

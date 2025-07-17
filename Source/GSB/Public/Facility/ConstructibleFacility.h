@@ -33,9 +33,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = "AConstructibleFacility|Construction")
 	float GetDeconstructionProgress() const;
 
-	UFUNCTION(BlueprintNativeEvent, Category = "AConstructibleFacility|Construction")
-	void BeginConstruction();
-	virtual void BeginConstruction_Implementation();
+	bool TryBeginConstruction();
+
+	bool TryBeginDeconstruction();
 
 protected:
 	UFUNCTION()
@@ -43,6 +43,10 @@ protected:
 
 	UFUNCTION()
 	void HandleDeconstructRequest(AActor* Interactor);
+
+	UFUNCTION(BlueprintNativeEvent, Category = "AConstructibleFacility|Construction")
+	void BeginConstruction();
+	virtual void BeginConstruction_Implementation();
 
 	UFUNCTION(BlueprintNativeEvent, Category = "AConstructibleFacility|Construction")
 	void BeginDeconstruction();

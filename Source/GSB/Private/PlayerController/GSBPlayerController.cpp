@@ -21,6 +21,7 @@ void AGSBPlayerController::ActivateCombatInputContext()
 {
 	ClearAllInputMappingContext();
 	AddInputMappingContext(PlayerInputSet->DefaultInputMapping);
+	AddInputMappingContext(PlayerInputSet->InteractionInputMapping);
 	AddInputMappingContext(PlayerInputSet->CombatInputMapping);
 }
 
@@ -28,6 +29,7 @@ void AGSBPlayerController::ActivateBuildInputContext()
 {
 	ClearAllInputMappingContext();
 	AddInputMappingContext(PlayerInputSet->DefaultInputMapping);
+	AddInputMappingContext(PlayerInputSet->InteractionInputMapping);
 	AddInputMappingContext(PlayerInputSet->BuildInputMapping);
 }
 
@@ -60,9 +62,9 @@ void AGSBPlayerController::RemoveInputMappingContext(UInputMappingContext* Input
 
 void AGSBPlayerController::ClearAllInputMappingContext()
 {
-	if (EnhancedInputLocalPlayerSubsystem)
+	for (UInputMappingContext* Context : CurrentInputMappingContexts)
 	{
-		EnhancedInputLocalPlayerSubsystem->ClearAllMappings();
+		RemoveInputMappingContext(Context);
 	}
 }
 
@@ -88,20 +90,10 @@ void AGSBPlayerController::SetUIControlMode(bool bUI)
 	}
 }
 
-void AGSBPlayerController::FocusToWidget(UWidget* Widget)
-{
-	FInputModeGameAndUI InputMode;
-	InputMode.SetWidgetToFocus(Widget->TakeWidget());
-	InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-	SetInputMode(InputMode);
-}
-
 void AGSBPlayerController::EnterUIControlMode()
 {
-	bShowMouseCursor = true;
-
 	FInputModeGameAndUI InputMode;
-	InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+	InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::LockInFullscreen);
 	SetInputMode(InputMode);
 
 	StoreInputMappingContexts(CurrentInputMappingContexts);
@@ -111,8 +103,6 @@ void AGSBPlayerController::EnterUIControlMode()
 
 void AGSBPlayerController::ExitUIControlMode()
 {
-	bShowMouseCursor = false;
-
 	FInputModeGameOnly InputMode;
 	SetInputMode(InputMode);
 

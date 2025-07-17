@@ -63,7 +63,6 @@ void AConveyorBelt::OnDisconnectedFromItemSender()
 
 void AConveyorBelt::OnReceiveItem(AActor* Item)
 {
-    ItemReceiveComponent->OnReceiveItem(Item);
     TransportComponent->TransportActor(Item, TransportComponent->GetSplineLength());
 }
 
@@ -101,7 +100,7 @@ void AConveyorBelt::DeconstructConnectedConveyorChain()
 {
     DeconstructConnectedReceiverConveyorChain(false);
     DeconstructConnectedSenderConveyorChain(false);
-    BeginDeconstruction();
+    TryBeginDeconstruction();
 }
 
 void AConveyorBelt::DeconstructConnectedReceiverConveyorChain(bool bDeconstructSelf)
@@ -112,7 +111,7 @@ void AConveyorBelt::DeconstructConnectedReceiverConveyorChain(bool bDeconstructS
     }
     if (bDeconstructSelf)
     {
-        BeginDeconstruction();
+        TryBeginDeconstruction();
     }
 }
 
@@ -124,7 +123,7 @@ void AConveyorBelt::DeconstructConnectedSenderConveyorChain(bool bDeconstructSel
     }
     if (bDeconstructSelf)
     {
-        BeginDeconstruction();
+        TryBeginDeconstruction();
     }
 }
 

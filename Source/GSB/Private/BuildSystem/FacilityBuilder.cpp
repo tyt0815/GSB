@@ -139,7 +139,7 @@ AConstructibleFacility* AFacilityBuilder::BuildFacility(TSubclassOf<AConstructib
 {
 	if (AConstructibleFacility* Facility = GetWorld()->SpawnActor<AConstructibleFacility>(FacilityClass, Transform))
 	{
-		Facility->BeginConstruction();
+		Facility->TryBeginConstruction();
 		return Facility;
 	}
 	return nullptr;	

@@ -68,12 +68,13 @@ void AGSBPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 		EnhancedInputComponent->BindAction(InputSet->MoveInputAction, ETriggerEvent::Triggered, this, &AGSBPlayer::Move);
 		EnhancedInputComponent->BindAction(InputSet->LookInputAction, ETriggerEvent::Triggered, this, &AGSBPlayer::Look);
 		EnhancedInputComponent->BindAction(InputSet->JumpInputAction, ETriggerEvent::Triggered, this, &AGSBPlayer::Jump);
-		EnhancedInputComponent->BindAction(InputSet->ToggleCombatAndBuildModeInputAction, ETriggerEvent::Started, this, &AGSBPlayer::ToggleCombatAndBuildMode);
+		EnhancedInputComponent->BindAction(InputSet->ToggleInventoryInputAction, ETriggerEvent::Started, this, &AGSBPlayer::ToggleInventory);
+		EnhancedInputComponent->BindAction(InputSet->EscInputAction, ETriggerEvent::Started, this, &AGSBPlayer::Esc_Triggered);
+
+		// Interaction
 		EnhancedInputComponent->BindAction(InputSet->InteractionInputAction, ETriggerEvent::Started, this, &AGSBPlayer::Interaction);
 		EnhancedInputComponent->BindAction(InputSet->SelectInteractionScrollUpInputAction, ETriggerEvent::Started, this, &AGSBPlayer::SelectInteractionScrollUp);
 		EnhancedInputComponent->BindAction(InputSet->SelectInteractionScrollDownInputAction, ETriggerEvent::Started, this, &AGSBPlayer::SelectInteractionScrollDown);
-		EnhancedInputComponent->BindAction(InputSet->ToggleInventoryInputAction, ETriggerEvent::Started, this, &AGSBPlayer::ToggleInventory);
-		EnhancedInputComponent->BindAction(InputSet->EscInputAction, ETriggerEvent::Started, this, &AGSBPlayer::Esc_Triggered);
 
 		// Build Mode
 		EnhancedInputComponent->BindAction(InputSet->RotatePreview, ETriggerEvent::Started, this, &AGSBPlayer::RotatePreview);
@@ -82,11 +83,13 @@ void AGSBPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 		EnhancedInputComponent->BindAction(InputSet->PreviewConveyorBeltInputAction, ETriggerEvent::Started, this, &AGSBPlayer::PreviewConveyorBelt);
 		EnhancedInputComponent->BindAction(InputSet->PreviewExtensionHubInputAction, ETriggerEvent::Started, this, &AGSBPlayer::PreviewExtensionHub);
 		EnhancedInputComponent->BindAction(InputSet->PreviewMiningFacilityInputAction, ETriggerEvent::Started, this, &AGSBPlayer::PreviewMiningFacility);
+		EnhancedInputComponent->BindAction(InputSet->SwitchToCombatModeInputAction, ETriggerEvent::Started, this, &AGSBPlayer::SwitchToCombatMode);
 
 		// Combat Mode
 		EnhancedInputComponent->BindAction(InputSet->Ability1InputAction, ETriggerEvent::Started, this, &AGSBPlayer::Ability1_Started);
 		EnhancedInputComponent->BindAction(InputSet->Ability2InputAction, ETriggerEvent::Started, this, &AGSBPlayer::Ability2_Started);
 		EnhancedInputComponent->BindAction(InputSet->Ability3InputAction, ETriggerEvent::Started, this, &AGSBPlayer::Ability3_Started);
+		EnhancedInputComponent->BindAction(InputSet->SwitchToBuildModeInputAction, ETriggerEvent::Started, this, &AGSBPlayer::SwitchToBuildMode);
 	}
 }
 
@@ -178,23 +181,6 @@ void AGSBPlayer::Look(const FInputActionValue& Value)
 		// add yaw and pitch input to controller
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
-	}
-}
-
-void AGSBPlayer::ToggleCombatAndBuildMode()
-{
-	switch (GamePlayMode)
-	{
-	case EGamePlayMode::EGPM_Combat:
-		SetGamePlayMode(EGamePlayMode::EGPM_Build);
-		break;
-	case EGamePlayMode::EGPM_Build:
-		SetGamePlayMode(EGamePlayMode::EGPM_Combat);
-		FacilityBuilder->CancelPreview();
-		break;
-	default:
-		SCREEN_LOG_NONE_KEY(TEXT("정의 되지 않은 case(AGSBPlayer::ToggleCombatAndBuildMode)"));
-		break;
 	}
 }
 
@@ -301,6 +287,17 @@ void AGSBPlayer::PreviewMiningFacility()
 	FacilityBuilder->PreviewMiningFacility();
 }
 
+void AGSBPlayer::SwitchToCombatMode()
+{
+	SetGamePlayMode(EGamePlayMode::EGPM_Combat);
+	FacilityBuilder->CancelPreview();
+}
+
+void AGSBPlayer::SwitchToBuildMode()
+{
+	SetGamePlayMode(EGamePlayMode::EGPM_Build);
+}
+
 void AGSBPlayer::SetGamePlayMode(EGamePlayMode NewGamePlayMode)
 {
 	if (GamePlayMode == NewGamePlayMode)
@@ -325,8 +322,6 @@ void AGSBPlayer::SetGamePlayMode(EGamePlayMode NewGamePlayMode)
 
 void AGSBPlayer::SetGamePlayMode_Combat()
 {
-	SCREEN_LOG_NONE_KEY(TEXT("CombatMode(AGSBPlayer::SetGamePlayMode_Combat)"));
-
 	if (PlayerController)
 	{
 		PlayerController->ActivateCombatInputContext();
@@ -340,8 +335,6 @@ void AGSBPlayer::SetGamePlayMode_Combat()
 
 void AGSBPlayer::SetGamePlayMode_Build()
 {
-	SCREEN_LOG_NONE_KEY(TEXT("BuildMode(AGSBPlayer::SetGamePlayMode_Build)"));
-
 	if (PlayerController)
 	{
 		PlayerController->ActivateBuildInputContext();

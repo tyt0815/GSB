@@ -65,7 +65,7 @@ void ACrossPassConveyorBelt::DeconstructConnectedConveyorChain()
 		}
 	}
 
-	BeginDeconstruction();
+	TryBeginDeconstruction();
 }
 
 void ACrossPassConveyorBelt::BeginPlay()

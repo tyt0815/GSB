@@ -36,8 +36,6 @@ public:
 
 	void SetUIControlMode(bool bUI);
 
-	void FocusToWidget(UWidget* Widget);
-
 protected:
 	UPROPERTY(EditAnywhere)
 	UGSBPlayerInputActionSetDataAsset* PlayerInputSet;

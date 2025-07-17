@@ -73,7 +73,7 @@ void AConveyorTriSplitter::DeconstructConnectedConveyorChain()
 		RightOutputPort->DeconstructConnectedConveyorBeltChain();
 	}
 
-	BeginDeconstruction();
+	TryBeginDeconstruction();
 }
 
 

@@ -66,9 +66,11 @@ protected:
 	void PreviewConveyorBelt();
 	void PreviewExtensionHub();
 	void PreviewMiningFacility();
+	void SwitchToCombatMode();
 	virtual void Ability1_Started() {}
 	virtual void Ability2_Started() {}
 	virtual void Ability3_Started() {}
+	void SwitchToBuildMode();
 
 	AGSBPlayerController* PlayerController;
 

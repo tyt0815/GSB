@@ -50,6 +50,26 @@ float AConstructibleFacility::GetDeconstructionProgress() const
 	return GetWorldTimerManager().GetTimerElapsed(DeconstructionTimer) / DeconstructionTime;
 }
 
+bool AConstructibleFacility::TryBeginConstruction()
+{
+	if (IsConstructing())
+	{
+		return false;
+	}
+	BeginConstruction();
+	return true;
+}
+
+bool AConstructibleFacility::TryBeginDeconstruction()
+{
+	if (IsConstructed())
+	{
+		BeginDeconstruction();
+		return true;
+	}
+	return false;
+}
+
 void AConstructibleFacility::BeginConstruction_Implementation()
 {
 	InteractionComponent->ClearInteractions();
@@ -79,11 +99,15 @@ void AConstructibleFacility::HandleDeconstructRequest(AActor* Interactor)
 	}
 	else if(IsConstructed())
 	{
-		BeginDeconstruction();
+		TryBeginDeconstruction();
 	}
 }
 void AConstructibleFacility::BeginDeconstruction_Implementation()
 {
+	if (IsDeconstructing())
+	{
+		return;	
+	}
 	if (IsValid(DetailWindow))
 	{
 		DetailWindow->Close();
