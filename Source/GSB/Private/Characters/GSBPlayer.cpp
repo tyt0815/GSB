@@ -27,6 +27,8 @@ AGSBPlayer::AGSBPlayer()
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SprintArm"));
 	SpringArmComponent->SetupAttachment(GetRootComponent());
 	SpringArmComponent->bUsePawnControlRotation = true;		// 카메라 회전
+	SpringArmComponent->TargetArmLength = 500.0f;
+	SpringArmComponent->SetRelativeLocation(FVector(0, 0, 100));
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
 	CameraComponent->SetupAttachment(SpringArmComponent);
 
@@ -54,42 +56,39 @@ void AGSBPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	PlayerController = GetController<AGSBPlayerController>();
-	if (!PlayerController)
+	if (AGSBPlayerController* PlayerController = GetPlayerController())
 	{
-		TRACE_SCREEN_LOG(TEXT("PlayerController 캐스팅 실패"))
-		return;
-	}
+		PlayerController->ActivateCombatInputContext();
+		if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
+		{
+			const UGSBPlayerInputActionSetDataAsset* InputSet = PlayerController->GetPlayerInputSet();
+			// Default
+			EnhancedInputComponent->BindAction(InputSet->MoveInputAction, ETriggerEvent::Triggered, this, &AGSBPlayer::Move);
+			EnhancedInputComponent->BindAction(InputSet->LookInputAction, ETriggerEvent::Triggered, this, &AGSBPlayer::Look);
+			EnhancedInputComponent->BindAction(InputSet->JumpInputAction, ETriggerEvent::Triggered, this, &AGSBPlayer::Jump);
+			EnhancedInputComponent->BindAction(InputSet->ToggleInventoryInputAction, ETriggerEvent::Started, this, &AGSBPlayer::ToggleInventory);
+			EnhancedInputComponent->BindAction(InputSet->EscInputAction, ETriggerEvent::Started, this, &AGSBPlayer::Esc_Triggered);
 
-	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
-	{
-		const UGSBPlayerInputActionSetDataAsset* InputSet = PlayerController->GetPlayerInputSet();
-		// Default
-		EnhancedInputComponent->BindAction(InputSet->MoveInputAction, ETriggerEvent::Triggered, this, &AGSBPlayer::Move);
-		EnhancedInputComponent->BindAction(InputSet->LookInputAction, ETriggerEvent::Triggered, this, &AGSBPlayer::Look);
-		EnhancedInputComponent->BindAction(InputSet->JumpInputAction, ETriggerEvent::Triggered, this, &AGSBPlayer::Jump);
-		EnhancedInputComponent->BindAction(InputSet->ToggleInventoryInputAction, ETriggerEvent::Started, this, &AGSBPlayer::ToggleInventory);
-		EnhancedInputComponent->BindAction(InputSet->EscInputAction, ETriggerEvent::Started, this, &AGSBPlayer::Esc_Triggered);
+			// Interaction
+			EnhancedInputComponent->BindAction(InputSet->InteractionInputAction, ETriggerEvent::Started, this, &AGSBPlayer::Interaction);
+			EnhancedInputComponent->BindAction(InputSet->SelectInteractionScrollUpInputAction, ETriggerEvent::Started, this, &AGSBPlayer::SelectInteractionScrollUp);
+			EnhancedInputComponent->BindAction(InputSet->SelectInteractionScrollDownInputAction, ETriggerEvent::Started, this, &AGSBPlayer::SelectInteractionScrollDown);
 
-		// Interaction
-		EnhancedInputComponent->BindAction(InputSet->InteractionInputAction, ETriggerEvent::Started, this, &AGSBPlayer::Interaction);
-		EnhancedInputComponent->BindAction(InputSet->SelectInteractionScrollUpInputAction, ETriggerEvent::Started, this, &AGSBPlayer::SelectInteractionScrollUp);
-		EnhancedInputComponent->BindAction(InputSet->SelectInteractionScrollDownInputAction, ETriggerEvent::Started, this, &AGSBPlayer::SelectInteractionScrollDown);
+			// Build Mode
+			EnhancedInputComponent->BindAction(InputSet->RotatePreview, ETriggerEvent::Started, this, &AGSBPlayer::RotatePreview);
+			EnhancedInputComponent->BindAction(InputSet->ConfirmFacilityPlacementInputAction, ETriggerEvent::Started, this, &AGSBPlayer::ConfirmFacilityPlacement);
+			EnhancedInputComponent->BindAction(InputSet->CancelFacilityPreviewInputAction, ETriggerEvent::Started, this, &AGSBPlayer::CancelFacilityPreview);
+			EnhancedInputComponent->BindAction(InputSet->PreviewConveyorBeltInputAction, ETriggerEvent::Started, this, &AGSBPlayer::PreviewConveyorBelt);
+			EnhancedInputComponent->BindAction(InputSet->PreviewExtensionHubInputAction, ETriggerEvent::Started, this, &AGSBPlayer::PreviewExtensionHub);
+			EnhancedInputComponent->BindAction(InputSet->PreviewMiningFacilityInputAction, ETriggerEvent::Started, this, &AGSBPlayer::PreviewMiningFacility);
+			EnhancedInputComponent->BindAction(InputSet->SwitchToCombatModeInputAction, ETriggerEvent::Started, this, &AGSBPlayer::SwitchToCombatMode);
 
-		// Build Mode
-		EnhancedInputComponent->BindAction(InputSet->RotatePreview, ETriggerEvent::Started, this, &AGSBPlayer::RotatePreview);
-		EnhancedInputComponent->BindAction(InputSet->ConfirmFacilityPlacementInputAction, ETriggerEvent::Started, this, &AGSBPlayer::ConfirmFacilityPlacement);
-		EnhancedInputComponent->BindAction(InputSet->CancelFacilityPreviewInputAction, ETriggerEvent::Started, this, &AGSBPlayer::CancelFacilityPreview);
-		EnhancedInputComponent->BindAction(InputSet->PreviewConveyorBeltInputAction, ETriggerEvent::Started, this, &AGSBPlayer::PreviewConveyorBelt);
-		EnhancedInputComponent->BindAction(InputSet->PreviewExtensionHubInputAction, ETriggerEvent::Started, this, &AGSBPlayer::PreviewExtensionHub);
-		EnhancedInputComponent->BindAction(InputSet->PreviewMiningFacilityInputAction, ETriggerEvent::Started, this, &AGSBPlayer::PreviewMiningFacility);
-		EnhancedInputComponent->BindAction(InputSet->SwitchToCombatModeInputAction, ETriggerEvent::Started, this, &AGSBPlayer::SwitchToCombatMode);
-
-		// Combat Mode
-		EnhancedInputComponent->BindAction(InputSet->Ability1InputAction, ETriggerEvent::Started, this, &AGSBPlayer::Ability1_Started);
-		EnhancedInputComponent->BindAction(InputSet->Ability2InputAction, ETriggerEvent::Started, this, &AGSBPlayer::Ability2_Started);
-		EnhancedInputComponent->BindAction(InputSet->Ability3InputAction, ETriggerEvent::Started, this, &AGSBPlayer::Ability3_Started);
-		EnhancedInputComponent->BindAction(InputSet->SwitchToBuildModeInputAction, ETriggerEvent::Started, this, &AGSBPlayer::SwitchToBuildMode);
+			// Combat Mode
+			EnhancedInputComponent->BindAction(InputSet->Ability1InputAction, ETriggerEvent::Started, this, &AGSBPlayer::Ability1_Started);
+			EnhancedInputComponent->BindAction(InputSet->Ability2InputAction, ETriggerEvent::Started, this, &AGSBPlayer::Ability2_Started);
+			EnhancedInputComponent->BindAction(InputSet->Ability3InputAction, ETriggerEvent::Started, this, &AGSBPlayer::Ability3_Started);
+			EnhancedInputComponent->BindAction(InputSet->SwitchToBuildModeInputAction, ETriggerEvent::Started, this, &AGSBPlayer::SwitchToBuildMode);
+		}
 	}
 }
 
@@ -97,29 +96,7 @@ void AGSBPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 
-	PlayerController = GetController<AGSBPlayerController>();
-	if (PlayerController)
-	{
-		HUD = Cast<AGSBPlayerHUD>(PlayerController->GetHUD());
-		if (HUD)
-		{
-			SetOverlayWidget();
-			if (!OverlayWidget)
-			{
-				HUD->OnEndBeginPlay.AddDynamic(this, &AGSBPlayer::SetOverlayWidget);
-			}
-		}
-		else
-		{
-			TRACE_SCREEN_LOG(TEXT("HUD 캐스팅 실패"));
-		}
-		SetGamePlayMode_Combat();
-	}
-	else
-	{
-		TRACE_SCREEN_LOG(TEXT("AGSBPlayerController 캐스팅 실패"));
-	}
-	
+	SetGamePlayMode_Combat();	
 
 	if (UGSBGameInstance* GameInst = Cast<UGSBGameInstance>(GetGameInstance()))
 	{
@@ -168,7 +145,7 @@ void AGSBPlayer::Move(const FInputActionValue& Value)
 
 void AGSBPlayer::Look(const FInputActionValue& Value)
 {
-	if (PlayerController->IsUIControlMode())
+	if (IsUIMode())
 	{
 		return;
 	}
@@ -189,8 +166,11 @@ void AGSBPlayer::Interaction()
 	if (InteractableActor)
 	{
 		InteractableActor->Interaction(SelectedInteractionIndex, this);
-		OverlayWidget->HideInteractionList();
 		InteractableActor = nullptr;
+		if (UGSBPlayerOverlay* OverlayWidget = GetOverlayWidget())
+		{
+			OverlayWidget->HideInteractionList();
+		}
 	}
 }
 
@@ -199,7 +179,10 @@ void AGSBPlayer::SelectInteractionScrollUp()
 	if (InteractableActor)
 	{
 		SelectedInteractionIndex = FMath::Clamp(SelectedInteractionIndex - 1, 0, InteractableActor->GetNumInteractions() - 1);
-		OverlayWidget->UpdateInteractionFocusing(SelectedInteractionIndex);
+		if (UGSBPlayerOverlay* OverlayWidget = GetOverlayWidget())
+		{
+			OverlayWidget->UpdateInteractionFocusing(SelectedInteractionIndex);
+		}
 	}
 }
 
@@ -208,7 +191,10 @@ void AGSBPlayer::SelectInteractionScrollDown()
 	if (InteractableActor)
 	{
 		SelectedInteractionIndex = FMath::Clamp(SelectedInteractionIndex + 1, 0, InteractableActor->GetNumInteractions() - 1);
-		OverlayWidget->UpdateInteractionFocusing(SelectedInteractionIndex);
+		if (UGSBPlayerOverlay* OverlayWidget = GetOverlayWidget())
+		{
+			OverlayWidget->UpdateInteractionFocusing(SelectedInteractionIndex);
+		}
 	}
 }
 
@@ -298,6 +284,11 @@ void AGSBPlayer::SwitchToBuildMode()
 	SetGamePlayMode(EGamePlayMode::EGPM_Build);
 }
 
+AGSBPlayerController* AGSBPlayer::GetPlayerController() const
+{
+	return GetController<AGSBPlayerController>();
+}
+
 void AGSBPlayer::SetGamePlayMode(EGamePlayMode NewGamePlayMode)
 {
 	if (GamePlayMode == NewGamePlayMode)
@@ -322,12 +313,12 @@ void AGSBPlayer::SetGamePlayMode(EGamePlayMode NewGamePlayMode)
 
 void AGSBPlayer::SetGamePlayMode_Combat()
 {
-	if (PlayerController)
+	if (AGSBPlayerController* PlayerController = GetPlayerController())
 	{
 		PlayerController->ActivateCombatInputContext();
 	}
 
-	if (OverlayWidget)
+	if (UGSBPlayerOverlay* OverlayWidget = GetOverlayWidget())
 	{
 		OverlayWidget->SwitchToCombatModeUI();
 	}
@@ -335,12 +326,12 @@ void AGSBPlayer::SetGamePlayMode_Combat()
 
 void AGSBPlayer::SetGamePlayMode_Build()
 {
-	if (PlayerController)
+	if (AGSBPlayerController* PlayerController = GetPlayerController())
 	{
 		PlayerController->ActivateBuildInputContext();
 	}
 
-	if (OverlayWidget)
+	if (UGSBPlayerOverlay* OverlayWidget = GetOverlayWidget())
 	{
 		OverlayWidget->SwitchToBuildModeUI();
 	}
@@ -421,13 +412,19 @@ void AGSBPlayer::UpdateInteractableActor(AActor* Candidate)
 		TArray<FString> Descriptions;
 		InteractableActor->GetInteractionDescriptions(Descriptions);
 		InteractableActor->ClearInteractionListDirtyFlag();
-		OverlayWidget->ShowInteractionList();
-		OverlayWidget->UpdateInteractionList(Descriptions);
 		SelectedInteractionIndex = 0;
+		if (UGSBPlayerOverlay* OverlayWidget = GetOverlayWidget())
+		{
+			OverlayWidget->ShowInteractionList();
+			OverlayWidget->UpdateInteractionList(Descriptions);
+		}
 	}
 	else
 	{
-		OverlayWidget->HideInteractionList();
+		if (UGSBPlayerOverlay* OverlayWidget = GetOverlayWidget())
+		{
+			OverlayWidget->HideInteractionList();
+		}
 	}
 }
 
@@ -479,7 +476,11 @@ AActor* AGSBPlayer::TraceInteractableActor()
 
 bool AGSBPlayer::IsUIMode() const
 {
-	return PlayerController->bShowMouseCursor;
+	if (AGSBPlayerController* PlayerController = GetPlayerController())
+	{
+		return PlayerController->bShowMouseCursor;
+	}
+	return false;
 }
 
 void AGSBPlayer::OnItemSlotAddedToInventory(UGSBStorageWindow* Storage, UGSBStorage* StorageBody, UGSBItemList* ItemList, UGSBItemSlot* ItemSlot)
@@ -487,7 +488,20 @@ void AGSBPlayer::OnItemSlotAddedToInventory(UGSBStorageWindow* Storage, UGSBStor
 	ItemSlot->OnItemSlotLeftClicked.AddDynamic(StorageBody, &UGSBStorage::DropItemByItemSlotWidget);
 }
 
-void AGSBPlayer::SetOverlayWidget()
+AGSBPlayerHUD* AGSBPlayer::GetHUD() const
 {
-	OverlayWidget = Cast<UGSBPlayerOverlay>(HUD->GetOverlayWidget());
+	if (AGSBPlayerController* PlayerController = GetPlayerController())
+	{
+		return PlayerController->GetHUD<AGSBPlayerHUD>();
+	}
+	return nullptr;
+}
+
+UGSBPlayerOverlay* AGSBPlayer::GetOverlayWidget() const
+{
+	if (AGSBPlayerHUD* HUD = GetHUD())
+	{
+		return Cast<UGSBPlayerOverlay>(HUD->GetOverlayWidget());
+	}
+	return nullptr;
 }

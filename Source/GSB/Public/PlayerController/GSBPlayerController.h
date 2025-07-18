@@ -36,11 +36,13 @@ public:
 
 	void SetUIControlMode(bool bUI);
 
+	UEnhancedInputLocalPlayerSubsystem* GetEnhancedInputLocalPlayerSubsystem();
+
 protected:
 	UPROPERTY(EditAnywhere)
 	UGSBPlayerInputActionSetDataAsset* PlayerInputSet;
 
-	UEnhancedInputLocalPlayerSubsystem* EnhancedInputLocalPlayerSubsystem;
+	
 
 private:
 	void EnterUIControlMode();

@@ -53,7 +53,6 @@ protected:
 protected:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
-	void ToggleCombatAndBuildMode();
 	void Interaction();
 	void SelectInteractionScrollUp();
 	void SelectInteractionScrollDown();
@@ -72,7 +71,7 @@ protected:
 	virtual void Ability3_Started() {}
 	void SwitchToBuildMode();
 
-	AGSBPlayerController* PlayerController;
+	AGSBPlayerController* GetPlayerController() const;
 
 	///////////////////////////////////////////////////////////
 	// Components
@@ -133,21 +132,13 @@ protected:
 	UFUNCTION()
 	void OnItemSlotAddedToInventory(UGSBStorageWindow* Storage, UGSBStorage* StorageBody, UGSBItemList* ItemList, UGSBItemSlot* ItemSlot);
 
-	AGSBPlayerHUD* HUD;
+	AGSBPlayerHUD* GetHUD() const;
 
-	UGSBPlayerOverlay* OverlayWidget;
+	UGSBPlayerOverlay* GetOverlayWidget() const;
 
 	UGSBInventoryWindow* InventoryWidget;
 
-private:
-	UFUNCTION()
-	void SetOverlayWidget();
-
 public:
-	FORCEINLINE UGSBPlayerOverlay* GetOverlayWidget() const
-	{
-		return OverlayWidget;
-	}
 	
 	FORCEINLINE UInventoryComponent* GetInventoryComponent() const
 	{

@@ -10,11 +10,6 @@
 void AGSBPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-	EnhancedInputLocalPlayerSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
-	if (!EnhancedInputLocalPlayerSubsystem)
-	{
-		TRACE_SCREEN_LOG(TEXT("EnhancedInputLocalPlayerSubsystem 캐스팅 실패"));
-	}
 }
 
 void AGSBPlayerController::ActivateCombatInputContext()
@@ -35,10 +30,13 @@ void AGSBPlayerController::ActivateBuildInputContext()
 
 void AGSBPlayerController::AddInputMappingContext(UInputMappingContext* InputMappingContext)
 {
-	if (!EnhancedInputLocalPlayerSubsystem->HasMappingContext(InputMappingContext))
+	if (UEnhancedInputLocalPlayerSubsystem* EnhancedInputLocalPlayerSubsystem = GetEnhancedInputLocalPlayerSubsystem())
 	{
-		EnhancedInputLocalPlayerSubsystem->AddMappingContext(InputMappingContext, 0);
-		CurrentInputMappingContexts.Add(InputMappingContext);
+		if (!EnhancedInputLocalPlayerSubsystem->HasMappingContext(InputMappingContext))
+		{
+			EnhancedInputLocalPlayerSubsystem->AddMappingContext(InputMappingContext, 0);
+			CurrentInputMappingContexts.Add(InputMappingContext);
+		}
 	}
 }
 
@@ -52,12 +50,14 @@ void AGSBPlayerController::AddInputMappingContexts(const TArray<UInputMappingCon
 
 void AGSBPlayerController::RemoveInputMappingContext(UInputMappingContext* InputMappingContext)
 {
-	if (EnhancedInputLocalPlayerSubsystem->HasMappingContext(InputMappingContext))
+	if (UEnhancedInputLocalPlayerSubsystem* EnhancedInputLocalPlayerSubsystem = GetEnhancedInputLocalPlayerSubsystem())
 	{
-		EnhancedInputLocalPlayerSubsystem->RemoveMappingContext(InputMappingContext);
-		CurrentInputMappingContexts.Remove(InputMappingContext);
+		if (EnhancedInputLocalPlayerSubsystem->HasMappingContext(InputMappingContext))
+		{
+			EnhancedInputLocalPlayerSubsystem->RemoveMappingContext(InputMappingContext);
+			CurrentInputMappingContexts.Remove(InputMappingContext);
+		}
 	}
-	
 }
 
 void AGSBPlayerController::ClearAllInputMappingContext()
@@ -88,6 +88,11 @@ void AGSBPlayerController::SetUIControlMode(bool bUI)
 	{
 		ExitUIControlMode();
 	}
+}
+
+UEnhancedInputLocalPlayerSubsystem* AGSBPlayerController::GetEnhancedInputLocalPlayerSubsystem()
+{
+	return ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
 }
 
 void AGSBPlayerController::EnterUIControlMode()
