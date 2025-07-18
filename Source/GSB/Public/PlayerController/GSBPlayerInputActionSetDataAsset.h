@@ -72,13 +72,34 @@ public:
 	UInputAction* CancelFacilityPreviewInputAction;
 
 	UPROPERTY(EditDefaultsOnly)
-	UInputAction* PreviewConveyorBeltInputAction;
+	UInputAction* PreviewFacility1;
 
 	UPROPERTY(EditDefaultsOnly)
-	UInputAction* PreviewExtensionHubInputAction;
+	UInputAction* PreviewFacility2;
 
 	UPROPERTY(EditDefaultsOnly)
-	UInputAction* PreviewMiningFacilityInputAction;
+	UInputAction* PreviewFacility3;
+
+	UPROPERTY(EditDefaultsOnly)
+	UInputAction* PreviewFacility4;
+
+	UPROPERTY(EditDefaultsOnly)
+	UInputAction* PreviewFacility5;
+
+	UPROPERTY(EditDefaultsOnly)
+	UInputAction* PreviewFacility6;
+
+	UPROPERTY(EditDefaultsOnly)
+	UInputAction* PreviewFacility7;
+
+	UPROPERTY(EditDefaultsOnly)
+	UInputAction* PreviewFacility8;
+
+	UPROPERTY(EditDefaultsOnly)
+	UInputAction* PreviewFacility9;
+
+	UPROPERTY(EditDefaultsOnly)
+	UInputAction* PreviewFacility0;
 
 	//////////////////////////////////////////////////////////
 	// Combat Inputs

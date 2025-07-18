@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Facility/ConstructibleFacility.h"
+#include "Facility/GSBFacilityDataAsset.h"
 #include "FacilityBuilder.generated.h"
 
 class AFacilityGhostActor;
@@ -27,12 +28,13 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 
+protected:
+	virtual void BeginPlay() override;
+
 public:
-	void PreviewGeneralFacility(const FName& FacilityName);
+	void PreviewFacilityAt(int32 Index);
 
-	void PreviewMiningFacility();
-
-	void PreviewConveyorBelt();
+	void PreviewFacilityByFacilityData(UGSBFacilityDataAsset* FacilityData);
 
 	void ConfirmFacilityPlacement();
 
@@ -41,6 +43,12 @@ public:
 	void RotatePreview();
 
 private:
+	void PreviewGeneralFacility(UGSBFacilityDataAsset* FacilityData);
+
+	void PreviewMiningFacility();
+
+	void PreviewConveyorBelt();
+
 	AConstructibleFacility* BuildFacility(TSubclassOf<AConstructibleFacility> FacilityClass, const FTransform& Transform);
 
 	void BuildFirstConveyorBelt();
@@ -67,22 +75,24 @@ private:
 
 	void DestroyAllConveyorBeltGhosts();
 
-	UPROPERTY(EditDefaultsOnly, Category = "AFacilityBuilder")
-	TMap<FName, TSubclassOf<AConstructibleFacility>> GeneralFacilityClasses;
+	TStaticArray<UGSBFacilityDataAsset*, 10> FacilityPreviewQuickSlot;
 
-	UPROPERTY(EditDefaultsOnly, Category = "AFacilityBuilder")
-	TSubclassOf<AConstructibleFacility> MiningFacilityClass;
+	UPROPERTY(EditDefaultsOnly, Category = "GSB|FacilityBuilder")
+	TArray<UGSBFacilityDataAsset*> GeneralFacilityData;
 
-	UPROPERTY(EditDefaultsOnly, Category = "AFacilityBuilder")
-	TSubclassOf<AConstructibleFacility> ConveyorBeltForwardClass;
+	UPROPERTY(EditDefaultsOnly, Category = "GSB|FacilityBuilder")
+	UGSBFacilityDataAsset* MiningFacilityData;
 
-	UPROPERTY(EditDefaultsOnly, Category = "AFacilityBuilder")
-	TSubclassOf<AConstructibleFacility> ConveyorBeltRightClass;
+	UPROPERTY(EditDefaultsOnly, Category = "GSB|FacilityBuilder")
+	UGSBFacilityDataAsset* ConveyorBeltForwardData;
 
-	UPROPERTY(EditDefaultsOnly, Category = "AFacilityBuilder")
-	TSubclassOf<AConstructibleFacility> ConveyorBeltLeftClass;
+	UPROPERTY(EditDefaultsOnly, Category = "GSB|FacilityBuilder")
+	UGSBFacilityDataAsset* ConveyorBeltRightData;
 
-	TSubclassOf<AConstructibleFacility> CurrentGeneralFacilityClass;
+	UPROPERTY(EditDefaultsOnly, Category = "GSB|FacilityBuilder")
+	UGSBFacilityDataAsset* ConveyorBeltLeftData;
+
+	UGSBFacilityDataAsset* CurrentGeneralFacilityData;
 
 	AFacilityGhostActor* FacilityGhost;
 
@@ -102,4 +112,30 @@ private:
 	EChainRelativeDirection ChainRelativeDirection_LastTick = EChainRelativeDirection::ECRD_Forward;
 
 	EBuildMode BuildMode = EBuildMode::EBT_None;
+
+public:
+	FORCEINLINE const TStaticArray<UGSBFacilityDataAsset*, 10>& GetFacilityPreviewQuickSlot() const
+	{
+		return FacilityPreviewQuickSlot;
+	}
+	FORCEINLINE const TArray<UGSBFacilityDataAsset*>& GetGeneralFacilityData() const
+	{
+		return GeneralFacilityData;
+	}
+	FORCEINLINE UGSBFacilityDataAsset* GetMiningFacilityData() const
+	{
+		return MiningFacilityData;
+	}
+	FORCEINLINE UGSBFacilityDataAsset* GetConveyorBeltForwardData() const
+	{
+		return ConveyorBeltForwardData;
+	}
+	FORCEINLINE UGSBFacilityDataAsset* GetConveyorBeltLeftData() const
+	{
+		return ConveyorBeltLeftData;
+	}
+	FORCEINLINE UGSBFacilityDataAsset* GetConveyorBeltRightData() const
+	{
+		return ConveyorBeltRightData;
+	}
 };

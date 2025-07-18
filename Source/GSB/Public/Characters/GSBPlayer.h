@@ -15,7 +15,7 @@ class UCameraComponent;
 class UInventoryComponent;
 class UGSBStorageWindow;
 class UGSBInventoryWindow;
-class UGSBBuildableFacilityListWindow;
+class UGSBConstructableFacilityListWindow;
 class UGSBStorage;
 class UGSBPlayerOverlay;
 class AGSBPlayerHUD;
@@ -56,9 +56,16 @@ protected:
 	void ConfirmFacilityPlacement();
 	void CancelFacilityPreview();
 	void ToggleBuildableFacilityList();
-	void PreviewConveyorBelt();
-	void PreviewExtensionHub();
-	void PreviewMiningFacility();
+	void PreviewFacility1();
+	void PreviewFacility2();
+	void PreviewFacility3();
+	void PreviewFacility4();
+	void PreviewFacility5();
+	void PreviewFacility6();
+	void PreviewFacility7();
+	void PreviewFacility8();
+	void PreviewFacility9();
+	void PreviewFacility0();
 	void SwitchToCombatMode();
 	virtual void Ability1_Started() {}
 	virtual void Ability2_Started() {}
@@ -117,12 +124,15 @@ protected:
 
 	UGSBInventoryWindow* InventoryWindow;
 
-	UGSBBuildableFacilityListWindow* BuildableFacilityListWindow;
+	UGSBConstructableFacilityListWindow* ConstructableFacilityListWindow;
 
 public:
-	
 	FORCEINLINE UInventoryComponent* GetInventoryComponent() const
 	{
 		return InventoryComponent;
+	}
+	AFacilityBuilder* GetFacilityBuilder() const
+	{
+		return FacilityBuilder;
 	}
 };

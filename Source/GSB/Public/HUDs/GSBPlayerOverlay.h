@@ -39,7 +39,7 @@ private:
 	UGSBInteractionList* InteractionListWidget;
 
 	UPROPERTY(meta = (BindWidget))
-	UVerticalBox* BuildableFacilityList;
+	class UGSBFacilityQuickSlotList* ConstructableFacilityQuickSlotList;
 
 	UPROPERTY(meta = (BindWidget))
 	class UGSBPowerCapacity* PowerCapacity;

@@ -4,8 +4,8 @@
 #include "HUDs/GSBPlayerOverlay.h"
 #include "HUDs/GSBInteractionList.h"
 #include "HUDs/GSBPowerCapacity.h"
+#include "HUDs/GSBFacilityQuickSlotList.h"
 #include "PlayerController/GSBPlayerController.h"
-#include "Components/VerticalBox.h"
 
 void UGSBPlayerOverlay::InitializeOverlay()
 {
@@ -54,10 +54,11 @@ void UGSBPlayerOverlay::UpdatePowerCapacity(int32 CurrentPowerUsage, int32 Total
 
 void UGSBPlayerOverlay::SwitchToBuildModeUI()
 {
-	BuildableFacilityList->SetVisibility(ESlateVisibility::Visible);
+	ConstructableFacilityQuickSlotList->UpdateFacilityQuickSlots();
+	ConstructableFacilityQuickSlotList->SetVisibility(ESlateVisibility::Visible);
 }
 
 void UGSBPlayerOverlay::SwitchToCombatModeUI()
 {
-	BuildableFacilityList->SetVisibility(ESlateVisibility::Hidden);
+	ConstructableFacilityQuickSlotList->SetVisibility(ESlateVisibility::Hidden);
 }

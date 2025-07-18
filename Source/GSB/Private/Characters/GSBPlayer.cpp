@@ -19,7 +19,7 @@
 #include "HUDs/GSBInventory.h"
 #include "HUDs/GSBInventoryWindow.h"
 #include "HUDs/GSBItemSlot.h"
-#include "HUDs/GSBBuildableFacilityListWindow.h"
+#include "HUDs/GSBConstructableFacilityListWindow.h"
 #include "SubSystems/GSBWindowSubsystem.h"
 #include "DebugHeader.h"
 
@@ -63,32 +63,43 @@ void AGSBPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 		{
 			const UGSBPlayerInputActionSetDataAsset* InputSet = PlayerController->GetPlayerInputSet();
 			// Default
+			//// GameAndUI
 			EnhancedInputComponent->BindAction(InputSet->MoveInputAction, ETriggerEvent::Triggered, this, &AGSBPlayer::Move);
 			EnhancedInputComponent->BindAction(InputSet->LookInputAction, ETriggerEvent::Triggered, this, &AGSBPlayer::Look);
 			EnhancedInputComponent->BindAction(InputSet->JumpInputAction, ETriggerEvent::Triggered, this, &AGSBPlayer::Jump);
 			EnhancedInputComponent->BindAction(InputSet->ToggleInventoryInputAction, ETriggerEvent::Started, this, &AGSBPlayer::ToggleInventory);
 			EnhancedInputComponent->BindAction(InputSet->EscInputAction, ETriggerEvent::Started, this, &AGSBPlayer::Esc_Triggered);
-
-			// Interaction
+			//// GameOnly
 			EnhancedInputComponent->BindAction(InputSet->InteractionInputAction, ETriggerEvent::Started, this, &AGSBPlayer::Interaction);
 			EnhancedInputComponent->BindAction(InputSet->SelectInteractionScrollUpInputAction, ETriggerEvent::Started, this, &AGSBPlayer::SelectInteractionScrollUp);
 			EnhancedInputComponent->BindAction(InputSet->SelectInteractionScrollDownInputAction, ETriggerEvent::Started, this, &AGSBPlayer::SelectInteractionScrollDown);
 
 			// Build Mode
+			//// GameAndUI
+			EnhancedInputComponent->BindAction(InputSet->SwitchToCombatModeInputAction, ETriggerEvent::Started, this, &AGSBPlayer::SwitchToCombatMode);
+			EnhancedInputComponent->BindAction(InputSet->ToggleBuildableFacilityListInputAction, ETriggerEvent::Started, this, &AGSBPlayer::ToggleBuildableFacilityList);
+			//// GameOnly
 			EnhancedInputComponent->BindAction(InputSet->RotatePreview, ETriggerEvent::Started, this, &AGSBPlayer::RotatePreview);
 			EnhancedInputComponent->BindAction(InputSet->ConfirmFacilityPlacementInputAction, ETriggerEvent::Started, this, &AGSBPlayer::ConfirmFacilityPlacement);
 			EnhancedInputComponent->BindAction(InputSet->CancelFacilityPreviewInputAction, ETriggerEvent::Started, this, &AGSBPlayer::CancelFacilityPreview);
-			EnhancedInputComponent->BindAction(InputSet->ToggleBuildableFacilityListInputAction, ETriggerEvent::Started, this, &AGSBPlayer::ToggleBuildableFacilityList);
-			EnhancedInputComponent->BindAction(InputSet->PreviewConveyorBeltInputAction, ETriggerEvent::Started, this, &AGSBPlayer::PreviewConveyorBelt);
-			EnhancedInputComponent->BindAction(InputSet->PreviewExtensionHubInputAction, ETriggerEvent::Started, this, &AGSBPlayer::PreviewExtensionHub);
-			EnhancedInputComponent->BindAction(InputSet->PreviewMiningFacilityInputAction, ETriggerEvent::Started, this, &AGSBPlayer::PreviewMiningFacility);
-			EnhancedInputComponent->BindAction(InputSet->SwitchToCombatModeInputAction, ETriggerEvent::Started, this, &AGSBPlayer::SwitchToCombatMode);
+			EnhancedInputComponent->BindAction(InputSet->PreviewFacility1, ETriggerEvent::Started, this, &AGSBPlayer::PreviewFacility1);
+			EnhancedInputComponent->BindAction(InputSet->PreviewFacility2, ETriggerEvent::Started, this, &AGSBPlayer::PreviewFacility2);
+			EnhancedInputComponent->BindAction(InputSet->PreviewFacility3, ETriggerEvent::Started, this, &AGSBPlayer::PreviewFacility3);
+			EnhancedInputComponent->BindAction(InputSet->PreviewFacility4, ETriggerEvent::Started, this, &AGSBPlayer::PreviewFacility4);
+			EnhancedInputComponent->BindAction(InputSet->PreviewFacility5, ETriggerEvent::Started, this, &AGSBPlayer::PreviewFacility5);
+			EnhancedInputComponent->BindAction(InputSet->PreviewFacility6, ETriggerEvent::Started, this, &AGSBPlayer::PreviewFacility6);
+			EnhancedInputComponent->BindAction(InputSet->PreviewFacility7, ETriggerEvent::Started, this, &AGSBPlayer::PreviewFacility7);
+			EnhancedInputComponent->BindAction(InputSet->PreviewFacility8, ETriggerEvent::Started, this, &AGSBPlayer::PreviewFacility8);
+			EnhancedInputComponent->BindAction(InputSet->PreviewFacility9, ETriggerEvent::Started, this, &AGSBPlayer::PreviewFacility9);
+			EnhancedInputComponent->BindAction(InputSet->PreviewFacility0, ETriggerEvent::Started, this, &AGSBPlayer::PreviewFacility0);
 
 			// Combat Mode
+			//// GameAndUI
+			EnhancedInputComponent->BindAction(InputSet->SwitchToBuildModeInputAction, ETriggerEvent::Started, this, &AGSBPlayer::SwitchToBuildMode);
+			//// GameOnly
 			EnhancedInputComponent->BindAction(InputSet->Ability1InputAction, ETriggerEvent::Started, this, &AGSBPlayer::Ability1_Started);
 			EnhancedInputComponent->BindAction(InputSet->Ability2InputAction, ETriggerEvent::Started, this, &AGSBPlayer::Ability2_Started);
 			EnhancedInputComponent->BindAction(InputSet->Ability3InputAction, ETriggerEvent::Started, this, &AGSBPlayer::Ability3_Started);
-			EnhancedInputComponent->BindAction(InputSet->SwitchToBuildModeInputAction, ETriggerEvent::Started, this, &AGSBPlayer::SwitchToBuildMode);
 		}
 	}
 }
@@ -247,27 +258,60 @@ void AGSBPlayer::CancelFacilityPreview()
 
 void AGSBPlayer::ToggleBuildableFacilityList()
 {
-		TRACE_SCREEN_LOG(TEXT("sibal1"));
 	if (UGSBWindowSubsystem* WindowManager = UGSBWindowSubsystem::Get(this))
 	{
-		TRACE_SCREEN_LOG(TEXT("sibal2"));
-		WindowManager->ToggleWindow(BuildableFacilityListWindow, TEXT("BuildableFacilityListWindow"), TEXT("BuildableFacilityListWindow"));
+		WindowManager->ToggleWindow(ConstructableFacilityListWindow, TEXT("ConstructableFacilityListWindow"), TEXT("ConstructableFacilityListWindow"));
 	}
 }
 
-void AGSBPlayer::PreviewConveyorBelt()
+void AGSBPlayer::PreviewFacility1()
 {
-	FacilityBuilder->PreviewConveyorBelt();
+	FacilityBuilder->PreviewFacilityAt(1);
 }
 
-void AGSBPlayer::PreviewExtensionHub()
+void AGSBPlayer::PreviewFacility2()
 {
-	FacilityBuilder->PreviewGeneralFacility(TEXT("ExtensionHub"));
+	FacilityBuilder->PreviewFacilityAt(2);
 }
 
-void AGSBPlayer::PreviewMiningFacility()
+void AGSBPlayer::PreviewFacility3()
 {
-	FacilityBuilder->PreviewMiningFacility();
+	FacilityBuilder->PreviewFacilityAt(3);
+}
+
+void AGSBPlayer::PreviewFacility4()
+{
+	FacilityBuilder->PreviewFacilityAt(4);
+}
+
+void AGSBPlayer::PreviewFacility5()
+{
+	FacilityBuilder->PreviewFacilityAt(5);
+}
+
+void AGSBPlayer::PreviewFacility6()
+{
+	FacilityBuilder->PreviewFacilityAt(6);
+}
+
+void AGSBPlayer::PreviewFacility7()
+{
+	FacilityBuilder->PreviewFacilityAt(7);
+}
+
+void AGSBPlayer::PreviewFacility8()
+{
+	FacilityBuilder->PreviewFacilityAt(8);
+}
+
+void AGSBPlayer::PreviewFacility9()
+{
+	FacilityBuilder->PreviewFacilityAt(9);
+}
+
+void AGSBPlayer::PreviewFacility0()
+{
+	FacilityBuilder->PreviewFacilityAt(0);
 }
 
 void AGSBPlayer::SwitchToCombatMode()

@@ -5,6 +5,8 @@
 #include "BuildSystem/FacilityGhostActor.h"
 #include "Facility/ConstructibleFacility.h"
 #include "Facility/MiningPoint.h"
+#include "Facility/MiningFacility.h"
+#include "Facility/ConveyorBelt.h"
 #include "SubSystems/GSBFacilitySubsystem.h"
 #include "GSBDefines.h"
 #include "DebugHeader.h"
@@ -35,50 +37,41 @@ void AFacilityBuilder::Tick(float DeltaSeconds)
 	}
 }
 
-void AFacilityBuilder::PreviewGeneralFacility(const FName& FacilityName)
+void AFacilityBuilder::BeginPlay()
 {
-	CancelPreview();
-	if (GeneralFacilityClasses.Contains(FacilityName))
-	{
-		const TSubclassOf<AConstructibleFacility>& FacilityClass = *GeneralFacilityClasses.Find(FacilityName);
-		if (FacilityClass)
-		{
-			CurrentGeneralFacilityClass = FacilityClass;
-			FacilityGhost = SpawnFacilityGhost(CurrentGeneralFacilityClass, true);
-			BuildMode = EBuildMode::EBT_GeneralFacility;
-		}
-		else
-		{
-			TRACE_SCREEN_LOG(FacilityName.ToString() + TEXT("클래스가 nullptr입니다."));
-		}
-	}
-	else
-	{
-		TRACE_SCREEN_LOG(FacilityName.ToString() + TEXT("가 존재하지 않습니다."));
-	}
+	Super::BeginPlay();
+
+	FacilityPreviewQuickSlot[0] = ConveyorBeltForwardData;
 }
 
-void AFacilityBuilder::PreviewMiningFacility()
+void AFacilityBuilder::PreviewFacilityAt(int32 Index)
 {
-	CancelPreview();
-	if (MiningFacilityClass)
-	{
-		FacilityGhost = SpawnFacilityGhost(MiningFacilityClass, true);
-		BuildMode = EBuildMode::EBT_MiningFacility;
-	}
+	PreviewFacilityByFacilityData(FacilityPreviewQuickSlot[Index]);
 }
 
-void AFacilityBuilder::PreviewConveyorBelt()
+void AFacilityBuilder::PreviewFacilityByFacilityData(UGSBFacilityDataAsset* FacilityData)
 {
-	CancelPreview();
-	if (ConveyorBeltForwardClass && ConveyorBeltLeftClass && ConveyorBeltRightClass)
+	if (IsValid(FacilityData))
 	{
-		FacilityGhost = SpawnFacilityGhost(ConveyorBeltForwardClass, false);
-		BuildMode = EBuildMode::EBT_ConveyorBelt;
-	}
-	else
-	{
-		TRACE_SCREEN_LOG(TEXT("ConveyorBeltClasses가 nullptr입니다."));
+		if (UClass* FacilityClass = FacilityData->FacilityClass)
+		{
+			if (!FacilityClass->IsChildOf<AConstructibleFacility>())
+			{
+				return;
+			}
+			else if (FacilityClass->IsChildOf<AMiningFacility>())
+			{
+				PreviewMiningFacility();
+			}
+			else if (FacilityClass->IsChildOf<AConveyorBelt>())
+			{
+				PreviewConveyorBelt();
+			}
+			else
+			{
+				PreviewGeneralFacility(FacilityData);
+			}
+		}
 	}
 }
 
@@ -132,6 +125,80 @@ void AFacilityBuilder::RotatePreview()
 	if (IsValid(FacilityGhost))
 	{
 		FacilityGhost->AddActorWorldRotation(FRotator(0, 90, 0));
+	}
+}
+
+void AFacilityBuilder::PreviewGeneralFacility(UGSBFacilityDataAsset* FacilityData)
+{
+	CancelPreview();
+	if (IsValid(FacilityData)) 
+	{
+		if (UClass* FacilityClass = FacilityData->FacilityClass)
+		{
+			if (FacilityClass->IsChildOf<AConstructibleFacility>())
+			{
+				CurrentGeneralFacilityData = FacilityData;
+				FacilityGhost = SpawnFacilityGhost(FacilityClass, true);
+				BuildMode = EBuildMode::EBT_GeneralFacility;
+			}
+			else
+			{
+				TRACE_SCREEN_LOG(TEXT("FacilityClass 클래스는 AConstructibleFacility를 상속한 클래스이어야 합니다."));
+			}
+		}
+		else
+		{
+			TRACE_SCREEN_LOG(TEXT("FacilityClass가 nullptr입니다."));
+		}
+	}
+}
+
+void AFacilityBuilder::PreviewMiningFacility()
+{
+	CancelPreview();
+	if (IsValid(MiningFacilityData))
+	{
+		if (UClass* FacilityClass = MiningFacilityData->FacilityClass)
+		{
+			if (FacilityClass->IsChildOf<AMiningFacility>())
+			{
+				FacilityGhost = SpawnFacilityGhost(FacilityClass, true);
+				BuildMode = EBuildMode::EBT_MiningFacility;
+			}
+			else
+			{
+				TRACE_SCREEN_LOG(TEXT("FacilityClass는 AMiningFacility를 상속한 클래스이어야 합니다."));
+			}
+		}
+		else
+		{
+			TRACE_SCREEN_LOG(TEXT("FacilityClass가 nullptr 입니다."));
+		}
+	}
+	else
+	{
+		TRACE_SCREEN_LOG(TEXT("MiningFacilityData가 nullptr 입니다."));
+	}
+}
+
+void AFacilityBuilder::PreviewConveyorBelt()
+{
+	CancelPreview();
+	if (IsValid(ConveyorBeltForwardData) && IsValid(ConveyorBeltLeftData) && IsValid(ConveyorBeltRightData))
+	{
+		UClass* ForwardClass = ConveyorBeltForwardData->FacilityClass;
+		UClass* LeftClass = ConveyorBeltLeftData->FacilityClass;
+		UClass* RightClass = ConveyorBeltRightData->FacilityClass;
+		if (ForwardClass->IsChildOf<AConveyorBelt>() && LeftClass->IsChildOf<AConveyorBelt>() && RightClass->IsChildOf<AConveyorBelt>())
+		{
+			FacilityGhost = SpawnFacilityGhost(ForwardClass, false);
+			BuildMode = EBuildMode::EBT_ConveyorBelt;
+		}
+		
+	}
+	else
+	{
+		TRACE_SCREEN_LOG(TEXT("ConveyorBeltForwardDatas가 nullptr입니다."));
 	}
 }
 
@@ -214,7 +281,7 @@ void AFacilityBuilder::Tick_ConveyorBeltBuildMode(float DeltaSeconds)
 			case AFacilityBuilder::EChainRelativeDirection::ECRD_Forward:
 			case AFacilityBuilder::EChainRelativeDirection::ECRD_Backward:
 			{
-				AFacilityGhostActor* Ghost = SpawnFacilityGhost(ConveyorBeltForwardClass, false);
+				AFacilityGhostActor* Ghost = SpawnFacilityGhost(*(ConveyorBeltForwardData->FacilityClass), false);
 				ConveyorBeltGhosts.Add(Ghost);
 				Ghost->SetActorTransform(StartTransform);
 
@@ -222,7 +289,7 @@ void AFacilityBuilder::Tick_ConveyorBeltBuildMode(float DeltaSeconds)
 			}
 			case AFacilityBuilder::EChainRelativeDirection::ECRD_Right:
 			{
-				AFacilityGhostActor* Ghost = SpawnFacilityGhost(ConveyorBeltRightClass, false);
+				AFacilityGhostActor* Ghost = SpawnFacilityGhost(*(ConveyorBeltRightData->FacilityClass), false);
 				ConveyorBeltGhosts.Add(Ghost);
 				Ghost->SetActorTransform(StartTransform);
 
@@ -230,7 +297,7 @@ void AFacilityBuilder::Tick_ConveyorBeltBuildMode(float DeltaSeconds)
 			}
 			case AFacilityBuilder::EChainRelativeDirection::ECRD_Left:
 			{
-				AFacilityGhostActor* Ghost = SpawnFacilityGhost(ConveyorBeltLeftClass, false);
+				AFacilityGhostActor* Ghost = SpawnFacilityGhost(*(ConveyorBeltLeftData->FacilityClass), false);
 				ConveyorBeltGhosts.Add(Ghost);
 				Ghost->SetActorTransform(StartTransform);
 
@@ -277,7 +344,7 @@ void AFacilityBuilder::Tick_ConveyorBeltBuildMode(float DeltaSeconds)
 
 		for (int i = ConveyorBeltGhosts.Num(); i < GhostsNum; ++i)
 		{
-			AFacilityGhostActor* Ghost = SpawnFacilityGhost(ConveyorBeltForwardClass, false);
+			AFacilityGhostActor* Ghost = SpawnFacilityGhost(*(ConveyorBeltForwardData->FacilityClass), false);
 			Ghost->SetActorLocation(ConveyorBeltGhosts[i - 1]->GetActorLocation() + ChainConveyorBeltLocationOffset);
 			Ghost->SetActorRotation(ChainConveyorBeltsRotation);
 			ConveyorBeltGhosts.Add(Ghost);
@@ -302,7 +369,7 @@ void AFacilityBuilder::ConfirmPlacement_GeneralFacilityBuildMode()
 {
 	if (FacilityGhost && IsValidGeneralFacilityPlace(FacilityGhost))
 	{
-		BuildFacility(CurrentGeneralFacilityClass, FacilityGhost->GetTransform());
+		BuildFacility(*(CurrentGeneralFacilityData->FacilityClass), FacilityGhost->GetTransform());
 	}
 }
 
@@ -310,7 +377,7 @@ void AFacilityBuilder::ConfirmPlacement_MiningFacilityBuildMode()
 {
 	if (FacilityGhost && IsValidMiningFacilityPlace(FacilityGhost))
 	{
-		BuildFacility(MiningFacilityClass, FacilityGhost->GetTransform());
+		BuildFacility(*(MiningFacilityData->FacilityClass), FacilityGhost->GetTransform());
 	}
 }
 
@@ -323,7 +390,7 @@ void AFacilityBuilder::ConfirmPlacement_ConveyorBeltBuildMode()
 		{
 			if (IsValidGeneralFacilityPlace(ConveyorBeltGhosts[i]))
 			{
-				BuildFacility(ConveyorBeltForwardClass, ConveyorBeltGhosts[i]->GetActorTransform());
+				BuildFacility(*(ConveyorBeltForwardData->FacilityClass), ConveyorBeltGhosts[i]->GetActorTransform());
 			}
 		}
 		if (ConveyorBeltGhosts.Num() == 1)
@@ -420,13 +487,13 @@ void AFacilityBuilder::BuildConveyorBeltByChainRelativeDirection(EChainRelativeD
 	{
 	case AFacilityBuilder::EChainRelativeDirection::ECRD_Forward:
 	case AFacilityBuilder::EChainRelativeDirection::ECRD_Backward:
-		BuildFacility(ConveyorBeltForwardClass, BuildTransform);
+		BuildFacility(*(ConveyorBeltForwardData->FacilityClass), BuildTransform);
 		break;
 	case AFacilityBuilder::EChainRelativeDirection::ECRD_Right:
-		BuildFacility(ConveyorBeltRightClass, BuildTransform);
+		BuildFacility(*ConveyorBeltRightData->FacilityClass, BuildTransform);
 		break;
 	case AFacilityBuilder::EChainRelativeDirection::ECRD_Left:
-		BuildFacility(ConveyorBeltLeftClass, BuildTransform);
+		BuildFacility(*ConveyorBeltLeftData->FacilityClass, BuildTransform);
 		break;
 	default:
 		break;
