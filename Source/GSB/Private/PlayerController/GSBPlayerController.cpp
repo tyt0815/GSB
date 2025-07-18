@@ -4,6 +4,7 @@
 #include "PlayerController/GSBPlayerController.h"
 #include "PlayerController/GSBPlayerInputActionSetDataAsset.h"
 #include "EnhancedInputSubsystems.h"
+#include "InputMappingContext.h"
 #include "Components/Widget.h"
 #include "DebugHeader.h"
 
@@ -15,17 +16,35 @@ void AGSBPlayerController::BeginPlay()
 void AGSBPlayerController::ActivateCombatInputContext()
 {
 	ClearAllInputMappingContext();
-	AddInputMappingContext(PlayerInputSet->DefaultInputMapping);
-	AddInputMappingContext(PlayerInputSet->InteractionInputMapping);
-	AddInputMappingContext(PlayerInputSet->CombatInputMapping);
+	if (IsUIControlMode())
+	{
+		GamePlayMode = EGamePlayMode::EGPM_CombatGameAndUI;
+
+		AddCombatGameAndUIInputContexts();
+	}
+	else
+	{
+		GamePlayMode = EGamePlayMode::EGPM_CombatGameOnly;
+
+		AddCombatGameOnlyInputContexts();
+	}
 }
 
 void AGSBPlayerController::ActivateBuildInputContext()
 {
 	ClearAllInputMappingContext();
-	AddInputMappingContext(PlayerInputSet->DefaultInputMapping);
-	AddInputMappingContext(PlayerInputSet->InteractionInputMapping);
-	AddInputMappingContext(PlayerInputSet->BuildInputMapping);
+	if (IsUIControlMode())
+	{
+		GamePlayMode = EGamePlayMode::EGPM_BuildGameAndUI;
+
+		AddBuildGameAndUIInputContexts();
+	}
+	else
+	{
+		GamePlayMode = EGamePlayMode::EGPM_BuildGameOnly;
+
+		AddBuildGameOnlyInputContexts();
+	}
 }
 
 void AGSBPlayerController::AddInputMappingContext(UInputMappingContext* InputMappingContext)
@@ -79,7 +98,6 @@ void AGSBPlayerController::StoreInputMappingContexts(const TArray<UInputMappingC
 
 void AGSBPlayerController::SetUIControlMode(bool bUI)
 {
-	bUIControlMode = bUI;
 	if (bUI)
 	{
 		EnterUIControlMode();
@@ -90,9 +108,64 @@ void AGSBPlayerController::SetUIControlMode(bool bUI)
 	}
 }
 
+bool AGSBPlayerController::IsUIControlMode() const
+{
+	return GamePlayMode == EGamePlayMode::EGPM_BuildGameAndUI ||
+		GamePlayMode == EGamePlayMode::EGPM_CombatGameAndUI;
+}
+
+bool AGSBPlayerController::IsCombatMode() const
+{
+	return GamePlayMode == EGamePlayMode::EGPM_CombatGameAndUI ||
+		GamePlayMode == EGamePlayMode::EGPM_CombatGameOnly;
+}
+
+bool AGSBPlayerController::IsBuildMode() const
+{
+	return GamePlayMode == EGamePlayMode::EGPM_BuildGameAndUI ||
+		GamePlayMode == EGamePlayMode::EGPM_BuildGameOnly;
+}
+
 UEnhancedInputLocalPlayerSubsystem* AGSBPlayerController::GetEnhancedInputLocalPlayerSubsystem()
 {
 	return ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
+}
+
+void AGSBPlayerController::AddDefaultGameOnlyInputContexts()
+{
+	AddDefaultGameAndUIInputContexts();
+	AddInputMappingContext(PlayerInputSet->DefaultGameOnlyInputMapping);
+}
+
+void AGSBPlayerController::AddDefaultGameAndUIInputContexts()
+{
+	AddInputMappingContext(PlayerInputSet->DefaultGameAndUIInputMapping);
+}
+
+void AGSBPlayerController::AddCombatGameOnlyInputContexts()
+{
+	AddDefaultGameOnlyInputContexts();
+	AddCombatGameAndUIInputContexts();
+	AddInputMappingContext(PlayerInputSet->CombatGameOnlyInputMapping);
+}
+
+void AGSBPlayerController::AddCombatGameAndUIInputContexts()
+{
+	AddDefaultGameAndUIInputContexts();
+	AddInputMappingContext(PlayerInputSet->CombatGameAndUIInputMapping);
+}
+
+void AGSBPlayerController::AddBuildGameOnlyInputContexts()
+{
+	AddDefaultGameOnlyInputContexts();
+	AddBuildGameAndUIInputContexts();
+	AddInputMappingContext(PlayerInputSet->BuildGameOnlyInputMapping);
+}
+
+void AGSBPlayerController::AddBuildGameAndUIInputContexts()
+{
+	AddDefaultGameAndUIInputContexts();
+	AddInputMappingContext(PlayerInputSet->BuildGameAndUIInputMapping);
 }
 
 void AGSBPlayerController::EnterUIControlMode()
@@ -104,9 +177,20 @@ void AGSBPlayerController::EnterUIControlMode()
 	InputMode.SetHideCursorDuringCapture(false);
 	SetInputMode(InputMode);
 
-	StoreInputMappingContexts(CurrentInputMappingContexts);
-	ClearAllInputMappingContext();
-	AddInputMappingContext(PlayerInputSet->DefaultInputMapping);
+	if (IsBuildMode())
+	{
+		GamePlayMode = EGamePlayMode::EGPM_BuildGameAndUI;
+
+		ClearAllInputMappingContext();
+		AddBuildGameAndUIInputContexts();
+	}
+	else
+	{
+		GamePlayMode = EGamePlayMode::EGPM_CombatGameAndUI;
+
+		ClearAllInputMappingContext();
+		AddCombatGameAndUIInputContexts();
+	}
 }
 
 void AGSBPlayerController::ExitUIControlMode()
@@ -118,4 +202,19 @@ void AGSBPlayerController::ExitUIControlMode()
 
 	ClearAllInputMappingContext();
 	AddInputMappingContexts(StoredInputMappingContexts);
+
+	if (IsBuildMode())
+	{
+		GamePlayMode = EGamePlayMode::EGPM_BuildGameOnly;
+
+		ClearAllInputMappingContext();
+		AddBuildGameOnlyInputContexts();
+	}
+	else
+	{
+		GamePlayMode = EGamePlayMode::EGPM_CombatGameOnly;
+
+		ClearAllInputMappingContext();
+		AddCombatGameOnlyInputContexts();
+	}
 }

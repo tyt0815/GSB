@@ -18,7 +18,7 @@ public:
 	// Default Inputs
 	//////////////////////////////////////////////////////////
 	UPROPERTY(EditDefaultsOnly)
-	UInputMappingContext* DefaultInputMapping;
+	UInputMappingContext* DefaultGameAndUIInputMapping;
 
 	UPROPERTY(EditDefaultsOnly)
 	UInputAction* MoveInputAction;
@@ -35,11 +35,8 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	UInputAction* EscInputAction;
 
-	//////////////////////////////////////////////////////////
-	// Interaction Inputs
-	//////////////////////////////////////////////////////////
 	UPROPERTY(EditDefaultsOnly)
-	UInputMappingContext* InteractionInputMapping;
+	UInputMappingContext* DefaultGameOnlyInputMapping;
 
 	UPROPERTY(EditDefaultsOnly)
 	UInputAction* InteractionInputAction;
@@ -54,7 +51,16 @@ public:
 	// Build Inputs
 	//////////////////////////////////////////////////////////
 	UPROPERTY(EditDefaultsOnly)
-	UInputMappingContext* BuildInputMapping;
+	UInputMappingContext* BuildGameAndUIInputMapping;
+
+	UPROPERTY(EditDefaultsOnly)
+	UInputAction* SwitchToCombatModeInputAction;
+
+	UPROPERTY(EditDefaultsOnly)
+	UInputAction* ToggleBuildableFacilityListInputAction;
+
+	UPROPERTY(EditDefaultsOnly)
+	UInputMappingContext* BuildGameOnlyInputMapping;
 
 	UPROPERTY(EditDefaultsOnly)
 	UInputAction* RotatePreview;
@@ -66,9 +72,6 @@ public:
 	UInputAction* CancelFacilityPreviewInputAction;
 
 	UPROPERTY(EditDefaultsOnly)
-	UInputAction* ToggleBuildableFacilityListInputAction;
-
-	UPROPERTY(EditDefaultsOnly)
 	UInputAction* PreviewConveyorBeltInputAction;
 
 	UPROPERTY(EditDefaultsOnly)
@@ -77,14 +80,17 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	UInputAction* PreviewMiningFacilityInputAction;
 
-	UPROPERTY(EditDefaultsOnly)
-	UInputAction* SwitchToCombatModeInputAction;
-
 	//////////////////////////////////////////////////////////
 	// Combat Inputs
 	//////////////////////////////////////////////////////////
 	UPROPERTY(EditDefaultsOnly)
-	UInputMappingContext* CombatInputMapping;
+	UInputMappingContext* CombatGameAndUIInputMapping;
+
+	UPROPERTY(EditDefaultsOnly)
+	UInputAction* SwitchToBuildModeInputAction;
+
+	UPROPERTY(EditDefaultsOnly)
+	UInputMappingContext* CombatGameOnlyInputMapping;
 
 	UPROPERTY(EditDefaultsOnly)
 	UInputAction* Ability1InputAction;
@@ -94,7 +100,4 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	UInputAction* Ability3InputAction;
-
-	UPROPERTY(EditDefaultsOnly)
-	UInputAction* SwitchToBuildModeInputAction;
 };

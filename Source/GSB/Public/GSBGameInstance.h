@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
+#include "GameFramework/Actor.h"
+#include "Blueprint/UserWidget.h"
 #include "GSBGameInstance.generated.h"
 
 UCLASS()

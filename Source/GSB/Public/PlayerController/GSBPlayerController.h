@@ -11,6 +11,14 @@ class UInputMappingContext;
 class UEnhancedInputLocalPlayerSubsystem;
 class UGSBPlayerInputActionSetDataAsset;
 
+enum class EGamePlayMode : uint8
+{
+	EGPM_CombatGameOnly,
+	EGPM_CombatGameAndUI,
+	EGPM_BuildGameOnly,
+	EGPM_BuildGameAndUI
+};
+
 UCLASS()
 class GSB_API AGSBPlayerController : public APlayerController
 {
@@ -36,6 +44,12 @@ public:
 
 	void SetUIControlMode(bool bUI);
 
+	bool IsUIControlMode() const;
+
+	bool IsCombatMode() const;
+
+	bool IsBuildMode() const;
+
 	UEnhancedInputLocalPlayerSubsystem* GetEnhancedInputLocalPlayerSubsystem();
 
 protected:
@@ -45,20 +59,28 @@ protected:
 	
 
 private:
+	void AddDefaultGameOnlyInputContexts();
+
+	void AddDefaultGameAndUIInputContexts();
+
+	void AddCombatGameOnlyInputContexts();
+
+	void AddCombatGameAndUIInputContexts();;
+
+	void AddBuildGameOnlyInputContexts();
+
+	void AddBuildGameAndUIInputContexts();
+
 	void EnterUIControlMode();
 
 	void ExitUIControlMode();
 
-	bool bUIControlMode = false;
+	EGamePlayMode GamePlayMode;
 
 	TArray<UInputMappingContext*> CurrentInputMappingContexts;
 	TArray<UInputMappingContext*> StoredInputMappingContexts;
 
 public:
-	FORCEINLINE bool IsUIControlMode() const
-	{
-		return bUIControlMode;
-	}
 	FORCEINLINE UGSBPlayerInputActionSetDataAsset* GetPlayerInputSet() const
 	{
 		return PlayerInputSet;

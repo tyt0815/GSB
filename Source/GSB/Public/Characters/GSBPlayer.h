@@ -15,6 +15,7 @@ class UCameraComponent;
 class UInventoryComponent;
 class UGSBStorageWindow;
 class UGSBInventoryWindow;
+class UGSBBuildableFacilityListWindow;
 class UGSBStorage;
 class UGSBPlayerOverlay;
 class AGSBPlayerHUD;
@@ -23,26 +24,18 @@ class AConstructibleFacility;
 class AFacilityBuilder;
 struct FInputActionValue;
 
-enum class EGamePlayMode : uint8
-{
-	EGPM_Combat,
-	EGPM_Build
-};
-
-enum class EZoomState : uint8
-{
-	EZS_None,
-	EZS_ADS
-};
-
 UCLASS()
 class GSB_API AGSBPlayer : public AGSBCharacter, public IItemPickupActor
 {
 	GENERATED_BODY()
 public:
 	AGSBPlayer();
+
 	virtual void Tick(float DeltaTime) override;
+
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	virtual void PostInitializeComponents() override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -88,20 +81,6 @@ protected:
 	UInventoryComponent* InventoryComponent;
 
 	///////////////////////////////////////////////////////////
-	// 모드 변경
-	///////////////////////////////////////////////////////////
-public:
-	void SetGamePlayMode(EGamePlayMode NewGamePlayMode);
-
-protected:
-	EGamePlayMode GamePlayMode = EGamePlayMode::EGPM_Combat;
-
-private:
-	void SetGamePlayMode_Combat();
-	void SetGamePlayMode_Build();
-
-
-	///////////////////////////////////////////////////////////
 	// 건설 모드
 	///////////////////////////////////////////////////////////
 private:
@@ -129,9 +108,6 @@ private:
 protected:
 	bool IsUIMode() const;
 
-	template<typename WindowT>
-	void ToggleWindow(WindowT*& Window, const FName& WindowClassName, const FName& WindowName);
-
 	UFUNCTION()
 	void OnItemSlotAddedToInventory(UGSBStorageWindow* Storage, UGSBStorage* StorageBody, UGSBItemList* ItemList, UGSBItemSlot* ItemSlot);
 
@@ -139,10 +115,9 @@ protected:
 
 	UGSBPlayerOverlay* GetOverlayWidget() const;
 
-	UGSBInventoryWindow* InventoryWidget;
+	UGSBInventoryWindow* InventoryWindow;
 
-private:
-	class UGSBWindow* ToggleWindow_Internal(class UGSBWindow* Window, const FName& WindowClassName, const FName& WindowName);
+	UGSBBuildableFacilityListWindow* BuildableFacilityListWindow;
 
 public:
 	
@@ -151,9 +126,3 @@ public:
 		return InventoryComponent;
 	}
 };
-
-template<typename WindowT>
-inline void AGSBPlayer::ToggleWindow(WindowT*& Window, const FName& WindowClassName, const FName& WindowName)
-{
-	Window = Cast<WindowT>(ToggleWindow_Internal(Window, WindowClassName, WindowName));
-}

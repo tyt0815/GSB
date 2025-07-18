@@ -2,6 +2,7 @@
 
 
 #include "SubSystems/GSBWindowSubsystem.h"
+#include "GSBGameInstance.h"
 #include "HUDs/GSBHUD.h"
 #include "DebugHeader.h"
 
@@ -60,6 +61,27 @@ UGSBContextMenu* UGSBWindowSubsystem::OpenDefaultContextMenu(const FName& Contex
 UGSBWindow* UGSBWindowSubsystem::ToggleWindow_Internal(UGSBWindow* Window, UClass* WindowClass, const FName& WindowName)
 {
 	return GetHUD()->ToggleWindow(Window, WindowClass, WindowName);
+}
+
+UGSBWindow* UGSBWindowSubsystem::ToggleWindow_Internal(UGSBWindow* Window, const FName& WindowClassName, const FName& WindowName)
+{
+	if (UClass* Class = GetWidgetClass(WindowClassName))
+	{
+		return ToggleWindow_Internal(Window, Class, WindowName);
+	}
+	else
+	{
+		return nullptr;
+	}
+}
+
+UClass* UGSBWindowSubsystem::GetWidgetClass(const FName& ClassName)
+{
+	if (UGSBGameInstance* GameInst = Cast<UGSBGameInstance>(GetGameInstance()))
+	{
+		return GameInst->GetUserWidgetClass(ClassName);
+	}
+	return nullptr;
 }
 
 AGSBHUD* UGSBWindowSubsystem::GetHUD()

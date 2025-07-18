@@ -19,6 +19,7 @@
 #include "HUDs/GSBInventory.h"
 #include "HUDs/GSBInventoryWindow.h"
 #include "HUDs/GSBItemSlot.h"
+#include "HUDs/GSBBuildableFacilityListWindow.h"
 #include "SubSystems/GSBWindowSubsystem.h"
 #include "DebugHeader.h"
 
@@ -55,7 +56,6 @@ void AGSBPlayer::Tick(float DeltaTime)
 void AGSBPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
 	if (AGSBPlayerController* PlayerController = GetPlayerController())
 	{
 		PlayerController->ActivateCombatInputContext();
@@ -93,11 +93,14 @@ void AGSBPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	}
 }
 
+void AGSBPlayer::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+}
+
 void AGSBPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-
-	SetGamePlayMode_Combat();	
 
 	if (UGSBGameInstance* GameInst = Cast<UGSBGameInstance>(GetGameInstance()))
 	{
@@ -119,6 +122,8 @@ void AGSBPlayer::BeginPlay()
 	{
 		TRACE_SCREEN_LOG(TEXT("UGSBGameInstance 캐스팅 실패"));
 	}
+
+	SwitchToCombatMode();
 }
 
 void AGSBPlayer::Move(const FInputActionValue& Value)
@@ -201,12 +206,15 @@ void AGSBPlayer::SelectInteractionScrollDown()
 
 void AGSBPlayer::ToggleInventory()
 {
-	ToggleWindow(InventoryWidget, TEXT("Inventory"), TEXT("Inventory"));
-	if (IsValid(InventoryWidget))
+	if (UGSBWindowSubsystem* WindowManager = UGSBWindowSubsystem::Get(this))
 	{
-		InventoryWidget->OnItemSlotAdded.AddDynamic(this, &AGSBPlayer::OnItemSlotAddedToInventory);
-		InventoryWidget->LinkStorageComponent(InventoryComponent);
-	}
+		WindowManager->ToggleWindow(InventoryWindow, TEXT("Inventory"), TEXT("Inventory"));
+		if (IsValid(InventoryWindow))
+		{
+			InventoryWindow->OnItemSlotAdded.AddDynamic(this, &AGSBPlayer::OnItemSlotAddedToInventory);
+			InventoryWindow->LinkStorageComponent(InventoryComponent);
+		}
+	}	
 }
 
 void AGSBPlayer::Esc_Triggered()
@@ -239,7 +247,12 @@ void AGSBPlayer::CancelFacilityPreview()
 
 void AGSBPlayer::ToggleBuildableFacilityList()
 {
-
+		TRACE_SCREEN_LOG(TEXT("sibal1"));
+	if (UGSBWindowSubsystem* WindowManager = UGSBWindowSubsystem::Get(this))
+	{
+		TRACE_SCREEN_LOG(TEXT("sibal2"));
+		WindowManager->ToggleWindow(BuildableFacilityListWindow, TEXT("BuildableFacilityListWindow"), TEXT("BuildableFacilityListWindow"));
+	}
 }
 
 void AGSBPlayer::PreviewConveyorBelt()
@@ -259,66 +272,33 @@ void AGSBPlayer::PreviewMiningFacility()
 
 void AGSBPlayer::SwitchToCombatMode()
 {
-	SetGamePlayMode(EGamePlayMode::EGPM_Combat);
+	if (AGSBPlayerController* PC = GetPlayerController())
+	{
+		PC->ActivateCombatInputContext();
+	}
 	FacilityBuilder->CancelPreview();
+
+	if (UGSBPlayerOverlay* PlayerOverlay = GetOverlayWidget())
+	{
+		PlayerOverlay->SwitchToCombatModeUI();
+	}
 }
 
 void AGSBPlayer::SwitchToBuildMode()
 {
-	SetGamePlayMode(EGamePlayMode::EGPM_Build);
+	if (AGSBPlayerController* PC = GetPlayerController())
+	{
+		PC->ActivateBuildInputContext();
+	}
+	if (UGSBPlayerOverlay * PlayerOverlay = GetOverlayWidget())
+	{
+		PlayerOverlay->SwitchToBuildModeUI();
+	}
 }
 
 AGSBPlayerController* AGSBPlayer::GetPlayerController() const
 {
 	return GetController<AGSBPlayerController>();
-}
-
-void AGSBPlayer::SetGamePlayMode(EGamePlayMode NewGamePlayMode)
-{
-	if (GamePlayMode == NewGamePlayMode)
-	{
-		return;
-	}
-
-	GamePlayMode = NewGamePlayMode;
-	switch (GamePlayMode)
-	{
-	case EGamePlayMode::EGPM_Combat:
-		SetGamePlayMode_Combat();
-		break;
-	case EGamePlayMode::EGPM_Build:
-		SetGamePlayMode_Build();
-		break;
-	default:
-		SCREEN_LOG_NONE_KEY(TEXT("Undefined GamePlayMode: ") + FString::FromInt(static_cast<int32>(GamePlayMode)) + TEXT("(AGSBPlayer::SetGamePlayMode)"));
-		break;
-	}
-}
-
-void AGSBPlayer::SetGamePlayMode_Combat()
-{
-	if (AGSBPlayerController* PlayerController = GetPlayerController())
-	{
-		PlayerController->ActivateCombatInputContext();
-	}
-
-	if (UGSBPlayerOverlay* OverlayWidget = GetOverlayWidget())
-	{
-		OverlayWidget->SwitchToCombatModeUI();
-	}
-}
-
-void AGSBPlayer::SetGamePlayMode_Build()
-{
-	if (AGSBPlayerController* PlayerController = GetPlayerController())
-	{
-		PlayerController->ActivateBuildInputContext();
-	}
-
-	if (UGSBPlayerOverlay* OverlayWidget = GetOverlayWidget())
-	{
-		OverlayWidget->SwitchToBuildModeUI();
-	}
 }
 
 void AGSBPlayer::UpdateFacilityBuilderLocation()
@@ -486,22 +466,6 @@ UGSBPlayerOverlay* AGSBPlayer::GetOverlayWidget() const
 	if (AGSBPlayerHUD* HUD = GetHUD())
 	{
 		return Cast<UGSBPlayerOverlay>(HUD->GetOverlayWidget());
-	}
-	return nullptr;
-}
-
-UGSBWindow* AGSBPlayer::ToggleWindow_Internal(UGSBWindow* Window, const FName& WindowClassName, const FName& WindowName)
-{
-	if (UGSBWindowSubsystem* WindowManager = UGSBWindowSubsystem::Get(this))
-	{
-		if (UGSBGameInstance* GameInst = GetGameInstance<UGSBGameInstance>())
-		{
-			if (UClass* WindowClass = GameInst->GetUserWidgetClass(WindowClassName))
-			{
-				WindowManager->ToggleWindow(Window, WindowClass, WindowName);
-				return Window;
-			}
-		}
 	}
 	return nullptr;
 }
