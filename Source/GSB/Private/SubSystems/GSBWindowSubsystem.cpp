@@ -5,6 +5,18 @@
 #include "HUDs/GSBHUD.h"
 #include "DebugHeader.h"
 
+UGSBWindowSubsystem* UGSBWindowSubsystem::Get(UObject* WorldContext)
+{
+	if (UWorld* World = WorldContext->GetWorld())
+	{
+		if (UGameInstance* GameInst = World->GetGameInstance())
+		{
+			return GameInst->GetSubsystem<UGSBWindowSubsystem>();
+		}
+	}
+	return nullptr;
+}
+
 UGSBWindow* UGSBWindowSubsystem::OpenWindow(UClass* WindowClass, const FName& WindowName)
 {
 	return GetHUD()->OpenWindow(WindowClass, WindowName);
@@ -43,6 +55,11 @@ UGSBContextMenu* UGSBWindowSubsystem::OpenContextMenu(UClass* ContextMenuClass, 
 UGSBContextMenu* UGSBWindowSubsystem::OpenDefaultContextMenu(const FName& ContextMenuName, UObject* ContextTarget)
 {
 	return GetHUD()->OpenDefaultContextMenu(ContextMenuName, ContextTarget);
+}
+
+UGSBWindow* UGSBWindowSubsystem::ToggleWindow_Internal(UGSBWindow* Window, UClass* WindowClass, const FName& WindowName)
+{
+	return GetHUD()->ToggleWindow(Window, WindowClass, WindowName);
 }
 
 AGSBHUD* UGSBWindowSubsystem::GetHUD()

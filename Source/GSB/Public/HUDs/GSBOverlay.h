@@ -25,13 +25,15 @@ public:
 
 	UGSBWindow* OpenWindow(TSubclassOf<UGSBWindow> WindowClass, const FName& WindowName);
 
+	UGSBWindow* ToggleWindow(UGSBWindow* Window, TSubclassOf<UGSBWindow> WindowClass, const FName& WindowName);
+
 	UGSBNumberInputDialog* OpenNumberInputDialog(TSubclassOf<UGSBNumberInputDialog> NumberInputDialogClass, const FName& DialogName, UObject* TargetObject);
 	
 	UGSBNumberInputDialog* OpenDefaultNumberInputDialog(const FName& DialogName, UObject* TargetObject);
 
 	void CloseWindow(UGSBWindow* Window);
 
-	bool IsWindowOpened(UGSBWindow* Window);
+	bool IsWindowOpened(const UGSBWindow* Window) const;
 
 	void CloseAllWindows();
 

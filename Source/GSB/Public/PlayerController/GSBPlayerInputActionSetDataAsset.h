@@ -66,6 +66,9 @@ public:
 	UInputAction* CancelFacilityPreviewInputAction;
 
 	UPROPERTY(EditDefaultsOnly)
+	UInputAction* ToggleBuildableFacilityListInputAction;
+
+	UPROPERTY(EditDefaultsOnly)
 	UInputAction* PreviewConveyorBeltInputAction;
 
 	UPROPERTY(EditDefaultsOnly)

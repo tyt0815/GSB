@@ -24,6 +24,8 @@ public:
 public:
 	UGSBWindow* OpenWindow(UClass* WindowClass, const FName& WindowName);
 
+	UGSBWindow* ToggleWindow(UGSBWindow* Window, UClass* WindowClass, const FName& WindowName);
+
 	UGSBNumberInputDialog* OpenNumberInputDialog(UClass* NumberInputDialogClass, const FName& DialogName, UObject* TargetObject);
 
 	UGSBNumberInputDialog* OpenDefaultNumberInputDialog(const FName& DialogName, UObject* TargetObject);

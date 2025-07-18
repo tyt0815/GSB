@@ -62,6 +62,7 @@ protected:
 	void RotatePreview();
 	void ConfirmFacilityPlacement();
 	void CancelFacilityPreview();
+	void ToggleBuildableFacilityList();
 	void PreviewConveyorBelt();
 	void PreviewExtensionHub();
 	void PreviewMiningFacility();
@@ -126,8 +127,10 @@ private:
 	// UI
 	///////////////////////////////////////////////////////////
 protected:
-
 	bool IsUIMode() const;
+
+	template<typename WindowT>
+	void ToggleWindow(WindowT*& Window, const FName& WindowClassName, const FName& WindowName);
 
 	UFUNCTION()
 	void OnItemSlotAddedToInventory(UGSBStorageWindow* Storage, UGSBStorage* StorageBody, UGSBItemList* ItemList, UGSBItemSlot* ItemSlot);
@@ -138,6 +141,9 @@ protected:
 
 	UGSBInventoryWindow* InventoryWidget;
 
+private:
+	class UGSBWindow* ToggleWindow_Internal(class UGSBWindow* Window, const FName& WindowClassName, const FName& WindowName);
+
 public:
 	
 	FORCEINLINE UInventoryComponent* GetInventoryComponent() const
@@ -145,3 +151,9 @@ public:
 		return InventoryComponent;
 	}
 };
+
+template<typename WindowT>
+inline void AGSBPlayer::ToggleWindow(WindowT*& Window, const FName& WindowClassName, const FName& WindowName)
+{
+	Window = Cast<WindowT>(ToggleWindow_Internal(Window, WindowClassName, WindowName));
+}

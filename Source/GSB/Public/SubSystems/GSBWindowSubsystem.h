@@ -16,7 +16,12 @@ class GSB_API UGSBWindowSubsystem : public UGameInstanceSubsystem
 	GENERATED_BODY()
 
 public:
+	static UGSBWindowSubsystem* Get(UObject* WorldContext);
+
 	UGSBWindow* OpenWindow(UClass* WindowClass, const FName& WindowName);
+
+	template<typename WindowT>
+	void ToggleWindow(WindowT*& Window, UClass* WindowClass, const FName& WindowName);
 
 	UGSBNumberInputDialog* OpenNumberInputDialog(UClass* NumberInputDialogClass, const FName& DialogName, UObject* TargetObject);
 
@@ -33,7 +38,15 @@ public:
 	UGSBContextMenu* OpenDefaultContextMenu(const FName& ContextMenuName, UObject* ContextTarget);
 
 private	:
+	UGSBWindow* ToggleWindow_Internal(UGSBWindow* Window, UClass* WindowClass, const FName& WindowName);
+
 	AGSBHUD* HUD;
 
 	AGSBHUD* GetHUD();
 };
+
+template<typename WindowT>
+inline void UGSBWindowSubsystem::ToggleWindow(WindowT*& Window, UClass* WindowClass, const FName& WindowName)
+{
+	Window = Cast<WindowT>(ToggleWindow_Internal(Window, WindowClass, WindowName));
+}

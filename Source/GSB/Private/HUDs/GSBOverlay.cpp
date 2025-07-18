@@ -30,6 +30,19 @@ UGSBWindow* UGSBOverlay::OpenWindow(TSubclassOf<UGSBWindow> WindowClass, const F
 	return nullptr;
 }
 
+UGSBWindow* UGSBOverlay::ToggleWindow(UGSBWindow* Window, TSubclassOf<UGSBWindow> WindowClass, const FName& WindowName)
+{
+	if (IsWindowOpened(Window))
+	{
+		CloseWindow(Window);
+		return nullptr;
+	}
+	else
+	{
+		return OpenWindow(WindowClass, WindowName);
+	}
+}
+
 UGSBNumberInputDialog* UGSBOverlay::OpenNumberInputDialog(TSubclassOf<UGSBNumberInputDialog> NumberInputDialogClass, const FName& DialogName, UObject* TargetObject)
 {
 	if (UGSBNumberInputDialog* Dialog = Cast<UGSBNumberInputDialog>(OpenWindow(NumberInputDialogClass, DialogName)))
@@ -55,7 +68,7 @@ void UGSBOverlay::CloseWindow(UGSBWindow* Window)
 	UpdatePlayerControllMode();
 }
 
-bool UGSBOverlay::IsWindowOpened(UGSBWindow* Window)
+bool UGSBOverlay::IsWindowOpened(const UGSBWindow* Window) const
 {
 	return IsValid(Window) && OpenedWindows.Contains(Window);
 }

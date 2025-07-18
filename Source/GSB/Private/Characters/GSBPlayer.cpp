@@ -78,6 +78,7 @@ void AGSBPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 			EnhancedInputComponent->BindAction(InputSet->RotatePreview, ETriggerEvent::Started, this, &AGSBPlayer::RotatePreview);
 			EnhancedInputComponent->BindAction(InputSet->ConfirmFacilityPlacementInputAction, ETriggerEvent::Started, this, &AGSBPlayer::ConfirmFacilityPlacement);
 			EnhancedInputComponent->BindAction(InputSet->CancelFacilityPreviewInputAction, ETriggerEvent::Started, this, &AGSBPlayer::CancelFacilityPreview);
+			EnhancedInputComponent->BindAction(InputSet->ToggleBuildableFacilityListInputAction, ETriggerEvent::Started, this, &AGSBPlayer::ToggleBuildableFacilityList);
 			EnhancedInputComponent->BindAction(InputSet->PreviewConveyorBeltInputAction, ETriggerEvent::Started, this, &AGSBPlayer::PreviewConveyorBelt);
 			EnhancedInputComponent->BindAction(InputSet->PreviewExtensionHubInputAction, ETriggerEvent::Started, this, &AGSBPlayer::PreviewExtensionHub);
 			EnhancedInputComponent->BindAction(InputSet->PreviewMiningFacilityInputAction, ETriggerEvent::Started, this, &AGSBPlayer::PreviewMiningFacility);
@@ -200,33 +201,11 @@ void AGSBPlayer::SelectInteractionScrollDown()
 
 void AGSBPlayer::ToggleInventory()
 {
-	UGSBWindowSubsystem* WindowManager = GetGameInstance()->GetSubsystem<UGSBWindowSubsystem>();
-	UGSBGameInstance* GameInst = GetGameInstance<UGSBGameInstance>();
-	if (WindowManager->IsWindowOpened(InventoryWidget))
+	ToggleWindow(InventoryWidget, TEXT("Inventory"), TEXT("Inventory"));
+	if (IsValid(InventoryWidget))
 	{
-		WindowManager->CloseWindow(InventoryWidget);
-	}
-	else
-	{
-		UClass* InventoryWidgetClass = GameInst->GetUserWidgetClass(TEXT("Inventory"));
-		if (UGSBWindow* Window = WindowManager->OpenWindow(InventoryWidgetClass, TEXT("Inventory")))
-		{
-			InventoryWidget = Cast<UGSBInventoryWindow>(Window);
-			if (InventoryWidget)
-			{
-				InventoryWidget->OnItemSlotAdded.AddDynamic(this, &AGSBPlayer::OnItemSlotAddedToInventory);
-				InventoryWidget->LinkStorageComponent(InventoryComponent);
-			}
-			else
-			{
-				TRACE_SCREEN_LOG(TEXT("InventoryWidget 캐스팅 실패"));
-				WindowManager->CloseWindow(Window);
-			}
-		}
-		else
-		{
-			TRACE_SCREEN_LOG(TEXT("InventoryWidget 생성 실패"));
-		}
+		InventoryWidget->OnItemSlotAdded.AddDynamic(this, &AGSBPlayer::OnItemSlotAddedToInventory);
+		InventoryWidget->LinkStorageComponent(InventoryComponent);
 	}
 }
 
@@ -256,6 +235,11 @@ void AGSBPlayer::ConfirmFacilityPlacement()
 void AGSBPlayer::CancelFacilityPreview()
 {
 	FacilityBuilder->CancelPreview();
+}
+
+void AGSBPlayer::ToggleBuildableFacilityList()
+{
+
 }
 
 void AGSBPlayer::PreviewConveyorBelt()
@@ -502,6 +486,22 @@ UGSBPlayerOverlay* AGSBPlayer::GetOverlayWidget() const
 	if (AGSBPlayerHUD* HUD = GetHUD())
 	{
 		return Cast<UGSBPlayerOverlay>(HUD->GetOverlayWidget());
+	}
+	return nullptr;
+}
+
+UGSBWindow* AGSBPlayer::ToggleWindow_Internal(UGSBWindow* Window, const FName& WindowClassName, const FName& WindowName)
+{
+	if (UGSBWindowSubsystem* WindowManager = UGSBWindowSubsystem::Get(this))
+	{
+		if (UGSBGameInstance* GameInst = GetGameInstance<UGSBGameInstance>())
+		{
+			if (UClass* WindowClass = GameInst->GetUserWidgetClass(WindowClassName))
+			{
+				WindowManager->ToggleWindow(Window, WindowClass, WindowName);
+				return Window;
+			}
+		}
 	}
 	return nullptr;
 }
