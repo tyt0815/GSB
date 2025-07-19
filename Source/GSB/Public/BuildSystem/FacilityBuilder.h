@@ -9,6 +9,7 @@
 #include "FacilityBuilder.generated.h"
 
 class AFacilityGhostActor;
+class UGSBFacilityQuickSlotList;
 
 enum class EBuildMode : uint8
 {
@@ -41,6 +42,8 @@ public:
 	void CancelPreview();
 
 	void RotatePreview();
+
+	void SetFacilityQuickSlot(UGSBFacilityDataAsset* FacilityData, int32 Index);
 
 private:
 	void PreviewGeneralFacility(UGSBFacilityDataAsset* FacilityData);
@@ -76,6 +79,8 @@ private:
 	void DestroyAllConveyorBeltGhosts();
 
 	TStaticArray<UGSBFacilityDataAsset*, 10> FacilityPreviewQuickSlot;
+
+	UGSBFacilityQuickSlotList* FacilityQuickSlotListWidget;
 
 	UPROPERTY(EditDefaultsOnly, Category = "GSB|FacilityBuilder")
 	TArray<UGSBFacilityDataAsset*> GeneralFacilityData;
@@ -137,5 +142,9 @@ public:
 	FORCEINLINE UGSBFacilityDataAsset* GetConveyorBeltRightData() const
 	{
 		return ConveyorBeltRightData;
+	}
+	FORCEINLINE void SetFacilityQuickSlotListWidget(UGSBFacilityQuickSlotList* Widget)
+	{
+		FacilityQuickSlotListWidget = Widget;
 	}
 };

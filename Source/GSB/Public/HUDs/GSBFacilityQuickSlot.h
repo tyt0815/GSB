@@ -14,7 +14,14 @@ class GSB_API UGSBFacilityQuickSlot : public UGSBConstructableFacilitySlot
 {
 	GENERATED_BODY()
 public:
+	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) override;
+
+	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
+
+public:
 	void UpdateFacilityData(UGSBFacilityDataAsset* InFacilityData, int32 InQuickSlotIndex);
+
+	void SetFacilityQuickSlot(UGSBFacilityDataAsset* InFacilityData);
 
 private:
 	UPROPERTY(meta = (BindWidget))

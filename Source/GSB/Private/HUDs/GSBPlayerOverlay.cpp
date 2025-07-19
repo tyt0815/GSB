@@ -54,7 +54,7 @@ void UGSBPlayerOverlay::UpdatePowerCapacity(int32 CurrentPowerUsage, int32 Total
 
 void UGSBPlayerOverlay::SwitchToBuildModeUI()
 {
-	ConstructableFacilityQuickSlotList->UpdateFacilityQuickSlots();
+	ConstructableFacilityQuickSlotList->SyncronizeFacilityQuickSlots();
 	ConstructableFacilityQuickSlotList->SetVisibility(ESlateVisibility::Visible);
 }
 

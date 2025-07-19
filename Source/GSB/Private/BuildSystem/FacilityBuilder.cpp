@@ -7,6 +7,7 @@
 #include "Facility/MiningPoint.h"
 #include "Facility/MiningFacility.h"
 #include "Facility/ConveyorBelt.h"
+#include "HUDs/GSBFacilityQuickSlotList.h"
 #include "SubSystems/GSBFacilitySubsystem.h"
 #include "GSBDefines.h"
 #include "DebugHeader.h"
@@ -40,8 +41,6 @@ void AFacilityBuilder::Tick(float DeltaSeconds)
 void AFacilityBuilder::BeginPlay()
 {
 	Super::BeginPlay();
-
-	FacilityPreviewQuickSlot[0] = ConveyorBeltForwardData;
 }
 
 void AFacilityBuilder::PreviewFacilityAt(int32 Index)
@@ -125,6 +124,20 @@ void AFacilityBuilder::RotatePreview()
 	if (IsValid(FacilityGhost))
 	{
 		FacilityGhost->AddActorWorldRotation(FRotator(0, 90, 0));
+	}
+}
+
+void AFacilityBuilder::SetFacilityQuickSlot(UGSBFacilityDataAsset* FacilityData, int32 Index)
+{
+	if (Index < 0 || Index > 9)
+	{
+		return;
+	}
+
+	FacilityPreviewQuickSlot[Index] = FacilityData;
+	if (IsValid(FacilityQuickSlotListWidget))
+	{
+		FacilityQuickSlotListWidget->UpdateFacilityQuickSlot(FacilityData, Index);
 	}
 }
 

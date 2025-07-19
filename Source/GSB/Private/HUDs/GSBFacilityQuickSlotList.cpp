@@ -7,34 +7,55 @@
 #include "Characters/GSBPlayer.h"
 #include "BuildSystem/FacilityBuilder.h"
 
-void UGSBFacilityQuickSlotList::UpdateFacilityQuickSlots()
+void UGSBFacilityQuickSlotList::NativeConstruct()
 {
-	ConstructableFacilityQuickSlotList->ClearChildren();
-	if (AGSBPlayer* Player = GetOwningPlayerPawn<AGSBPlayer>())
-	{
-		if (AFacilityBuilder* FacilityBuilder = Player->GetFacilityBuilder())
-		{
-			AddFacilityQuickSlots(FacilityBuilder->GetFacilityPreviewQuickSlot());
-		}
-	}
-}
+	Super::NativeConstruct();
 
-void UGSBFacilityQuickSlotList::AddFacilityQuickSlots(const TStaticArray<UGSBFacilityDataAsset*, 10>& FacilityPreviewQuickSlots)
-{
+	ConstructableFacilityQuickSlotList->ClearChildren();
 	for (int i = 0; i < 10; ++i)
 	{
-		int32 Index = (i + 1) % 10;
-		UGSBFacilityDataAsset* FacilityData = FacilityPreviewQuickSlots[Index];
 		if (QuickSlotClass)
 		{
 			if (UGSBFacilityQuickSlot* QuickSlot = CreateWidget<UGSBFacilityQuickSlot>(GetOwningPlayer(), QuickSlotClass))
 			{
-				QuickSlot->UpdateFacilityData(FacilityData, Index);
 				if (UVerticalBoxSlot* VerticalBoxSlot = Cast<UVerticalBoxSlot>(ConstructableFacilityQuickSlotList->AddChild(QuickSlot)))
 				{
 					VerticalBoxSlot->SetHorizontalAlignment(EHorizontalAlignment::HAlign_Fill);
 				}
 			}
 		}
+	}
+}
+
+void UGSBFacilityQuickSlotList::SyncronizeFacilityQuickSlots()
+{
+	if (AGSBPlayer* Player = GetOwningPlayerPawn<AGSBPlayer>())
+	{
+		if (AFacilityBuilder* FacilityBuilder = Player->GetFacilityBuilder())
+		{
+			FacilityBuilder->SetFacilityQuickSlotListWidget(this);
+			const auto& FacilityPreviewQuickSlots = FacilityBuilder->GetFacilityPreviewQuickSlot();
+			for (int32 i = 0; i < FacilityPreviewQuickSlots.Num(); ++i)
+			{
+				UpdateFacilityQuickSlot(FacilityPreviewQuickSlots[i], i);
+			}
+		}
+	}
+}
+
+UGSBFacilityQuickSlot* UGSBFacilityQuickSlotList::GetFacilityQuickSlotAt(int32 Index)
+{
+	if (Index >= 0 && Index < 10)
+	{
+		return Cast<UGSBFacilityQuickSlot>(ConstructableFacilityQuickSlotList->GetChildAt((Index + 9) % 10));
+	}
+	return nullptr;
+}
+
+void UGSBFacilityQuickSlotList::UpdateFacilityQuickSlot(UGSBFacilityDataAsset* FacilityData, int32 Index)
+{
+	if (UGSBFacilityQuickSlot* QuickSlot = GetFacilityQuickSlotAt(Index))
+	{
+		QuickSlot->UpdateFacilityData(FacilityData, Index);
 	}
 }

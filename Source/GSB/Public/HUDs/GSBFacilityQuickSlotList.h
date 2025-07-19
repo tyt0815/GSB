@@ -11,12 +11,16 @@ UCLASS()
 class GSB_API UGSBFacilityQuickSlotList : public UUserWidget
 {
 	GENERATED_BODY()
+public:
+	virtual void NativeConstruct() override;
 
 public:
-	void UpdateFacilityQuickSlots();
+	void SyncronizeFacilityQuickSlots();
 
-private	:
-	void AddFacilityQuickSlots(const TStaticArray<UGSBFacilityDataAsset*, 10>& FacilityPreviewQuickSlots);
+	UGSBFacilityQuickSlot* GetFacilityQuickSlotAt(int32 Index);
+
+public:
+	void UpdateFacilityQuickSlot(UGSBFacilityDataAsset* FacilityData, int32 Index);
 
 	UPROPERTY(EditDefaultsOnly, Category = "GSB|GSBFacilityQuickSlotList")
 	TSubclassOf<UGSBFacilityQuickSlot> QuickSlotClass;
