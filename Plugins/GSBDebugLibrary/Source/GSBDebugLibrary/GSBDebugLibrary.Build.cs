@@ -2,9 +2,9 @@
 
 using UnrealBuildTool;
 
-public class GSBFacilityEditorTools : ModuleRules
+public class GSBDebugLibrary : ModuleRules
 {
-	public GSBFacilityEditorTools(ReadOnlyTargetRules Target) : base(Target)
+	public GSBDebugLibrary(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 		
@@ -38,8 +38,6 @@ public class GSBFacilityEditorTools : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
-				"Blutility",
-                "GSBDebugLibrary"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

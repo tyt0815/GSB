@@ -6,15 +6,23 @@
 #include "AssetActionUtility.h"
 #include "GSBFacilityMaterialAssetAction.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class GSBFACILITYEDITORTOOLS_API UGSBFacilityMaterialAssetAction : public UAssetActionUtility
 {
 	GENERATED_BODY()
+public:
+	UGSBFacilityMaterialAssetAction();
 	
 public:
 	UFUNCTION(CallInEditor)
 	void SetDissolveMaterialFunction();
+
+
+	/////////////////////////////////////////////////////////////
+	// SetDissolveMaterialFunction Slate Tab
+	/////////////////////////////////////////////////////////////
+private:
+	void RegisterSetDissolveMaterialFunctionTab();
+
+	TSharedRef<SDockTab> HandleOnSpawnSetDissolveMaterialFunctionTab(const FSpawnTabArgs& SpawnTabArgs);
 };
