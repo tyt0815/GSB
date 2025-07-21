@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "Misc/Optional.h"
 #include "Widgets/SCompoundWidget.h"
 
 class GSBFACILITYEDITORTOOLS_API SSetDissolveMaterialFunctionWidget : public SCompoundWidget
@@ -15,9 +16,24 @@ public:
 
 private	:
 	TSharedRef<SListView<TSharedPtr<FAssetData>>> ConstructMaterialAssetListView();
+
 	TSharedRef<ITableRow> OnGenerateRowForMaterialAssetListView(TSharedPtr<FAssetData> AssetDataToDisplay, const TSharedRef<STableViewBase>& OwnerTable);
+
 	void OnMaterialAssetListViewRowClicked(TSharedPtr<FAssetData> AssetData);
 
+	TSharedRef<SVerticalBox> ConstructDissolveMaterialFunctionPropertyList();
+
+	FString GetCurrentDissolvePatternTexturePath() const;
+
+	void OnDissolvePatternTextureChanged(const FAssetData& AssetData);
+
 	TArray<TSharedPtr<FAssetData>> SelectedMaterials;
+
 	TSharedPtr<SListView<TSharedPtr<FAssetData>>> ConstructedMaterialAssetListView;
+
+	UTexture2D* DissolvePatternTexture;
+
+	float Amount = 1;
+
+	float Tilting = 1;
 };

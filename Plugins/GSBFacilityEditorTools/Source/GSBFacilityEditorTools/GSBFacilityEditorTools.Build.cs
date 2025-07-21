@@ -42,6 +42,7 @@ public class GSBFacilityEditorTools : ModuleRules
 				"InputCore",
                 "EditorSubsystem",
                 "UnrealEd",
+                "PropertyEditor",
                 "GSBDebugLibrary",
 				// ... add private dependencies that you statically link with here ...	
 			}

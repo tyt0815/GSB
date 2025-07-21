@@ -27,4 +27,6 @@ public:
 
 private:
 	UMaterialFunctionInterface* DissolveMaterialFunction;
+	UTexture* DissolvePatternTexture;
+
 };

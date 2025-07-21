@@ -18,6 +18,12 @@ void UFacilityMaterialSubsystem::Initialize(FSubsystemCollectionBase& Collection
 	{
 		TRACE_PRINT_SCREEN_AND_LOG(TEXT("DissolveMaterialFunction가 invalid합니다."));
 	}
+
+	DissolvePatternTexture = LoadObject<UTexture>(this, TEXT("/Script/Engine.Texture2D'/GSBFacilityEditorTools/Texture/T_pattern_1.T_pattern_1'"));
+	if (!IsValid(DissolvePatternTexture))
+	{
+		TRACE_PRINT_SCREEN_AND_LOG(TEXT("DissolvePatternTexture가 invalid합니다."));
+	}
 }
 
 void UFacilityMaterialSubsystem::Deinitialize()
@@ -38,15 +44,14 @@ void UFacilityMaterialSubsystem::CreateOrUpdateDissolveMaterialFunctionNode(UMat
 		return;
 	}
 
-
+	Material->BlendMode = EBlendMode::BLEND_Masked;
 	UMaterialEditorOnlyData* MaterialEditorOnlyData = Material->GetEditorOnlyData();
 	if (!MaterialEditorOnlyData)
 	{
 		TRACE_PRINT_SCREEN_AND_LOG(Material->GetName() + TEXT(": MaterialEditorOnlyData캐스팅 실패"));
 		return;
 	}
-
-	Material->BlendMode = EBlendMode::BLEND_Masked;
+	
 	UMaterialExpressionMaterialFunctionCall* DissolveMaterialExpression;
 	if (IsDissolveMaterialFunctionLinked(MaterialEditorOnlyData->EmissiveColor.Expression))
 	{
@@ -126,7 +131,7 @@ void UFacilityMaterialSubsystem::CreateOrUpdateDissolveMaterialFunctionNode(UMat
 			MaterialExpression->MaterialExpressionEditorX = DissolveMaterialExpression->MaterialExpressionEditorX - 300;
 			MaterialExpression->MaterialExpressionEditorY = DissolveMaterialExpression->MaterialExpressionEditorY + 100 * (i - FunctionInputs.Num()/ 2);
 			
-			FunctionExpressionInput.Input.Expression = MaterialExpression;
+			FunctionExpressionInput.Input.Connect(0, MaterialExpression);
 		}
 
 		if (UMaterialExpressionParameter* MaterialExpressionParam = Cast<UMaterialExpressionParameter>(MaterialExpression))
