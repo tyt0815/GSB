@@ -39,7 +39,10 @@ public class GSBFacilityEditorTools : ModuleRules
 				"Slate",
 				"SlateCore",
 				"Blutility",
-                "GSBDebugLibrary"
+				"InputCore",
+                "EditorSubsystem",
+                "UnrealEd",
+                "GSBDebugLibrary",
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

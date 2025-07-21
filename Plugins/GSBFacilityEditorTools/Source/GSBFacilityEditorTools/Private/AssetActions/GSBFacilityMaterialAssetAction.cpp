@@ -2,6 +2,8 @@
 
 
 #include "AssetActions/GSBFacilityMaterialAssetAction.h"
+#include "Slate/SetDissolveMaterialFunctionWidget.h"
+#include "EditorUtilityLibrary.h"
 #include "GSBDebugLibrary.h"
 
 
@@ -28,5 +30,9 @@ TSharedRef<SDockTab> UGSBFacilityMaterialAssetAction::HandleOnSpawnSetDissolveMa
 {
 	return SNew(SDockTab)
 		.TabRole(ETabRole::NomadTab)
+		[
+			SNew(SSetDissolveMaterialFunctionWidget)
+				.SelectedAssetDatas(UEditorUtilityLibrary::GetSelectedAssetData())
+		]
 		;
 }

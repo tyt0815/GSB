@@ -11,28 +11,11 @@
 #endif
 
 // String Log
-#define SCREEN_DEBUG_MESSAGE(Key, TimeToDisplay, Color, DebugMessage) WITH_EDITOR_MACRO(\
+#define PRINT_SCREEN(Key, TimeToDisplay, Color, DebugMessage) WITH_EDITOR_MACRO(\
 	if(GEngine) \
 	{\
 		GEngine->AddOnScreenDebugMessage(Key, TimeToDisplay, Color, DebugMessage);\
 	})
-
-#define SCREEN_LOG(Key, DebugMessage)\
-	switch (Key)\
-	{ \
-		case 0: SCREEN_DEBUG_MESSAGE(Key, 5, FColor::Red, DebugMessage); break;\
-		case 1: SCREEN_DEBUG_MESSAGE(Key, 5, FColor::Green, DebugMessage); break;\
-		case 2: SCREEN_DEBUG_MESSAGE(Key, 5, FColor::Blue, DebugMessage); break;\
-		case 3: SCREEN_DEBUG_MESSAGE(Key, 5, FColor::Yellow, DebugMessage); break; \
-		case 4: SCREEN_DEBUG_MESSAGE(Key, 5, FColor::Cyan, DebugMessage); break; \
-		case 5: SCREEN_DEBUG_MESSAGE(Key, 5, FColor::Magenta, DebugMessage); break;\
-		default: SCREEN_DEBUG_MESSAGE(Key, 5, FColor::Purple, DebugMessage); break;\
-	}\
-
-
-#define SCREEN_LOG_COLOR(Key, DisplayColor, DebugMessage) SCREEN_DEBUG_MESSAGE(Key, 5, DisplayColor, DebugMessage);
-#define SCREEN_LOG_SINGLE_FRAME(DebugMessage) SCREEN_DEBUG_MESSAGE(INDEX_NONE, 0, FColor::Purple, DebugMessage);
-#define SCREEN_LOG_NONE_KEY(DebugMessage) SCREEN_DEBUG_MESSAGE(INDEX_NONE, 5, FColor::Orange, DebugMessage);
 
 #if defined(_MSC_VER)
 #define FUNCTION_NAME_MACRO __FUNCSIG__
@@ -42,9 +25,18 @@
 #define FUNCTION_NAME_MACRO __FUNCTION__ // fallback
 #endif
 
-#define TRACE_SCREEN_LOG(DebugMessage) SCREEN_DEBUG_MESSAGE(-1, 10, FColor::Cyan, FString(FUNCTION_NAME_MACRO) + TEXT(": ") + DebugMessage);
+#define TRACE_PRINT_SCREEN(DebugMessage) PRINT_SCREEN(-1, 10, FColor::Cyan, FString(FUNCTION_NAME_MACRO) + TEXT(": ") + DebugMessage);
 
+inline void PrintLog_Internal(const FString & DebugMessage)
+{
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *DebugMessage);
+}
 
+#define PRINT_LOG(DebugMessage) WITH_EDITOR_MACRO(PrintLog_Internal(DebugMessage))
+
+#define TRACE_PRINT_LOG(DebugMessage) PRINT_LOG(FString(FUNCTION_NAME_MACRO) + TEXT(": ") + DebugMessage)
+
+#define TRACE_PRINT_SCREEN_AND_LOG(DebugMessage) TRACE_PRINT_SCREEN(DebugMessage); TRACE_PRINT_LOG(DebugMessage);
 
 class FGSBDebugLibraryModule : public IModuleInterface
 {
