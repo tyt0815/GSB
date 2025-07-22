@@ -23,6 +23,18 @@ private	:
 
 	TSharedRef<SVerticalBox> ConstructDissolveMaterialFunctionPropertyList();
 
+	TSharedRef<SHorizontalBox> ConstructPropertyRowNameCell(const FText& PropertyName);
+
+	TSharedRef<SSplitter> ConstructPropertyBooleanRow(const FText& PropertyName, bool& Value);
+
+	TSharedRef<SSplitter> ConstructPropertyScalarRow(const FText& PropertyName, float& Value);
+
+	TSharedRef<SSplitter> ConstructPropertyColorRow(const FText& PropertyName, FLinearColor& Color);
+
+	TSharedRef<SSplitter> ConstructPropertyTextureRow(const FText& PropertyName, UTexture*& Texture);
+
+	FReply OnColorPropertyMouseButtonDown(const FGeometry& Geometry, const FPointerEvent& PointerEvent, FLinearColor& Color);
+
 	FString GetCurrentDissolvePatternTexturePath() const;
 
 	void OnDissolvePatternTextureChanged(const FAssetData& AssetData);
@@ -31,9 +43,19 @@ private	:
 
 	TSharedPtr<SListView<TSharedPtr<FAssetData>>> ConstructedMaterialAssetListView;
 
-	UTexture2D* DissolvePatternTexture;
+	bool bHueShift = true;
+
+	bool bSwitchUVs = true;
+
+	bool bUseOnlyTexture = true;
 
 	float Amount = 1;
 
 	float Tilting = 1;
+
+	float Width = 1;
+
+	FLinearColor FringeColor = FLinearColor(0,1,1,1);
+
+	UTexture* DissolvePatternTexture;
 };

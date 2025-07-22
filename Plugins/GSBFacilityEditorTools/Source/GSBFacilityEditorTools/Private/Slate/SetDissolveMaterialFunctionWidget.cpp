@@ -3,6 +3,7 @@
 
 #include "Slate/SetDissolveMaterialFunctionWidget.h"
 #include "Subsystems/FacilityMaterialSubsystem.h"
+#include "Widgets/Colors/SColorPicker.h"
 #include "PropertyCustomizationHelpers.h"
 #include "SDetailsSplitter.h"
 #include "Widgets/Input/SNumericEntryBox.h"
@@ -92,14 +93,20 @@ TSharedRef<ITableRow> SSetDissolveMaterialFunctionWidget::OnGenerateRowForMateri
 
 void SSetDissolveMaterialFunctionWidget::OnMaterialAssetListViewRowClicked(TSharedPtr<FAssetData> AssetData)
 {
-	if (UMaterial* Material = Cast<UMaterial>(AssetData->GetAsset()))
+	if (GEditor)
 	{
-		if (GEditor)
+		if (UFacilityMaterialSubsystem* FMS = GEditor->GetEditorSubsystem<UFacilityMaterialSubsystem>())
 		{
-			if (UFacilityMaterialSubsystem* FMS = GEditor->GetEditorSubsystem<UFacilityMaterialSubsystem>())
-			{
-				FMS->CreateOrUpdateDissolveMaterialFunctionNode(Material);
-			}
+			UFacilityMaterialSubsystem::FDissolveMaterialFunctionParameters Params = {};
+			Params.bHueShift = bHueShift;
+			Params.bSwitchUVs = bSwitchUVs;
+			Params.bUseOnlyTexture = bUseOnlyTexture;
+			Params.Amount = Amount;
+			Params.Tilting = Tilting;
+			Params.Width = Width;
+			Params.FringeColor = FringeColor;
+			Params.Pattern = DissolvePatternTexture;
+			FMS->CreateOrUpdateDissolveMaterialAsset(*AssetData.Get(), Params);
 		}
 	}
 }
@@ -107,49 +114,203 @@ void SSetDissolveMaterialFunctionWidget::OnMaterialAssetListViewRowClicked(TShar
 TSharedRef<SVerticalBox> SSetDissolveMaterialFunctionWidget::ConstructDissolveMaterialFunctionPropertyList()
 {
 	return SNew(SVerticalBox)
-		// Pattern Texture
+
+		+SVerticalBox::Slot()
+		[
+			ConstructPropertyBooleanRow(FText::FromString(TEXT("HueShift")), bHueShift)
+		]
+		+SVerticalBox::Slot()
+		[
+			ConstructPropertyBooleanRow(FText::FromString(TEXT("SwitchUVs")), bSwitchUVs)
+		]
+		+SVerticalBox::Slot()
+		[
+			ConstructPropertyBooleanRow(FText::FromString(TEXT("UseOnlyTexture")), bUseOnlyTexture)
+		]
+
 		+ SVerticalBox::Slot()
 		[
-			
-			SNew(SSplitter)
-				+ SSplitter::Slot()
-				[
-					// Property name
-					SNew(STextBlock)
-						.Text(FText::FromString("Pattern"))
-						.Justification(ETextJustify::Center)
-				]
-				+ SSplitter::Slot()
-				[
-					SNew(SObjectPropertyEntryBox)
-						.AllowedClass(UTexture::StaticClass())
-						.ObjectPath(this, &SSetDissolveMaterialFunctionWidget::GetCurrentDissolvePatternTexturePath)
-						.OnObjectChanged(this, &SSetDissolveMaterialFunctionWidget::OnDissolvePatternTextureChanged)
-				]
+			ConstructPropertyScalarRow(FText::FromString(TEXT("Amount")), Amount)
 		]
 		+ SVerticalBox::Slot()
 		[
-			SNew(SSplitter)
-				+SSplitter::Slot()
+			ConstructPropertyScalarRow(FText::FromString(TEXT("Tilting")), Tilting)
+		]
+		+ SVerticalBox::Slot()
+		[
+			ConstructPropertyScalarRow(FText::FromString(TEXT("Width")), Width)
+		]
+
+		+ SVerticalBox::Slot()
+		[
+			ConstructPropertyColorRow(FText::FromString(TEXT("FringeColor")), FringeColor)
+		]
+
+
+
+		// Pattern Texture
+		+ SVerticalBox::Slot()
+		[
+			ConstructPropertyTextureRow(FText::FromString(TEXT("Pattern")), DissolvePatternTexture)
+		]
+		;
+}
+
+TSharedRef<SHorizontalBox> SSetDissolveMaterialFunctionWidget::ConstructPropertyRowNameCell(const FText& PropertyName)
+{
+	return SNew(SHorizontalBox)
+		+ SHorizontalBox::Slot()
+		.VAlign(EVerticalAlignment::VAlign_Center)
+		.HAlign(EHorizontalAlignment::HAlign_Left)
+		.Padding(32, 0, 0, 0)
+		
+		[
+			SNew(STextBlock)
+				.Text(PropertyName)
+				.Justification(ETextJustify::Center)
+		];
+}
+
+TSharedRef<SSplitter> SSetDissolveMaterialFunctionWidget::ConstructPropertyBooleanRow(const FText& PropertyName, bool& Value)
+{
+	TSharedRef<SCheckBox> CheckBox = SNew(SCheckBox)
+		.Type(ESlateCheckBoxType::CheckBox)
+		.OnCheckStateChanged_Lambda([&Value](ECheckBoxState State)
+			{
+				switch (State)
+				{
+				case ECheckBoxState::Unchecked:
+					Value = false;
+					break;
+				case ECheckBoxState::Checked:
+					Value = true;
+					break;
+				case ECheckBoxState::Undetermined:
+					break;
+				default:
+					break;
+				}
+			}
+		);
+
+	if(CheckBox->IsChecked() != Value)
+	{ 
+		CheckBox->ToggleCheckedState();
+	}
+
+	return SNew(SSplitter)
+		+ SSplitter::Slot()
+		[
+			ConstructPropertyRowNameCell(PropertyName)
+		]
+		+ SSplitter::Slot()
+		[
+			SNew(SHorizontalBox)
+				+ SHorizontalBox::Slot()
+				.VAlign(EVerticalAlignment::VAlign_Center)
+				.HAlign(EHorizontalAlignment::HAlign_Fill)
+				.MaxWidth(100)
 				[
-					SNew(STextBlock)
-						.Text(FText::FromString("Amount"))
-						.Justification(ETextJustify::Center)
+					CheckBox
 				]
-				+ SSplitter::Slot()
+
+		];
+}
+
+TSharedRef<SSplitter> SSetDissolveMaterialFunctionWidget::ConstructPropertyScalarRow(const FText& PropertyName, float& Value)
+{
+	return SNew(SSplitter)
+		+ SSplitter::Slot()
+		[
+			ConstructPropertyRowNameCell(PropertyName)
+		]
+		+ SSplitter::Slot()
+		[
+			SNew(SHorizontalBox)
+				+ SHorizontalBox::Slot()
+				.VAlign(EVerticalAlignment::VAlign_Center)
+				.HAlign(EHorizontalAlignment::HAlign_Fill)
+				.MaxWidth(100)
 				[
 					SNew(SNumericEntryBox<float>)
 						.LabelVAlign(VAlign_Center)
-						.Value_Lambda([this]() { return TOptional<float>(Amount); })  // 현재 값 반환
-						.OnValueChanged_Lambda([this](float NewValue) { Amount = NewValue; })  // 값 변경 처리
+						.Value_Lambda([&Value]() { return TOptional<float>(Value); })  // 현재 값 반환
+						.OnValueChanged_Lambda([&Value](float NewValue) { Value = NewValue; })  // 값 변경 처리
 						.MinValue(0.f)
 						.MaxValue(1.f)
 						.MinSliderValue(0.f)
 						.MaxSliderValue(1.f)
 						.AllowSpin(true)
 				]
+
+		];
+}
+
+TSharedRef<SSplitter> SSetDissolveMaterialFunctionWidget::ConstructPropertyColorRow(const FText& PropertyName, FLinearColor& Color)
+{
+	return SNew(SSplitter)
+		+ SSplitter::Slot()
+		[
+			ConstructPropertyRowNameCell(PropertyName)
 		]
-		;
+		+ SSplitter::Slot()
+		[
+			SNew(SHorizontalBox)
+				+ SHorizontalBox::Slot()
+				.VAlign(EVerticalAlignment::VAlign_Center)
+				.HAlign(EHorizontalAlignment::HAlign_Fill)
+				.MaxWidth(100)
+				[
+					SNew(SColorBlock)
+						.Color_Lambda([&Color]() { return Color; })
+						.OnMouseButtonDown_Lambda([this, &Color](const FGeometry& Geometry, const FPointerEvent& PointerEvent)
+							{
+								return this->OnColorPropertyMouseButtonDown(Geometry, PointerEvent, Color);
+							}
+						)
+				]
+		];
+}
+
+TSharedRef<SSplitter> SSetDissolveMaterialFunctionWidget::ConstructPropertyTextureRow(const FText& PropertyName, UTexture*& Texture)
+{
+	return SNew(SSplitter)
+		+ SSplitter::Slot()
+		[
+			ConstructPropertyRowNameCell(PropertyName)
+		]
+		+ SSplitter::Slot()
+			[
+				SNew(SHorizontalBox)
+				+ SHorizontalBox::Slot()
+				.VAlign(EVerticalAlignment::VAlign_Center)
+				.HAlign(EHorizontalAlignment::HAlign_Fill)
+				.MaxWidth(200)
+				[
+					SNew(SObjectPropertyEntryBox)
+					.AllowedClass(UTexture::StaticClass())
+					.ObjectPath_Lambda([&Texture]()
+						{
+							return IsValid(Texture) ? Texture->GetPathName() : FString();
+						}
+					)
+					.OnObjectChanged_Lambda([&Texture](const FAssetData& AssetData)
+						{
+							Texture = Cast<UTexture>(AssetData.GetAsset());
+						}
+					)
+				]
+			];
+}
+
+FReply SSetDissolveMaterialFunctionWidget::OnColorPropertyMouseButtonDown(const FGeometry& Geometry, const FPointerEvent& PointerEvent, FLinearColor& Color)
+{
+	FColorPickerArgs PickerArgs;
+	PickerArgs.bIsModal = true;
+	PickerArgs.InitialColorOverride = Color;
+	PickerArgs.OnColorCommitted.BindLambda([&Color](FLinearColor NewColor) { Color = NewColor; });
+	OpenColorPicker(PickerArgs);
+	return FReply::Handled();
 }
 
 FString SSetDissolveMaterialFunctionWidget::GetCurrentDissolvePatternTexturePath() const

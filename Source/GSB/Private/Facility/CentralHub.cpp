@@ -21,7 +21,7 @@ ACentralHub::ACentralHub()
 	PowerProviderComponent = CreateDefaultSubobject<UPowerProviderComponent>(TEXT("PowerProvider"));
 	PowerProviderComponent->SetupAttachment(GetRootComponent());
 	PowerProviderComponent->SetCollisionProfileName(TEXT("PowerInfluenceArea"));
-
+	
 	PowerInfluenceAreaStaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PowerInfluenceArea"));
 	PowerInfluenceAreaStaticMeshComponent->SetupAttachment(GetRootComponent());
 	PowerInfluenceAreaStaticMeshComponent->SetCollisionProfileName(TEXT("NoCollision"));

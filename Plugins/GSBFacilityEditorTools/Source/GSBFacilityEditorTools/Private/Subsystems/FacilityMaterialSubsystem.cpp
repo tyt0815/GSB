@@ -2,12 +2,18 @@
 
 
 #include "Subsystems/FacilityMaterialSubsystem.h"
+#include "AssetToolsModule.h"
+#include "EditorAssetLibrary.h"
+#include "EditorSupportDelegates.h"
+#include "Factories/MaterialFactoryNew.h"
 #include "Materials/MaterialExpressionFunctionInput.h"
 #include "Materials/MaterialExpressionScalarParameter.h"
 #include "Materials/MaterialExpressionStaticBoolParameter.h"
 #include "Materials/MaterialExpressionVectorParameter.h"
 #include "Materials/MaterialExpressionTextureObjectParameter.h"
-#include "MaterialEditingLibrary.h"
+#include "Materials/MaterialExpressionLinearInterpolate.h"
+#include "Materials/MaterialExpressionMin.h"
+#include "MaterialGraph/MaterialGraph.h"
 #include "GSBDebugLibrary.h"
 
 void UFacilityMaterialSubsystem::Initialize(FSubsystemCollectionBase& Collection)
@@ -32,27 +38,54 @@ void UFacilityMaterialSubsystem::Deinitialize()
 	Super::Deinitialize();
 }
 
-UMaterialExpressionStaticBoolParameter* UFacilityMaterialSubsystem::CreateMaterialExpressionStaticBoolParameter(UMaterial* Material)
+UMaterialExpression* UFacilityMaterialSubsystem::FindMaterialExpressionByDesc(UMaterial* Material, const FString& Desc)
 {
-	return Cast<UMaterialExpressionStaticBoolParameter>(UMaterialEditingLibrary::CreateMaterialExpression(Material, UMaterialExpressionStaticBoolParameter::StaticClass()));;
+	Material->GetExpressions();
+	if (UMaterialEditorOnlyData* EditorOnly = Material->GetEditorOnlyData())
+	{
+		TArray<TObjectPtr<UMaterialExpression>>& ExprCollection = EditorOnly->ExpressionCollection.Expressions;
+		for (const TObjectPtr<UMaterialExpression>& MatExpr : ExprCollection)
+		{
+			if (IsValid(MatExpr) && MatExpr->Desc == Desc)
+			{
+				return MatExpr.Get();
+			}
+		}
+	}
+	return nullptr;
 }
 
-UMaterialExpressionTextureObjectParameter* UFacilityMaterialSubsystem::CreateMaterialExpressionTextureObjectParameter(UMaterial* Material)
+UMaterialExpressionParameter* UFacilityMaterialSubsystem::FindMaterialExpressionParameterByName(UMaterial* Material, const FName& ParameterName)
 {
-	return Cast<UMaterialExpressionTextureObjectParameter>(UMaterialEditingLibrary::CreateMaterialExpression(Material, UMaterialExpressionTextureObjectParameter::StaticClass()));;
+	for (const TObjectPtr<UMaterialExpression>& MatExpr : Material->GetExpressions())
+	{
+		if (UMaterialExpressionParameter* MatExprParam = Cast<UMaterialExpressionParameter>(MatExpr))
+		{
+			if (MatExprParam->GetParameterName() == ParameterName)
+			{
+				return MatExprParam;
+			}
+		}
+	}
+	return nullptr;
 }
 
-UMaterialExpressionScalarParameter* UFacilityMaterialSubsystem::CreateMaterialExpressionScalarParameter(UMaterial* Material)
+UMaterialExpressionTextureSampleParameter* UFacilityMaterialSubsystem::FindMaterialExpressionTextureSampleParameterByName(UMaterial* Material, const FString& ParameterName)
 {
-	return Cast<UMaterialExpressionScalarParameter>(UMaterialEditingLibrary::CreateMaterialExpression(Material, UMaterialExpressionScalarParameter::StaticClass()));;
+	for (const TObjectPtr<UMaterialExpression>& MatExpr : Material->GetExpressions())
+	{
+		if (UMaterialExpressionTextureSampleParameter* MatExprTextureSampleParam = Cast<UMaterialExpressionTextureSampleParameter>(MatExpr))
+		{
+			if (MatExprTextureSampleParam->GetParameterName() == ParameterName)
+			{
+				return MatExprTextureSampleParam;
+			}
+		}
+	}
+	return nullptr;
 }
 
-UMaterialExpressionVectorParameter* UFacilityMaterialSubsystem::CreateMaterialExpressionVectorParameter(UMaterial* Material)
-{
-	return  Cast<UMaterialExpressionVectorParameter>(UMaterialEditingLibrary::CreateMaterialExpression(Material, UMaterialExpressionVectorParameter::StaticClass()));;
-}
-
-void UFacilityMaterialSubsystem::CreateOrUpdateDissolveMaterialFunctionNode(UMaterial* Material)
+void UFacilityMaterialSubsystem::CreateOrUpdateDissolveMaterialFunctionNode(UMaterial* Material, const FDissolveMaterialFunctionParameters& Params)
 {
 	if (!IsValid(Material))
 	{
@@ -61,7 +94,7 @@ void UFacilityMaterialSubsystem::CreateOrUpdateDissolveMaterialFunctionNode(UMat
 	}
 	if (!IsValid(DissolveMaterialFunction))
 	{
-		TRACE_PRINT_SCREEN_AND_LOG(TEXT("DissolveMaterialFunction가 invalid합니다."));
+		TRACE_PRINT_SCREEN_AND_LOG(TEXT("DissolveMaterialFunction이 invalid합니다."));
 		return;
 	}
 
@@ -69,27 +102,56 @@ void UFacilityMaterialSubsystem::CreateOrUpdateDissolveMaterialFunctionNode(UMat
 	UMaterialEditorOnlyData* MaterialEditorOnlyData = Material->GetEditorOnlyData();
 	if (!MaterialEditorOnlyData)
 	{
-		TRACE_PRINT_SCREEN_AND_LOG(Material->GetName() + TEXT(": MaterialEditorOnlyData캐스팅 실패"));
+		TRACE_PRINT_SCREEN_AND_LOG(Material->GetName() + TEXT(": MaterialEditorOnlyData가 nullptr 입니다."));
 		return;
 	}
 	
 	// Find or Create Dissolve Material Expression Function
 	UMaterialExpressionMaterialFunctionCall* DissolveMaterialExpression;
-	if (IsDissolveMaterialFunctionLinked(MaterialEditorOnlyData->EmissiveColor.Expression))
+	//// Find
+	if (UMaterialExpression* MatExpr = FindMaterialExpressionByDesc(Material, TEXT("Final Dissolve Effect")))
 	{
-		DissolveMaterialExpression = Cast<UMaterialExpressionMaterialFunctionCall>(MaterialEditorOnlyData->EmissiveColor.Expression);
+		DissolveMaterialExpression = Cast<UMaterialExpressionMaterialFunctionCall>(MatExpr);
 	}
-	else if (IsDissolveMaterialFunctionLinked(MaterialEditorOnlyData->OpacityMask.Expression))
-	{
-		DissolveMaterialExpression = Cast<UMaterialExpressionMaterialFunctionCall>(MaterialEditorOnlyData->OpacityMask.Expression);
-	}
+	//// Create
 	else
 	{
 		DissolveMaterialExpression = Cast<UMaterialExpressionMaterialFunctionCall>(UMaterialEditingLibrary::CreateMaterialExpression(Material, UMaterialExpressionMaterialFunctionCall::StaticClass()));
 		DissolveMaterialExpression->SetMaterialFunction(DissolveMaterialFunction);
-		MaterialEditorOnlyData->ExpressionCollection.AddExpression(DissolveMaterialExpression);
-		DissolveMaterialExpression->MaterialExpressionEditorX = -300;
-		DissolveMaterialExpression->MaterialExpressionEditorY = +200;
+		DissolveMaterialExpression->Desc = TEXT("Final Dissolve Effect");
+		DissolveMaterialExpression->MaterialExpressionEditorX -= 600;
+		DissolveMaterialExpression->MaterialExpressionEditorY += 300;
+
+		// ConnectPin To EmissiveColor and OpacityMask
+		if (MaterialEditorOnlyData->EmissiveColor.IsConnected())
+		{
+			FColorMaterialInput& EmissiveColorInput = MaterialEditorOnlyData->EmissiveColor;
+			UMaterialExpressionLinearInterpolate* MatExprLerp = CreateMaterialExpression<UMaterialExpressionLinearInterpolate>(Material);
+			MatExprLerp->B.Connect(EmissiveColorInput.OutputIndex, EmissiveColorInput.Expression);
+			MatExprLerp->A.Connect(0, DissolveMaterialExpression);		// EmissiveColor
+			MatExprLerp->Alpha.Connect(1, DissolveMaterialExpression);	// OpacityMask
+			MatExprLerp->MaterialExpressionEditorX = DissolveMaterialExpression->MaterialExpressionEditorX + 300;
+			MatExprLerp->MaterialExpressionEditorY = DissolveMaterialExpression->MaterialExpressionEditorY - 300;
+			EmissiveColorInput.Connect(0, MatExprLerp);
+		}
+		else
+		{
+			MaterialEditorOnlyData->EmissiveColor.Connect(0, DissolveMaterialExpression);
+		}
+		if (MaterialEditorOnlyData->OpacityMask.IsConnected())
+		{
+			FScalarMaterialInput& OpacityMaskInput = MaterialEditorOnlyData->OpacityMask;
+			UMaterialExpressionMin* MatExprMin = CreateMaterialExpression<UMaterialExpressionMin>(Material);
+			MatExprMin->A.Connect(OpacityMaskInput.OutputIndex, OpacityMaskInput.Expression);
+			MatExprMin->B.Connect(1, DissolveMaterialExpression);
+			MatExprMin->MaterialExpressionEditorX = DissolveMaterialExpression->MaterialExpressionEditorX + 300;
+			MatExprMin->MaterialExpressionEditorY = DissolveMaterialExpression->MaterialExpressionEditorY - 150;
+			OpacityMaskInput.Connect(0, MatExprMin);
+		}
+		else
+		{
+			MaterialEditorOnlyData->OpacityMask.Connect(1, DissolveMaterialExpression);
+		}
 	}
 
 	if (!IsValid(DissolveMaterialExpression))
@@ -98,45 +160,59 @@ void UFacilityMaterialSubsystem::CreateOrUpdateDissolveMaterialFunctionNode(UMat
 		return;
 	}
 
-	MaterialEditorOnlyData->EmissiveColor.Connect(0, DissolveMaterialExpression);
-	MaterialEditorOnlyData->OpacityMask.Connect(1, DissolveMaterialExpression);
+	
 
-	// Create Dissolve Material Expression Parameters
 	TArray<FFunctionExpressionInput>& FunctionInputs = DissolveMaterialExpression->FunctionInputs;
 	for (int i = 0; i < FunctionInputs.Num(); ++i)
 	{
 		FFunctionExpressionInput& FunctionExpressionInput = FunctionInputs[i]; 
 		FName ExprParamName = GetDissolveMaterialFunctionParameterName(FunctionExpressionInput);
+
+		// 파라미터가 연결되었는지 확인하는 방식 수정이 필요할 수도 있음. IsConnected함수가 아무 노드도 연결되어 있지
+		// 않아도 true를 반환하여 이름을 비교하는 방식을 채택. 아마 머티리얼 함수의 Default값이 설정되어 있어서 IsConnected가
+		// true를 반환한 것으로 추정됨
 		if (FunctionExpressionInput.Input.IsConnected())
 		{
-			if (FunctionExpressionInput.Input.Expression->GetName() == ExprParamName)
+			if (UMaterialExpressionParameter* ExprParam = Cast<UMaterialExpressionParameter>(FunctionExpressionInput.Input.Expression))
 			{
-				continue;
+				if (ExprParam->GetParameterName() == ExprParamName)
+				{
+					continue;
+				}
+			}
+
+			if (UMaterialExpressionTextureSampleParameter* ExprParam = Cast<UMaterialExpressionTextureSampleParameter>(FunctionExpressionInput.Input.Expression))
+			{
+				if (ExprParam->GetParameterName() == ExprParamName)
+				{
+					continue;
+				}
 			}
 		}
 
+		// 타입에 따른 머티리얼 표현식 파라미터 생성
 		TEnumAsByte<EFunctionInputType> InputType = FunctionExpressionInput.ExpressionInput->InputType;
 		UMaterialExpression* MaterialExpression = nullptr;
 		switch (InputType)
 		{
 		case FunctionInput_StaticBool:
 		{
-			MaterialExpression = CreateMaterialExpressionStaticBoolParameter(Material);
-			break;
-		}
-		case FunctionInput_Texture2D:
-		{
-			MaterialExpression = CreateMaterialExpressionTextureObjectParameter(Material);
+			MaterialExpression = CreateMaterialExpression<UMaterialExpressionStaticBoolParameter>(Material);
 			break;
 		}
 		case FunctionInput_Scalar:
 		{
-			MaterialExpression = CreateMaterialExpressionScalarParameter(Material);
+			MaterialExpression = CreateMaterialExpression<UMaterialExpressionScalarParameter>(Material);
 			break;
 		}
 		case FunctionInput_Vector3:
 		{
-			MaterialExpression = CreateMaterialExpressionVectorParameter(Material);
+			MaterialExpression = CreateMaterialExpression<UMaterialExpressionVectorParameter>(Material);
+			break;
+		}
+		case FunctionInput_Texture2D:
+		{
+			MaterialExpression = CreateMaterialExpression<UMaterialExpressionTextureObjectParameter>(Material);
 			break;
 		}
 		default:
@@ -144,6 +220,8 @@ void UFacilityMaterialSubsystem::CreateOrUpdateDissolveMaterialFunctionNode(UMat
 			break;
 		}
 		
+		// 텍스처의 경우, UMaterialExpressionParameter를 상속하지 않고 독자적으로 UMaterialExpressionTextureSampleParameter
+		// 를 상속하기 때문에 아래와 같이 분리하여 처리함.
 		if (MaterialExpression)
 		{
 			MaterialExpression->MaterialExpressionEditorX = DissolveMaterialExpression->MaterialExpressionEditorX - 300;
@@ -151,7 +229,6 @@ void UFacilityMaterialSubsystem::CreateOrUpdateDissolveMaterialFunctionNode(UMat
 			
 			FunctionExpressionInput.Input.Connect(0, MaterialExpression);
 		}
-
 		if (UMaterialExpressionParameter* MaterialExpressionParam = Cast<UMaterialExpressionParameter>(MaterialExpression))
 		{
 			MaterialExpressionParam->SetParameterName(ExprParamName);
@@ -165,9 +242,98 @@ void UFacilityMaterialSubsystem::CreateOrUpdateDissolveMaterialFunctionNode(UMat
 	}	
 
 	// Update Dissolve Parameter Value
+	// Create Dissolve Material Expression Parameters
+	if (UMaterialExpressionStaticBoolParameter* MatExpr = Cast<UMaterialExpressionStaticBoolParameter>(FindMaterialExpressionParameterByName(Material, TEXT("DissolveEffect_HueShift"))))
+	{
+		MatExpr->SortPriority = 0;
+		MatExpr->DefaultValue = Params.bHueShift;
+	}
+	if(UMaterialExpressionStaticBoolParameter* MatExpr = Cast<UMaterialExpressionStaticBoolParameter>(FindMaterialExpressionParameterByName(Material, TEXT("DissolveEffect_SwitchUVs"))))
+	{
+		MatExpr->SortPriority = 0;
+		MatExpr->DefaultValue = Params.bSwitchUVs;
+	}
+	if(UMaterialExpressionStaticBoolParameter* MatExpr = Cast<UMaterialExpressionStaticBoolParameter>(FindMaterialExpressionParameterByName(Material, TEXT("DissolveEffect_UseOnlyTexture"))))
+	{
+		MatExpr->SortPriority = 0;
+		MatExpr->DefaultValue = Params.bUseOnlyTexture;
+	}
+	if (UMaterialExpressionScalarParameter* MatExpr = Cast<UMaterialExpressionScalarParameter>(FindMaterialExpressionParameterByName(Material, TEXT("DissolveEffect_Amount"))))
+	{
+		MatExpr->SortPriority = 1;
+		MatExpr->DefaultValue = Params.Amount;
+	}
+	if (UMaterialExpressionScalarParameter* MatExpr = Cast<UMaterialExpressionScalarParameter>(FindMaterialExpressionParameterByName(Material, TEXT("DissolveEffect_Tilting"))))
+	{
+		MatExpr->SortPriority = 1;
+		MatExpr->DefaultValue = Params.Tilting;
+	}
+	if (UMaterialExpressionScalarParameter* MatExpr = Cast<UMaterialExpressionScalarParameter>(FindMaterialExpressionParameterByName(Material, TEXT("DissolveEffect_Width"))))
+	{
+		MatExpr->SortPriority = 1;
+		MatExpr->DefaultValue = Params.Width;
+	}
+	if (UMaterialExpressionVectorParameter* MatExpr = Cast<UMaterialExpressionVectorParameter>(FindMaterialExpressionParameterByName(Material, TEXT("DissolveEffect_FringeColor"))))
+	{
+		MatExpr->SortPriority = 2;
+		MatExpr->DefaultValue = Params.FringeColor;
+	}
+	if (UMaterialExpressionTextureObjectParameter* MatExpr = Cast<UMaterialExpressionTextureObjectParameter>(FindMaterialExpressionTextureSampleParameterByName(Material, TEXT("DissolveEffect_Pattern"))))
+	{
+		MatExpr->SortPriority = 3;
+		MatExpr->Texture = Params.Pattern;
+	}
 
-
+	Material->MarkPackageDirty();
+	Material->PreEditChange(nullptr);
 	Material->PostEditChange();
+	FEditorDelegates::RefreshEditor.Broadcast();
+	FEditorSupportDelegates::RedrawAllViewports.Broadcast();
+}
+
+FAssetData UFacilityMaterialSubsystem::FindOrCreateAssetWithSuffix(const FAssetData& AssetData, FString Suffix)
+{
+	if (!Suffix.StartsWith(TEXT("_")))
+	{
+		Suffix = TEXT("_") + Suffix;
+	}
+
+	if (AssetData.AssetName.ToString().EndsWith(Suffix))
+	{
+		return AssetData;
+	}
+	else
+	{
+		const FString AssetNameWithSuffix = AssetData.AssetName.ToString() + Suffix;
+		const FString PackagePath = AssetData.PackagePath.ToString();
+		const FString TargetAssetPath = PackagePath / AssetNameWithSuffix;
+		if (!UEditorAssetLibrary::DoesAssetExist(TargetAssetPath))
+		{
+			const FString SourceAssetPath = AssetData.GetSoftObjectPath().ToString();
+
+			if (UEditorAssetLibrary::DuplicateAsset(SourceAssetPath, TargetAssetPath))
+			{
+				UEditorAssetLibrary::SaveAsset(TargetAssetPath, false);
+			}
+		}
+		return UEditorAssetLibrary::FindAssetData(TargetAssetPath);
+	}
+}
+
+FAssetData UFacilityMaterialSubsystem::CreateOrUpdateDissolveMaterialAsset(const FAssetData& MaterialAssetData, const FDissolveMaterialFunctionParameters& Params)
+{
+	if (!MaterialAssetData.GetAsset()->GetClass()->IsChildOf<UMaterial>())
+	{
+		return FAssetData();
+	}
+
+	FAssetData DissolveMaterialAsset = FindOrCreateAssetWithSuffix(MaterialAssetData, TEXT("Dissolve"));
+
+	CreateOrUpdateDissolveMaterialFunctionNode(Cast<UMaterial>(DissolveMaterialAsset.GetAsset()), Params);
+
+	UEditorAssetLibrary::SaveAsset(DissolveMaterialAsset.GetSoftObjectPath().ToString());
+
+	return DissolveMaterialAsset;
 }
 
 bool UFacilityMaterialSubsystem::IsDissolveMaterialFunctionLinkedToEmissiveOrOpacityMask(UMaterial* Material)
@@ -197,5 +363,5 @@ bool UFacilityMaterialSubsystem::IsDissolveMaterialFunctionLinked(UMaterialExpre
 
 FName UFacilityMaterialSubsystem::GetDissolveMaterialFunctionParameterName(const FFunctionExpressionInput& FunctionExpressionInput) const
 {
-	return FName(TEXT("DissolveMaterialFunction") + FunctionExpressionInput.Input.InputName.ToString());
+	return FName(TEXT("DissolveEffect_") + FunctionExpressionInput.Input.InputName.ToString());
 }
