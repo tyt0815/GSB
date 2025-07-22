@@ -19,11 +19,21 @@ public:
 	virtual void Deinitialize() override;
 
 public:
+	class UMaterialExpressionStaticBoolParameter* CreateMaterialExpressionStaticBoolParameter(UMaterial* Material);
+
+	class UMaterialExpressionTextureObjectParameter* CreateMaterialExpressionTextureObjectParameter(UMaterial* Material);
+
+	class UMaterialExpressionScalarParameter* CreateMaterialExpressionScalarParameter(UMaterial* Material);
+
+	class UMaterialExpressionVectorParameter* CreateMaterialExpressionVectorParameter(UMaterial* Material);
+
 	void CreateOrUpdateDissolveMaterialFunctionNode(UMaterial* Material);
 
 	bool IsDissolveMaterialFunctionLinkedToEmissiveOrOpacityMask(UMaterial* Material);
 
 	bool IsDissolveMaterialFunctionLinked(UMaterialExpression* MaterialExpression);
+
+	FName GetDissolveMaterialFunctionParameterName(const FFunctionExpressionInput& FunctionExpressionInput) const;
 
 private:
 	UMaterialFunctionInterface* DissolveMaterialFunction;

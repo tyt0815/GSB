@@ -7,6 +7,7 @@
 #include "Materials/MaterialExpressionStaticBoolParameter.h"
 #include "Materials/MaterialExpressionVectorParameter.h"
 #include "Materials/MaterialExpressionTextureObjectParameter.h"
+#include "MaterialEditingLibrary.h"
 #include "GSBDebugLibrary.h"
 
 void UFacilityMaterialSubsystem::Initialize(FSubsystemCollectionBase& Collection)
@@ -31,6 +32,26 @@ void UFacilityMaterialSubsystem::Deinitialize()
 	Super::Deinitialize();
 }
 
+UMaterialExpressionStaticBoolParameter* UFacilityMaterialSubsystem::CreateMaterialExpressionStaticBoolParameter(UMaterial* Material)
+{
+	return Cast<UMaterialExpressionStaticBoolParameter>(UMaterialEditingLibrary::CreateMaterialExpression(Material, UMaterialExpressionStaticBoolParameter::StaticClass()));;
+}
+
+UMaterialExpressionTextureObjectParameter* UFacilityMaterialSubsystem::CreateMaterialExpressionTextureObjectParameter(UMaterial* Material)
+{
+	return Cast<UMaterialExpressionTextureObjectParameter>(UMaterialEditingLibrary::CreateMaterialExpression(Material, UMaterialExpressionTextureObjectParameter::StaticClass()));;
+}
+
+UMaterialExpressionScalarParameter* UFacilityMaterialSubsystem::CreateMaterialExpressionScalarParameter(UMaterial* Material)
+{
+	return Cast<UMaterialExpressionScalarParameter>(UMaterialEditingLibrary::CreateMaterialExpression(Material, UMaterialExpressionScalarParameter::StaticClass()));;
+}
+
+UMaterialExpressionVectorParameter* UFacilityMaterialSubsystem::CreateMaterialExpressionVectorParameter(UMaterial* Material)
+{
+	return  Cast<UMaterialExpressionVectorParameter>(UMaterialEditingLibrary::CreateMaterialExpression(Material, UMaterialExpressionVectorParameter::StaticClass()));;
+}
+
 void UFacilityMaterialSubsystem::CreateOrUpdateDissolveMaterialFunctionNode(UMaterial* Material)
 {
 	if (!IsValid(Material))
@@ -52,6 +73,7 @@ void UFacilityMaterialSubsystem::CreateOrUpdateDissolveMaterialFunctionNode(UMat
 		return;
 	}
 	
+	// Find or Create Dissolve Material Expression Function
 	UMaterialExpressionMaterialFunctionCall* DissolveMaterialExpression;
 	if (IsDissolveMaterialFunctionLinked(MaterialEditorOnlyData->EmissiveColor.Expression))
 	{
@@ -63,7 +85,7 @@ void UFacilityMaterialSubsystem::CreateOrUpdateDissolveMaterialFunctionNode(UMat
 	}
 	else
 	{
-		DissolveMaterialExpression = NewObject<UMaterialExpressionMaterialFunctionCall>(Material);
+		DissolveMaterialExpression = Cast<UMaterialExpressionMaterialFunctionCall>(UMaterialEditingLibrary::CreateMaterialExpression(Material, UMaterialExpressionMaterialFunctionCall::StaticClass()));
 		DissolveMaterialExpression->SetMaterialFunction(DissolveMaterialFunction);
 		MaterialEditorOnlyData->ExpressionCollection.AddExpression(DissolveMaterialExpression);
 		DissolveMaterialExpression->MaterialExpressionEditorX = -300;
@@ -79,12 +101,12 @@ void UFacilityMaterialSubsystem::CreateOrUpdateDissolveMaterialFunctionNode(UMat
 	MaterialEditorOnlyData->EmissiveColor.Connect(0, DissolveMaterialExpression);
 	MaterialEditorOnlyData->OpacityMask.Connect(1, DissolveMaterialExpression);
 
-
+	// Create Dissolve Material Expression Parameters
 	TArray<FFunctionExpressionInput>& FunctionInputs = DissolveMaterialExpression->FunctionInputs;
 	for (int i = 0; i < FunctionInputs.Num(); ++i)
 	{
-		FFunctionExpressionInput& FunctionExpressionInput = FunctionInputs[i];
-		FName ExprParamName = FName(TEXT("DissolveMaterialFunction") + FunctionExpressionInput.Input.InputName.ToString());
+		FFunctionExpressionInput& FunctionExpressionInput = FunctionInputs[i]; 
+		FName ExprParamName = GetDissolveMaterialFunctionParameterName(FunctionExpressionInput);
 		if (FunctionExpressionInput.Input.IsConnected())
 		{
 			if (FunctionExpressionInput.Input.Expression->GetName() == ExprParamName)
@@ -99,26 +121,22 @@ void UFacilityMaterialSubsystem::CreateOrUpdateDissolveMaterialFunctionNode(UMat
 		{
 		case FunctionInput_StaticBool:
 		{
-			UMaterialExpressionStaticBoolParameter* StaticBoolParam = NewObject<UMaterialExpressionStaticBoolParameter>(Material);
-			MaterialExpression = StaticBoolParam;
+			MaterialExpression = CreateMaterialExpressionStaticBoolParameter(Material);
 			break;
 		}
 		case FunctionInput_Texture2D:
 		{
-			UMaterialExpressionTextureObjectParameter* TextureObjParam = NewObject<UMaterialExpressionTextureObjectParameter>(Material);
-			MaterialExpression = TextureObjParam;
+			MaterialExpression = CreateMaterialExpressionTextureObjectParameter(Material);
 			break;
 		}
 		case FunctionInput_Scalar:
 		{
-			UMaterialExpressionScalarParameter* ScalarParam = NewObject<UMaterialExpressionScalarParameter>(Material);
-			MaterialExpression = ScalarParam;
+			MaterialExpression = CreateMaterialExpressionScalarParameter(Material);
 			break;
 		}
 		case FunctionInput_Vector3:
 		{
-			UMaterialExpressionVectorParameter* VectorParam = NewObject <UMaterialExpressionVectorParameter>(Material);
-			MaterialExpression = VectorParam;
+			MaterialExpression = CreateMaterialExpressionVectorParameter(Material);
 			break;
 		}
 		default:
@@ -137,13 +155,17 @@ void UFacilityMaterialSubsystem::CreateOrUpdateDissolveMaterialFunctionNode(UMat
 		if (UMaterialExpressionParameter* MaterialExpressionParam = Cast<UMaterialExpressionParameter>(MaterialExpression))
 		{
 			MaterialExpressionParam->SetParameterName(ExprParamName);
+			MaterialExpressionParam->Group = TEXT("Dissolve");
 		}
 		if (UMaterialExpressionTextureSampleParameter* MaterialExpressionTextureSampleParam = Cast<UMaterialExpressionTextureSampleParameter>(MaterialExpression))
 		{
 			MaterialExpressionTextureSampleParam->SetParameterName(ExprParamName);
+			MaterialExpressionTextureSampleParam->Group = TEXT("Dissolve");
 		}
-		
 	}	
+
+	// Update Dissolve Parameter Value
+
 
 	Material->PostEditChange();
 }
@@ -171,4 +193,9 @@ bool UFacilityMaterialSubsystem::IsDissolveMaterialFunctionLinked(UMaterialExpre
 		}
 	}
 	return false;
+}
+
+FName UFacilityMaterialSubsystem::GetDissolveMaterialFunctionParameterName(const FFunctionExpressionInput& FunctionExpressionInput) const
+{
+	return FName(TEXT("DissolveMaterialFunction") + FunctionExpressionInput.Input.InputName.ToString());
 }
