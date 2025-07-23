@@ -10,7 +10,6 @@
 UItemStorageComponent::UItemStorageComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
-
 }
 
 void UItemStorageComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

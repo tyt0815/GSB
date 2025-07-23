@@ -46,6 +46,7 @@ public class GSBFacilityEditorTools : ModuleRules
                 "MaterialEditor",
                 "EditorScriptingUtilities",
                 "AppFramework",
+                "BlueprintGraph",
                 "GSBDebugLibrary",
 				// ... add private dependencies that you statically link with here ...	
 			}

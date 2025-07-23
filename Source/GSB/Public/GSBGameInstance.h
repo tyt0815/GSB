@@ -20,6 +20,8 @@ public:
 
 	UMaterialInterface* GetMaterialInterface(const FName& Name) const;
 
+	UCurveFloat* GetCurveFloat(const FName& Name) const;
+
 private:
 	////////////////////////////////////////////////////////////////////////////////
 	// Subclass
@@ -32,4 +34,7 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	TMap<FName, UMaterialInterface*> MaterialInterfaces;
+
+	UPROPERTY(EditDefaultsOnly)
+	TMap<FName, UCurveFloat*> CurveFloats;
 };

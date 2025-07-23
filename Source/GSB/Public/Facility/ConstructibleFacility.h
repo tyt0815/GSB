@@ -12,6 +12,8 @@ class GSB_API AConstructibleFacility : public AFacility
 	GENERATED_BODY()
 
 public:
+	AConstructibleFacility();
+
 	virtual bool IsOperating() const override;
 
 protected:
@@ -38,11 +40,21 @@ public:
 	bool TryBeginDeconstruction();
 
 protected:
+	void CreateAllDynamicMaterialInstances();
+
+	TArray<UMaterialInstanceDynamic*> AllDynamicMaterialInstances;
+
 	UFUNCTION()
 	void HandleCancelConstruction(AActor* Interactor);
 
 	UFUNCTION()
 	void HandleDeconstructRequest(AActor* Interactor);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UTimelineComponent* ConstructionTimeline;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	class UTimelineComponent* DeconstructionTimeline;
 
 	UFUNCTION(BlueprintNativeEvent, Category = "AConstructibleFacility|Construction")
 	void BeginConstruction();
@@ -51,6 +63,14 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "AConstructibleFacility|Construction")
 	void BeginDeconstruction();
 	virtual void BeginDeconstruction_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, Category = "AConstructibleFacility|Construction")
+	void OnConstructing(float Progress);
+	virtual void OnConstructing_Implementation(float Progress);
+
+	UFUNCTION(BlueprintNativeEvent, Category = "AConstructibleFacility|Construction")
+	void OnDeconstructing(float Progress);
+	virtual void OnDeconstructing_Implementation(float Progress);
 
 	UFUNCTION(BlueprintNativeEvent, Category = "AConstructibleFacility|Construction")
 	void CompleteConstruction();
@@ -66,6 +86,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AConstructibleFacility|Construction")
 	float DeconstructionTime = 2;
 
-	FTimerHandle ConstructionTimer;
-	FTimerHandle DeconstructionTimer;
+private:
+	void InitializeConstructionTimeline();
+
+	void InitializeDeconstructionTimeline();
+
+	void SetDissolveEffect(float Amount);
 };

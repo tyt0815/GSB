@@ -5,7 +5,20 @@
 #include "Facility/Addon/FacilityAddon.h"
 #include "Interfaces/PowerProviderFacility.h"
 #include "Components/ItemStorageComponent.h"
+#include "Components/TimelineComponent.h"
+#include "Kismet/KismetMaterialLibrary.h"
+#include "GSBGameInstance.h"
 #include "DebugHeader.h"
+
+AConstructibleFacility::AConstructibleFacility()
+{
+	ConstructionTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("ConstructionTimeline"));
+	ConstructionTimeline->SetLooping(false);
+	ConstructionTimeline->SetTimelineLengthMode(ETimelineLengthMode::TL_TimelineLength);
+	DeconstructionTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("DeconstructionTimeline"));
+	DeconstructionTimeline->SetLooping(false);
+	DeconstructionTimeline->SetTimelineLengthMode(ETimelineLengthMode::TL_TimelineLength);
+}
 
 bool AConstructibleFacility::IsOperating() const
 {
@@ -22,7 +35,12 @@ void AConstructibleFacility::BeginPlay()
 {
 	Super::BeginPlay();
 
-	BeginConstruction();
+	InitializeConstructionTimeline();
+	InitializeDeconstructionTimeline();
+
+	CreateAllDynamicMaterialInstances();
+
+	CompleteConstruction();
 }
 
 bool AConstructibleFacility::IsConstructed() const
@@ -32,22 +50,22 @@ bool AConstructibleFacility::IsConstructed() const
 
 bool AConstructibleFacility::IsConstructing() const
 {
-	return GetWorldTimerManager().IsTimerActive(ConstructionTimer);
+	return ConstructionTimeline->IsPlaying();
 }
 
 bool AConstructibleFacility::IsDeconstructing() const
 {
-	return GetWorldTimerManager().IsTimerActive(DeconstructionTimer);
+	return DeconstructionTimeline->IsReversing();
 }
 
 float AConstructibleFacility::GetConstructionProgress() const
 {
-	return GetWorldTimerManager().GetTimerElapsed(ConstructionTimer) / ConstructionTime;
+	return ConstructionTimeline->GetPlaybackPosition() / FMath::Max(ConstructionTimeline->GetTimelineLength(), 0.000000001);
 }
 
 float AConstructibleFacility::GetDeconstructionProgress() const
 {
-	return GetWorldTimerManager().GetTimerElapsed(DeconstructionTimer) / DeconstructionTime;
+	return DeconstructionTimeline->GetPlaybackPosition() / FMath::Max(DeconstructionTimeline->GetTimelineLength(), 0.000000001);
 }
 
 bool AConstructibleFacility::TryBeginConstruction()
@@ -70,6 +88,32 @@ bool AConstructibleFacility::TryBeginDeconstruction()
 	return false;
 }
 
+void AConstructibleFacility::CreateAllDynamicMaterialInstances()
+{
+	TArray<UStaticMeshComponent*> AllStaticMeshComponents;
+	GetComponents<UStaticMeshComponent>(AllStaticMeshComponents, true);
+	for (UStaticMeshComponent* StaticMeshComp : AllStaticMeshComponents)
+	{
+		if (!IsValid(StaticMeshComp))
+		{
+			continue;
+		}
+		TArray<UMaterialInterface*> AllMaterials = StaticMeshComp->GetMaterials();
+		for (int i = 0; i < AllMaterials.Num(); ++i)
+		{
+			if (!IsValid(AllMaterials[i]))
+			{
+				continue;
+			}
+			if (UMaterialInstanceDynamic* DynamicMaterialInstances = UKismetMaterialLibrary::CreateDynamicMaterialInstance(this, AllMaterials[i]))
+			{
+				StaticMeshComp->SetMaterial(i, DynamicMaterialInstances);
+				AllDynamicMaterialInstances.Add(DynamicMaterialInstances);
+			}
+		}
+	}
+}
+
 void AConstructibleFacility::BeginConstruction_Implementation()
 {
 	InteractionComponent->ClearInteractions();
@@ -82,9 +126,7 @@ void AConstructibleFacility::BeginConstruction_Implementation()
 	}
 	else
 	{
-		FTimerDelegate ConstructionDelegate;
-		ConstructionDelegate.BindUFunction(this, TEXT("CompleteConstruction"));
-		GetWorldTimerManager().SetTimer(ConstructionTimer, ConstructionDelegate, ConstructionTime, false);
+		ConstructionTimeline->PlayFromStart();
 	}
 }
 void AConstructibleFacility::HandleCancelConstruction(AActor* Interactor)
@@ -121,23 +163,30 @@ void AConstructibleFacility::BeginDeconstruction_Implementation()
 	}
 	else
 	{
-		FTimerDelegate DeconstructionDelegate;
-		DeconstructionDelegate.BindUFunction(this, TEXT("CompleteDeconstruction"));
-		GetWorldTimerManager().SetTimer(DeconstructionTimer, DeconstructionDelegate, DeconstructionTime, false);
+		DeconstructionTimeline->PlayFromStart();
 	}
-	
+}
+
+void AConstructibleFacility::OnConstructing_Implementation(float Progress)
+{
+	SetDissolveEffect(Progress);
+}
+
+void AConstructibleFacility::OnDeconstructing_Implementation(float Progress)
+{
+	SetDissolveEffect(1 - Progress);
 }
 void AConstructibleFacility::CompleteConstruction_Implementation()
 {
-	GetWorldTimerManager().ClearTimer(ConstructionTimer);
+	InteractionComponent->ClearInteractions();
+	AddDefaultInteractions();
+
+	SetDissolveEffect(1);
+
 	for (AFacilityAddon* Addon : ConnectedAddons)
 	{
 		Addon->CompleteConstruction();
 	}
-
-	InteractionComponent->ClearInteractions();
-	AddDefaultInteractions();
-
 }
 
 void AConstructibleFacility::CompleteDeconstruction_Implementation()
@@ -149,5 +198,67 @@ void AConstructibleFacility::CompleteDeconstruction_Implementation()
 		ItemStorage->DropAllItems();
 	}
 
+	SetDissolveEffect(0);
+
 	Destroy();
+}
+
+void AConstructibleFacility::InitializeConstructionTimeline()
+{
+	FOnTimelineFloatStatic OnTimelineFloatStatic;
+	OnTimelineFloatStatic.BindLambda(
+		[this](float Time)
+		{
+			OnConstructing(GetConstructionProgress());
+		}
+	);
+	FOnTimelineEventStatic OnTimelineFinished;
+	OnTimelineFinished.BindLambda(
+		[this]()
+		{
+			CompleteConstruction();
+		}
+	);
+	if (UGSBGameInstance* GameInst = GetGameInstance<UGSBGameInstance>())
+	{
+		UCurveFloat* LinearCurveFloat = GameInst->GetCurveFloat(TEXT("LinearZeroToOne"));
+		ConstructionTimeline->SetTimelineLength(1);
+		ConstructionTimeline->SetPlayRate(1.f / FMath::Max(0.00000001, ConstructionTime));
+		ConstructionTimeline->AddInterpFloat(LinearCurveFloat, OnTimelineFloatStatic);
+		ConstructionTimeline->SetTimelineFinishedFunc(OnTimelineFinished);
+	}
+}
+
+void AConstructibleFacility::InitializeDeconstructionTimeline()
+{
+	FOnTimelineFloatStatic OnTimelineFloatStatic;
+	OnTimelineFloatStatic.BindLambda(
+		[this](float Time)
+		{
+			OnDeconstructing(GetDeconstructionProgress());
+		}
+	);
+	FOnTimelineEventStatic OnTimelineFinished;
+	OnTimelineFinished.BindLambda(
+		[this]()
+		{
+			CompleteDeconstruction();
+		}
+	);
+	if (UGSBGameInstance* GameInst = GetGameInstance<UGSBGameInstance>())
+	{
+		UCurveFloat* LinearCurveFloat = GameInst->GetCurveFloat(TEXT("LinearZeroToOne"));
+		DeconstructionTimeline->SetTimelineLength(1);
+		DeconstructionTimeline->SetPlayRate(1.f / FMath::Max(0.00000001, DeconstructionTime));
+		DeconstructionTimeline->AddInterpFloat(LinearCurveFloat, OnTimelineFloatStatic);
+		DeconstructionTimeline->SetTimelineFinishedFunc(OnTimelineFinished);
+	}
+}
+
+void AConstructibleFacility::SetDissolveEffect(float Amount)
+{
+	for (UMaterialInstanceDynamic* DynamicMaterialInstances : AllDynamicMaterialInstances)
+	{
+		DynamicMaterialInstances->SetScalarParameterValue(TEXT("DissolveEffect_Amount"), Amount);
+	}
 }

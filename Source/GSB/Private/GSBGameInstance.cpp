@@ -33,3 +33,13 @@ UMaterialInterface* UGSBGameInstance::GetMaterialInterface(const FName& Name) co
 	TRACE_SCREEN_LOG(TEXT("존재하지 않는 공용 MaterialInterface: ") + Name.ToString());
 	return nullptr;
 }
+
+UCurveFloat* UGSBGameInstance::GetCurveFloat(const FName& Name) const
+{
+	if (CurveFloats.Contains(Name))
+	{
+		return CurveFloats[Name];
+	}
+	TRACE_SCREEN_LOG(TEXT("존재하지 않는 공용 CurveFloat: ") + Name.ToString());
+	return nullptr;
+}
