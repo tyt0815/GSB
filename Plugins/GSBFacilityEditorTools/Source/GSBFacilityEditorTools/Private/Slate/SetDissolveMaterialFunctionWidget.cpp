@@ -9,7 +9,7 @@
 #include "Widgets/Input/SNumericEntryBox.h"
 #include "GSBDebugLibrary.h"
 
-#define DEFAULT_DISSOLVE_PATTERN_TEXTURE_PATH TEXT("/GSBFacilityEditorTools/Texture/T_pattern_1.T_pattern_1")
+#define DEFAULT_DISSOLVE_PATTERN_TEXTURE_PATH TEXT("/GSBFacilityEditorTools/Texture/T_pattern_0.T_pattern_0")
 
 void SSetDissolveMaterialFunctionWidget::Construct(const FArguments& InArgs)
 {
@@ -36,6 +36,7 @@ void SSetDissolveMaterialFunctionWidget::Construct(const FArguments& InArgs)
 			SNew(SVerticalBox)
 				+ SVerticalBox::Slot()
 				.AutoHeight()
+				.Padding(32, 32, 32, 16)
 				[
 					// Title
 					SNew(STextBlock)
@@ -46,23 +47,44 @@ void SSetDissolveMaterialFunctionWidget::Construct(const FArguments& InArgs)
 
 				// Material AssetList
 				+ SVerticalBox::Slot()
+				.HAlign(EHorizontalAlignment::HAlign_Fill)
 				.VAlign(EVerticalAlignment::VAlign_Fill)
+				.Padding(32, 16, 32, 16)
 				[
 					SNew(SScrollBox)
 						+SScrollBox::Slot()
-						.Padding(32)
 						[
 							ConstructMaterialAssetListView()
 						]
 				]
 
-				// Texture
 				+SVerticalBox::Slot()
 				.AutoHeight()
 				.HAlign(EHorizontalAlignment::HAlign_Fill)
-				.VAlign(EVerticalAlignment::VAlign_Top)
+				.VAlign(EVerticalAlignment::VAlign_Bottom)
+				.Padding(32, 0, 32, 8)
 				[
 					ConstructDissolveMaterialFunctionPropertyList()
+				]
+
+				+ SVerticalBox::Slot()
+				.AutoHeight()
+				.HAlign(EHorizontalAlignment::HAlign_Fill)
+				.VAlign(EVerticalAlignment::VAlign_Bottom)
+				.Padding(32, 8, 32, 8)
+				[
+					ConstructPropertyBooleanRow(FText::FromString(TEXT("Create Material instance")), bCreateMaterialInstance)
+				]
+
+				+ SVerticalBox::Slot()
+				.AutoHeight()
+				.Padding(32, 8, 32, 32)
+				.HAlign(EHorizontalAlignment::HAlign_Center)
+				.VAlign(EVerticalAlignment::VAlign_Bottom)
+				[
+					SNew(SButton)
+					.Text(FText::FromString(TEXT("확인")))
+					.OnClicked(this, &SSetDissolveMaterialFunctionWidget::OnConfirmButtonClicked)
 				]
 		];
 }
@@ -93,28 +115,12 @@ TSharedRef<ITableRow> SSetDissolveMaterialFunctionWidget::OnGenerateRowForMateri
 
 void SSetDissolveMaterialFunctionWidget::OnMaterialAssetListViewRowClicked(TSharedPtr<FAssetData> AssetData)
 {
-	if (GEditor)
-	{
-		if (UFacilityMaterialSubsystem* FMS = GEditor->GetEditorSubsystem<UFacilityMaterialSubsystem>())
-		{
-			UFacilityMaterialSubsystem::FDissolveMaterialFunctionParameters Params = {};
-			Params.bHueShift = bHueShift;
-			Params.bSwitchUVs = bSwitchUVs;
-			Params.bUseOnlyTexture = bUseOnlyTexture;
-			Params.Amount = Amount;
-			Params.Tilting = Tilting;
-			Params.Width = Width;
-			Params.FringeColor = FringeColor;
-			Params.Pattern = DissolvePatternTexture;
-			FMS->CreateOrUpdateDissolveMaterialAsset(*AssetData.Get(), Params);
-		}
-	}
+	
 }
 
 TSharedRef<SVerticalBox> SSetDissolveMaterialFunctionWidget::ConstructDissolveMaterialFunctionPropertyList()
 {
 	return SNew(SVerticalBox)
-
 		+SVerticalBox::Slot()
 		[
 			ConstructPropertyBooleanRow(FText::FromString(TEXT("HueShift")), bHueShift)
@@ -130,15 +136,15 @@ TSharedRef<SVerticalBox> SSetDissolveMaterialFunctionWidget::ConstructDissolveMa
 
 		+ SVerticalBox::Slot()
 		[
-			ConstructPropertyScalarRow(FText::FromString(TEXT("Amount")), Amount)
+			ConstructPropertyScalarRow(FText::FromString(TEXT("Amount")), Amount, 0, 1)
 		]
 		+ SVerticalBox::Slot()
 		[
-			ConstructPropertyScalarRow(FText::FromString(TEXT("Tilting")), Tilting)
+			ConstructPropertyScalarRow(FText::FromString(TEXT("Tiling")), Tiling, 0, 256)
 		]
 		+ SVerticalBox::Slot()
 		[
-			ConstructPropertyScalarRow(FText::FromString(TEXT("Width")), Width)
+			ConstructPropertyScalarRow(FText::FromString(TEXT("Width")), Width, 0, 256)
 		]
 
 		+ SVerticalBox::Slot()
@@ -146,9 +152,6 @@ TSharedRef<SVerticalBox> SSetDissolveMaterialFunctionWidget::ConstructDissolveMa
 			ConstructPropertyColorRow(FText::FromString(TEXT("FringeColor")), FringeColor)
 		]
 
-
-
-		// Pattern Texture
 		+ SVerticalBox::Slot()
 		[
 			ConstructPropertyTextureRow(FText::FromString(TEXT("Pattern")), DissolvePatternTexture)
@@ -217,7 +220,7 @@ TSharedRef<SSplitter> SSetDissolveMaterialFunctionWidget::ConstructPropertyBoole
 		];
 }
 
-TSharedRef<SSplitter> SSetDissolveMaterialFunctionWidget::ConstructPropertyScalarRow(const FText& PropertyName, float& Value)
+TSharedRef<SSplitter> SSetDissolveMaterialFunctionWidget::ConstructPropertyScalarRow(const FText& PropertyName, float& Value, float MinValue, float MaxValue)
 {
 	return SNew(SSplitter)
 		+ SSplitter::Slot()
@@ -234,12 +237,12 @@ TSharedRef<SSplitter> SSetDissolveMaterialFunctionWidget::ConstructPropertyScala
 				[
 					SNew(SNumericEntryBox<float>)
 						.LabelVAlign(VAlign_Center)
-						.Value_Lambda([&Value]() { return TOptional<float>(Value); })  // 현재 값 반환
+						.Value_Lambda([&Value]() { return Value; })  // 현재 값 반환
 						.OnValueChanged_Lambda([&Value](float NewValue) { Value = NewValue; })  // 값 변경 처리
-						.MinValue(0.f)
-						.MaxValue(1.f)
-						.MinSliderValue(0.f)
-						.MaxSliderValue(1.f)
+						.MinValue(MinValue)
+						.MaxValue(MaxValue)
+						.MinSliderValue(MinValue)
+						.MaxSliderValue(MaxValue)
 						.AllowSpin(true)
 				]
 
@@ -307,7 +310,7 @@ FReply SSetDissolveMaterialFunctionWidget::OnColorPropertyMouseButtonDown(const 
 {
 	FColorPickerArgs PickerArgs;
 	PickerArgs.bIsModal = true;
-	PickerArgs.InitialColorOverride = Color;
+	PickerArgs.InitialColor = Color;
 	PickerArgs.OnColorCommitted.BindLambda([&Color](FLinearColor NewColor) { Color = NewColor; });
 	OpenColorPicker(PickerArgs);
 	return FReply::Handled();
@@ -324,4 +327,27 @@ void SSetDissolveMaterialFunctionWidget::OnDissolvePatternTextureChanged(const F
 	{
 		DissolvePatternTexture = Texture;
 	}
+}
+
+FReply SSetDissolveMaterialFunctionWidget::OnConfirmButtonClicked()
+{
+	if (GEditor)
+	{
+		if (UFacilityMaterialSubsystem* FMS = GEditor->GetEditorSubsystem<UFacilityMaterialSubsystem>())
+		{
+			UFacilityMaterialSubsystem::FDissolveMaterialFunctionParameters Params = {};
+			Params.bCreateMaterialInstance = bCreateMaterialInstance;
+			Params.bHueShift = bHueShift;
+			Params.bSwitchUVs = bSwitchUVs;
+			Params.bUseOnlyTexture = bUseOnlyTexture;
+			Params.Amount = Amount;
+			Params.Tiling = Tiling;
+			Params.Width = Width;
+			Params.FringeColor = FringeColor;
+			Params.Pattern = DissolvePatternTexture;
+			FMS->CreateOrUpdateDissolveMaterialAssets(SelectedMaterials, Params);
+		}
+	}
+	
+	return FReply::Handled();
 }

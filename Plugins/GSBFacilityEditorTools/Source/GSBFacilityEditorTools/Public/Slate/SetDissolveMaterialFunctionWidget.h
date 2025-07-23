@@ -27,7 +27,7 @@ private	:
 
 	TSharedRef<SSplitter> ConstructPropertyBooleanRow(const FText& PropertyName, bool& Value);
 
-	TSharedRef<SSplitter> ConstructPropertyScalarRow(const FText& PropertyName, float& Value);
+	TSharedRef<SSplitter> ConstructPropertyScalarRow(const FText& PropertyName, float& Value, float MinValue, float MaxValue);
 
 	TSharedRef<SSplitter> ConstructPropertyColorRow(const FText& PropertyName, FLinearColor& Color);
 
@@ -39,19 +39,23 @@ private	:
 
 	void OnDissolvePatternTextureChanged(const FAssetData& AssetData);
 
+	FReply OnConfirmButtonClicked();
+
 	TArray<TSharedPtr<FAssetData>> SelectedMaterials;
 
 	TSharedPtr<SListView<TSharedPtr<FAssetData>>> ConstructedMaterialAssetListView;
 
-	bool bHueShift = true;
+	bool bCreateMaterialInstance = true;
+
+	bool bHueShift = false;
 
 	bool bSwitchUVs = true;
 
-	bool bUseOnlyTexture = true;
+	bool bUseOnlyTexture = false;
 
-	float Amount = 1;
+	float Amount = 0.6f;
 
-	float Tilting = 1;
+	float Tiling = 4;
 
 	float Width = 1;
 

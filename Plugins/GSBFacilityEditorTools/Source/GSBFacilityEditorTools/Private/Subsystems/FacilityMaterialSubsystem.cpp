@@ -6,6 +6,8 @@
 #include "EditorAssetLibrary.h"
 #include "EditorSupportDelegates.h"
 #include "Factories/MaterialFactoryNew.h"
+#include "Factories/MaterialInstanceConstantFactoryNew.h"
+#include "Materials/MaterialInstanceConstant.h"
 #include "Materials/MaterialExpressionFunctionInput.h"
 #include "Materials/MaterialExpressionScalarParameter.h"
 #include "Materials/MaterialExpressionStaticBoolParameter.h"
@@ -13,7 +15,6 @@
 #include "Materials/MaterialExpressionTextureObjectParameter.h"
 #include "Materials/MaterialExpressionLinearInterpolate.h"
 #include "Materials/MaterialExpressionMin.h"
-#include "MaterialGraph/MaterialGraph.h"
 #include "GSBDebugLibrary.h"
 
 void UFacilityMaterialSubsystem::Initialize(FSubsystemCollectionBase& Collection)
@@ -36,6 +37,27 @@ void UFacilityMaterialSubsystem::Initialize(FSubsystemCollectionBase& Collection
 void UFacilityMaterialSubsystem::Deinitialize()
 {
 	Super::Deinitialize();
+}
+
+UMaterialInstanceConstant* UFacilityMaterialSubsystem::CreateMaterialInstanceConstant(const FString& NameOfTheMaterialInst, const FString PackagePath)
+{
+	UMaterialInstanceConstantFactoryNew* MaterialInstFactory = NewObject< UMaterialInstanceConstantFactoryNew>();
+	FAssetToolsModule& AssetToolsModule = FModuleManager::LoadModuleChecked<FAssetToolsModule>(TEXT("AssetTools"));
+	UObject* CreatedObject = AssetToolsModule.Get().CreateAsset(NameOfTheMaterialInst, PackagePath, UMaterialInstanceConstant::StaticClass(), MaterialInstFactory);
+	UMaterialInstanceConstant* CreatedMaterialInst = nullptr;
+	CreatedMaterialInst = Cast<UMaterialInstanceConstant>(CreatedObject);
+	return CreatedMaterialInst;
+
+	return nullptr;
+}
+
+UMaterialInstanceConstant* UFacilityMaterialSubsystem::FindOrCreateMaterialInstanceConstant(const FString& NameOfTheMaterialInst, const FString PackagePath)
+{
+	if (UEditorAssetLibrary::DoesAssetExist(PackagePath / NameOfTheMaterialInst))
+	{
+		return Cast<UMaterialInstanceConstant>(UEditorAssetLibrary::FindAssetData(PackagePath / NameOfTheMaterialInst).GetAsset());
+	}
+	return CreateMaterialInstanceConstant(NameOfTheMaterialInst, PackagePath);
 }
 
 UMaterialExpression* UFacilityMaterialSubsystem::FindMaterialExpressionByDesc(UMaterial* Material, const FString& Desc)
@@ -263,10 +285,10 @@ void UFacilityMaterialSubsystem::CreateOrUpdateDissolveMaterialFunctionNode(UMat
 		MatExpr->SortPriority = 1;
 		MatExpr->DefaultValue = Params.Amount;
 	}
-	if (UMaterialExpressionScalarParameter* MatExpr = Cast<UMaterialExpressionScalarParameter>(FindMaterialExpressionParameterByName(Material, TEXT("DissolveEffect_Tilting"))))
+	if (UMaterialExpressionScalarParameter* MatExpr = Cast<UMaterialExpressionScalarParameter>(FindMaterialExpressionParameterByName(Material, TEXT("DissolveEffect_Tiling"))))
 	{
 		MatExpr->SortPriority = 1;
-		MatExpr->DefaultValue = Params.Tilting;
+		MatExpr->DefaultValue = Params.Tiling;
 	}
 	if (UMaterialExpressionScalarParameter* MatExpr = Cast<UMaterialExpressionScalarParameter>(FindMaterialExpressionParameterByName(Material, TEXT("DissolveEffect_Width"))))
 	{
@@ -284,11 +306,7 @@ void UFacilityMaterialSubsystem::CreateOrUpdateDissolveMaterialFunctionNode(UMat
 		MatExpr->Texture = Params.Pattern;
 	}
 
-	Material->MarkPackageDirty();
-	Material->PreEditChange(nullptr);
 	Material->PostEditChange();
-	FEditorDelegates::RefreshEditor.Broadcast();
-	FEditorSupportDelegates::RedrawAllViewports.Broadcast();
 }
 
 FAssetData UFacilityMaterialSubsystem::FindOrCreateAssetWithSuffix(const FAssetData& AssetData, FString Suffix)
@@ -333,7 +351,30 @@ FAssetData UFacilityMaterialSubsystem::CreateOrUpdateDissolveMaterialAsset(const
 
 	UEditorAssetLibrary::SaveAsset(DissolveMaterialAsset.GetSoftObjectPath().ToString());
 
+	if (Params.bCreateMaterialInstance && DissolveMaterialAsset.IsValid())
+	{
+		FString MatInstName = DissolveMaterialAsset.AssetName.ToString();
+		MatInstName.RemoveFromStart(TEXT("M_"));
+		MatInstName.InsertAt(0, TEXT("MI_"));
+		if (UMaterialInstanceConstant* MaterialInstanceConst = FindOrCreateMaterialInstanceConstant(MatInstName, DissolveMaterialAsset.PackagePath.ToString()))
+		{
+			if (MaterialInstanceConst->Parent != DissolveMaterialAsset.GetAsset())
+			{
+				MaterialInstanceConst->SetParentEditorOnly(Cast<UMaterialInterface>(DissolveMaterialAsset.GetAsset()));
+				MaterialInstanceConst->PostEditChange();
+			}
+		}
+	}
+
 	return DissolveMaterialAsset;
+}
+
+void UFacilityMaterialSubsystem::CreateOrUpdateDissolveMaterialAssets(TConstArrayView<TSharedPtr<FAssetData>> MaterialAssetDatas, const FDissolveMaterialFunctionParameters& Params)
+{
+	for (const TSharedPtr<FAssetData>& MaterialAssetData : MaterialAssetDatas)
+	{
+		CreateOrUpdateDissolveMaterialAsset(*MaterialAssetData.Get(), Params);
+	}
 }
 
 bool UFacilityMaterialSubsystem::IsDissolveMaterialFunctionLinkedToEmissiveOrOpacityMask(UMaterial* Material)

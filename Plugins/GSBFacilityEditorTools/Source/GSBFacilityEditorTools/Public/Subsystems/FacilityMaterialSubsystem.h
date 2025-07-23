@@ -17,11 +17,12 @@ class GSBFACILITYEDITORTOOLS_API UFacilityMaterialSubsystem : public UEditorSubs
 public:
 	struct FDissolveMaterialFunctionParameters
 	{
+		bool bCreateMaterialInstance;
 		bool bHueShift;
 		bool bSwitchUVs;
 		bool bUseOnlyTexture;
 		float Amount;
-		float Tilting;
+		float Tiling;
 		float Width;
 		FLinearColor FringeColor;
 		UTexture* Pattern;
@@ -33,6 +34,10 @@ public:
 	virtual void Deinitialize() override;
 
 public:
+	UMaterialInstanceConstant* CreateMaterialInstanceConstant(const FString& NameOfTheMaterialInst, const FString PackagePath);
+
+	UMaterialInstanceConstant* FindOrCreateMaterialInstanceConstant(const FString& NameOfTheMaterialInst, const FString PackagePath);
+
 	template<typename MaterialExpressionT>
 	MaterialExpressionT* CreateMaterialExpression(UMaterial* Material);
 
@@ -47,6 +52,8 @@ public:
 	FAssetData FindOrCreateAssetWithSuffix(const FAssetData& AssetData, FString Suffix);
 
 	FAssetData CreateOrUpdateDissolveMaterialAsset(const FAssetData& MaterialAssetData, const FDissolveMaterialFunctionParameters& Params);
+
+	void CreateOrUpdateDissolveMaterialAssets(TConstArrayView<TSharedPtr<FAssetData>> MaterialAssetDatas, const FDissolveMaterialFunctionParameters& Params);
 
 	bool IsDissolveMaterialFunctionLinkedToEmissiveOrOpacityMask(UMaterial* Material);
 
