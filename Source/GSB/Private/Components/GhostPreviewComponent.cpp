@@ -3,6 +3,7 @@
 
 #include "Components/GhostPreviewComponent.h"
 #include "ProceduralMeshComponent.h"
+#include "Components/InstancedStaticMeshComponent.h"
 #include "GSBUtility.h"
 #include "DebugHeader.h"
 
@@ -42,7 +43,6 @@ void UGhostPreviewComponent::ClearGhostPreviewComponents()
 	GhostPreviewComponents.Empty();
 }
 
-
 void UGhostPreviewComponent::CopyActorComponentsToPreview(AActor* SourceActor, USceneComponent* Target)
 {
 	if (IsValid(Target) && IsValid(SourceActor))
@@ -58,7 +58,21 @@ void UGhostPreviewComponent::CopyComponentHierarchyToPreview(USceneComponent* So
 		FString NewChildCompName = TEXT("ChildComp") + FString::FromInt(GhostPreviewComponents.Num());
 	
 		USceneComponent* NewChild = nullptr;
-		if (UStaticMeshComponent* StaticMeshComponent = Cast<UStaticMeshComponent>(SourceComp))
+		if (UInstancedStaticMeshComponent* InstStaticMeshComp = Cast<UInstancedStaticMeshComponent>(SourceComp))
+		{
+			NewChildCompName += TEXT("_InstancedStaticMeshComponent");
+			UInstancedStaticMeshComponent* NewInstStaticMeshComp = NewObject<UInstancedStaticMeshComponent>(this, *NewChildCompName);
+			NewInstStaticMeshComp->SetStaticMesh(InstStaticMeshComp->GetStaticMesh());
+			for (int i = 0; i < InstStaticMeshComp->GetNumInstances(); ++i)
+			{
+				FTransform Transform = {};
+				InstStaticMeshComp->GetInstanceTransform(i, Transform);
+				NewInstStaticMeshComp->AddInstance(Transform);
+			}
+			NewInstStaticMeshComp->MarkRenderStateDirty();
+			NewChild = NewInstStaticMeshComp;
+		}
+		else if (UStaticMeshComponent* StaticMeshComponent = Cast<UStaticMeshComponent>(SourceComp))
 		{
 			NewChildCompName += TEXT("_StaticMesh");
 			UStaticMeshComponent* NewStaticMeshComp = NewObject<UStaticMeshComponent>(this, *NewChildCompName);
