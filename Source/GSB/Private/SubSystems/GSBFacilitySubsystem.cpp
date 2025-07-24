@@ -15,7 +15,7 @@ UGSBFacilitySubsystem* UGSBFacilitySubsystem::Get(const UObject* WorldContext)
 
 void UGSBFacilitySubsystem::SetFacilityPowerInfluenceVisibility(TScriptInterface<IPowerProviderFacility> PowerProvider, bool bVisibility)
 {
-	if (IsValid(PowerProvider.GetObject()))
+	if (IsValid(PowerProvider.GetObject()) && PowerProvider.GetObject()->Implements<UPowerProviderFacility>())
 	{
 		PowerProvider->SetPowerInfluenceAreaVisibility(bVisibility);
 	}

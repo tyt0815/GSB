@@ -83,6 +83,19 @@ void AFacility::BeginPlay()
 	AddDefaultInteractions();
 
 	AddHighlightTargetRecursive(this);
+
+	TArray<UPrimitiveComponent*> AllPrimitiveComps;
+	GetComponents<UPrimitiveComponent>(AllPrimitiveComps, true);
+	for (UPrimitiveComponent* Comp : AllPrimitiveComps)
+	{
+		if (IsValid(Comp))
+		{
+			if (Comp->GetCollisionObjectType() == ECollisionChannel::ECC_WorldStatic || Comp->GetCollisionObjectType() == ECollisionChannel::ECC_WorldDynamic)
+			{
+				Comp->SetCollisionProfileName(TEXT("FacilityMesh"));	
+			}
+		}
+	}
 }
 
 void AFacility::ConnectFacilityAddon(AFacilityAddon* Addon)
