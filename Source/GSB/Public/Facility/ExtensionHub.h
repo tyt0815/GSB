@@ -15,8 +15,6 @@ class GSB_API AExtensionHub : public APowerRelayFacility,  public IHubFacility
 public:
 	AExtensionHub();
 
-	virtual void OnShowDetailInteraction(AActor* Interactor) override;
-
 	virtual bool TryLinkPowerConsumerFacility(APowerConsumerFacility* PowerConsumerFacility) override;
 
 	virtual bool CanLinkToPowerProvider(IPowerProviderFacility* PowerProvider) override;

@@ -3,16 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "HUDs/GSBFacilityDetailWindow.h"
-#include "GSBHubDetailWindow.generated.h"
+#include "Blueprint/UserWidget.h"
+#include "GSBHubDetail.generated.h"
 
 class UGSBStorage;
 class UGSBInventory;
-class UGSBItemList;
-class UGSBItemSlot;
 
 UCLASS()
-class GSB_API UGSBHubDetailWindow : public UGSBFacilityDetailWindow
+class GSB_API UGSBHubDetail : public UUserWidget
 {
 	GENERATED_BODY()
 public:

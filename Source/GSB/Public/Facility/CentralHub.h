@@ -26,8 +26,6 @@ class GSB_API ACentralHub :
 public:
 	ACentralHub();
 
-	virtual void OnShowDetailInteraction(AActor* Interactor) override;
-
 	virtual bool CanProvidePower() override;
 
 	virtual bool TryLinkPowerConsumerFacility(APowerConsumerFacility* PowerConsumerFacility) override;

@@ -9,10 +9,8 @@
 #include "Components/RetryPrioritizedActorRequestHandlerComponent.h"
 #include "Components/ItemStorageComponent.h"
 #include "Items/ItemCrate.h"
-#include "Characters/GSBPlayer.h"
 #include "HUDs/GSBPlayerHUD.h"
 #include "HUDs/GSBPlayerOverlay.h"
-#include "HUDs/GSBHubDetailWindow.h"
 #include "SubSystems/GSBFacilitySubsystem.h"
 #include "DebugHeader.h"
 
@@ -29,25 +27,6 @@ ACentralHub::ACentralHub()
 	StorageComponent = CreateDefaultSubobject<UItemStorageComponent>(TEXT("Storage"));
 	InputPortHandler = CreateDefaultSubobject<URetryPrioritizedActorRequestHandlerComponent>(TEXT("InputPortHandler"));
 	OutputPortHandler = CreateDefaultSubobject<URetryPrioritizedActorRequestHandlerComponent>(TEXT("OutputPortHandler"));
-}
-
-void ACentralHub::OnShowDetailInteraction(AActor* Interactor)
-{
-	Super::OnShowDetailInteraction(Interactor);
-
-	if (UGSBHubDetailWindow* Window = Cast<UGSBHubDetailWindow>(DetailWindow))
-	{
-		Window->LinkHubStorageComponent(StorageComponent);
-
-		if (AGSBPlayer* Player = Cast<AGSBPlayer>(Interactor))
-		{
-			Window->LinkInventoryComponent(Player->GetInventoryComponent());
-		}
-	}
-	else
-	{
-		TRACE_SCREEN_LOG(TEXT("UGSBHubDetailWindow 캐스팅 실패"));
-	}
 }
 
 bool ACentralHub::CanProvidePower()

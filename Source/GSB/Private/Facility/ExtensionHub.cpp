@@ -5,30 +5,10 @@
 #include "Facility/CentralHub.h"
 #include "Characters/GSBPlayer.h"
 #include "SubSystems/GSBFacilitySubsystem.h"
-#include "HUDs/GSBHubDetailWindow.h"
 #include "DebugHeader.h"	
 
 AExtensionHub::AExtensionHub()
 {
-}
-
-void AExtensionHub::OnShowDetailInteraction(AActor* Interactor)
-{
-	Super::OnShowDetailInteraction(Interactor);
-
-	if (UGSBHubDetailWindow* Window = Cast<UGSBHubDetailWindow>(DetailWindow))
-	{
-		Window->LinkHubStorageComponent(GetHubStorageComponent());
-
-		if (AGSBPlayer* Player = Cast<AGSBPlayer>(Interactor))
-		{
-			Window->LinkInventoryComponent(Player->GetInventoryComponent());
-		}
-	}
-	else
-	{
-		TRACE_SCREEN_LOG(TEXT("UGSBHubDetailWindow 캐스팅 실패"));
-	}
 }
 
 bool AExtensionHub::TryLinkPowerConsumerFacility(APowerConsumerFacility* PowerConsumerFacility)
