@@ -163,6 +163,9 @@ void AConveyorBelt::BeginDeconstruction_Implementation()
         }
     }
 
+    ItemReceiveComponent->DisconnectFromItemSender();
+    ItemSendComponent->DisconnectItemReceiver();
+
     Super::BeginDeconstruction_Implementation();
 }
 

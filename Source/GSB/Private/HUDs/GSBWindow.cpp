@@ -28,5 +28,12 @@ void UGSBWindow::OnClosed()
 
 void UGSBWindow::Close()
 {
-	ParentOverlay->CloseWindow(this);
+	if (IsValid(ParentOverlay))
+	{
+		ParentOverlay->CloseWindow(this);
+	}
+	else
+	{
+		OnClosed();
+	}
 }

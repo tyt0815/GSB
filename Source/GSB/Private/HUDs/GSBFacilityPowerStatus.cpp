@@ -14,22 +14,34 @@ void UGSBFacilityPowerStatus::NativeConstruct()
 
 void UGSBFacilityPowerStatus::SetPowerStatus_Powered()
 {
-	PowerStatusText->SetColorAndOpacity(FColor::Green);
+	if (IsValid(PowerStatusText))
+	{
+		PowerStatusText->SetColorAndOpacity(FColor::Green);
+	}
 }
 
 void UGSBFacilityPowerStatus::SetPowerStatus_Unpowered()
 {
-	PowerStatusText->SetColorAndOpacity(FColor::Red);
+	if (IsValid(PowerStatusText))
+	{
+		PowerStatusText->SetColorAndOpacity(FColor::Red);
+	}
 }
 
 void UGSBFacilityPowerStatus::SetPowerStatus_TurnedOff()
 {
-	PowerStatusText->SetColorAndOpacity(FLinearColor(0.2, 0.2, 0.2, 1));
+	if (IsValid(PowerStatusText))
+	{
+		PowerStatusText->SetColorAndOpacity(FLinearColor(0.2, 0.2, 0.2, 1));
+	}
 }
 
 void UGSBFacilityPowerStatus::SetPowerConsumption(int32 Value)
 {
-	PowerConsumption->SetText(FText::FromString(FString::Printf(TEXT("소비 전력: %d"), Value)));
+	if (IsValid(PowerConsumption))
+	{
+		PowerConsumption->SetText(FText::FromString(FString::Printf(TEXT("소비 전력: %d"), Value)));
+	}
 }
 
 void UGSBFacilityPowerStatus::HandleOnPowerSwitchClicked()
