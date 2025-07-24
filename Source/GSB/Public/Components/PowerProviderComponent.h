@@ -32,8 +32,6 @@ public:
 
 	bool IsLinkedPowerConsumerFacility(APowerConsumerFacility* PowerConsumerFacility);
 
-	void GetFacilitiesInPowerInfluenceArea(TArray<AActor*>& Facilities);
-
 	void SetPowerInfluenceAreaVisibility(bool bVisibility, bool bPropagateToChildren = false);
 
 private:

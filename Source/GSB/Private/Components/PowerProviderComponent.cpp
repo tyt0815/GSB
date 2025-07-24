@@ -42,14 +42,20 @@ void UPowerProviderComponent::UnlinkPowerConsumerFacility(APowerConsumerFacility
 
 void UPowerProviderComponent::LinkFacilitiesInPowerInfluenceArea()
 {
-	TArray<AActor*> Facilities;
-	GetFacilitiesInPowerInfluenceArea(Facilities);
-	for (AActor* Facility : Facilities)
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_GameTraceChannel2)); // FacilityMesh
+	TArray<AActor*> ActorsToIgnore;
+	TArray<FHitResult> HitResults;
+	BoxTraceMultiFromGridBoundsForObjects(ObjectTypes, ActorsToIgnore, HitResults);
+	
+	for (const FHitResult& HitResult : HitResults)
 	{
-		APowerConsumerFacility* PowerConsumer = Cast<APowerConsumerFacility>(Facility);
-		if (IsValid(PowerConsumer) && !PowerConsumer->IsLinkedToPowerProvider())
+		if (APowerConsumerFacility* PowerConsumer = Cast<APowerConsumerFacility>(HitResult.GetActor()))
 		{
-			PowerConsumer->TryLinkToPowerProvider(Cast<IPowerProviderFacility>(GetOwner()));
+			if (!PowerConsumer->IsLinkedToPowerProvider())
+			{
+				PowerConsumer->TryLinkToPowerProvider(Cast<IPowerProviderFacility>(GetOwner()));
+			}
 		}
 	}
 }
@@ -65,12 +71,6 @@ void UPowerProviderComponent::UnlinkAllPowerConsumerFacility()
 bool UPowerProviderComponent::IsLinkedPowerConsumerFacility(APowerConsumerFacility* PowerConsumerFacility)
 {
 	return IsValid(PowerConsumerFacility) && LinkedPowerConsumerFacilities.Contains(PowerConsumerFacility);
-}
-
-void UPowerProviderComponent::GetFacilitiesInPowerInfluenceArea(TArray<AActor*>& Facilities)
-{
-	Facilities.Empty();
-	GetOverlappingActors(Facilities, AFacility::StaticClass());
 }
 
 void UPowerProviderComponent::SetPowerInfluenceAreaVisibility(bool bVisibility, bool bPropagateToChildren)
