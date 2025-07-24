@@ -51,6 +51,8 @@ public:
 	void ClearHighlightTargetsArray();
 
 	void ClearOverlayTargetsArray();
+
+
 private:
 	TArray<UMeshComponent*> OutlineTargets;
 

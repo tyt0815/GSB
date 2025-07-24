@@ -82,7 +82,7 @@ void AFacility::BeginPlay()
 
 	AddDefaultInteractions();
 
-	MeshOverlayHelperComponent->AddHighlightTarget(StaticMeshComponent);
+	AddHighlightTargetRecursive(this);
 }
 
 void AFacility::ConnectFacilityAddon(AFacilityAddon* Addon)
@@ -120,6 +120,35 @@ void AFacility::OnShowDetailInteraction(AActor* Interactor)
 	else
 	{
 		TRACE_SCREEN_LOG(TEXT("DetailWindowClass가 nullptr입니다. :") + GetFacilityName().ToString());
+	}
+}
+
+void AFacility::AddHighlightTargetRecursive(AActor* Actor)
+{
+	if (!IsValid(Actor))
+	{
+		return;
+	}
+
+	TArray<UMeshComponent*> AllMeshComponents;
+	Actor->GetComponents<UMeshComponent>(AllMeshComponents);
+	for (UMeshComponent* MeshComp : AllMeshComponents)
+	{
+		MeshOverlayHelperComponent->AddHighlightTarget(MeshComp);
+	}
+
+	TArray<AActor*> AllChildActors;
+	Actor->GetAllChildActors(AllChildActors);
+	for (AActor* ChildActor : AllChildActors)
+	{
+		if (!IsValid(ChildActor))
+		{
+			continue;
+		}
+		else
+		{
+			AddHighlightTargetRecursive(ChildActor);
+		}
 	}
 }
 
