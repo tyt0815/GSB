@@ -33,6 +33,10 @@ void AInputPort::OnConnectedToFacility()
     {
         InputPortHandler->RegisterInputPort(this);
     }
+    else
+    {
+        TRACE_SCREEN_LOG(FString::Printf(TEXT("IInputPortHandler를 상속한 클래스에 연결되어야 합니다.(연결된 시설 클래스: %s)"), *GetOwner()->GetClass()->GetName()));
+    }
 }
 
 bool AInputPort::CanReceiveItem() const
