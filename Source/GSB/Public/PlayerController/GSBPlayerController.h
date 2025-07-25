@@ -10,13 +10,15 @@ class UWidget;
 class UInputMappingContext;
 class UEnhancedInputLocalPlayerSubsystem;
 class UGSBPlayerInputActionSetDataAsset;
+class UGSBTopDownBuildPawnInputSet;
 
 enum class EGamePlayMode : uint8
 {
 	EGPM_CombatGameOnly,
 	EGPM_CombatGameAndUI,
-	EGPM_BuildGameOnly,
-	EGPM_BuildGameAndUI
+	EGPM_CharacterBuildGameOnly,
+	EGPM_CharacterGameAndUI,
+	EGPM_TopDownBuild
 };
 
 UCLASS()
@@ -30,7 +32,9 @@ public:
 public:
 	void ActivateCombatInputContext();
 
-	void ActivateBuildInputContext();
+	void ActivateCharacterBuildInputContext();
+
+	void ActivateTopDownBuildInputContext();
 
 	void AddInputMappingContext(UInputMappingContext* InputMappingContext);
 
@@ -48,7 +52,9 @@ public:
 
 	bool IsCombatMode() const;
 
-	bool IsBuildMode() const;
+	bool IsCharacterBuildMode() const;
+
+	bool IsTopDownBuildMode() const;
 
 	UEnhancedInputLocalPlayerSubsystem* GetEnhancedInputLocalPlayerSubsystem();
 
@@ -56,7 +62,8 @@ protected:
 	UPROPERTY(EditAnywhere)
 	UGSBPlayerInputActionSetDataAsset* PlayerInputSet;
 
-	
+	UPROPERTY(EditAnywhere)
+	UGSBTopDownBuildPawnInputSet* TopDownBuildPawnInputSet;
 
 private:
 	void AddDefaultGameOnlyInputContexts();
@@ -84,5 +91,9 @@ public:
 	FORCEINLINE UGSBPlayerInputActionSetDataAsset* GetPlayerInputSet() const
 	{
 		return PlayerInputSet;
+	}
+	FORCEINLINE UGSBTopDownBuildPawnInputSet* GetTopDownBuildPawnInputSet() const
+	{
+		return TopDownBuildPawnInputSet;
 	}
 };

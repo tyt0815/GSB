@@ -84,8 +84,8 @@ void APowerConsumerFacility::OnLinkToPowerProvider_Implementation(AActor* PowerP
 				if (PowerWire)
 				{
 					FVector Offset = FVector(0, 0, -2);
-					FVector Start = GetFacilityMeshTop() + Offset;
-					FVector PowerProviderTop = PowerProviderFacility->GetFacilityMeshTop();
+					FVector Start = GetLocationOnTopXYPlane() + Offset;
+					FVector PowerProviderTop = PowerProviderFacility->GetLocationOnTopXYPlane();
 					FVector WireForward = PowerProviderTop - Start;
 					WireForward.Normalize();
 					FVector	WireRight = FVector::ZAxisVector.Cross(WireForward);
@@ -119,6 +119,10 @@ void APowerConsumerFacility::OnLinkToPowerProvider_Implementation(AActor* PowerP
 					FVector ImpactPoint2 = PowerProviderTop;
 					for (const FHitResult& HitResult : OutHits)
 					{
+						if (!HitResult.GetActor()->ActorHasTag(TEXT("Antenna")) || HitResult.GetActor() != PowerProviderActor)
+						{
+							continue;
+						}
 						FVector UnitVector = HitResult.ImpactPoint - Start;
 						UnitVector.Normalize();
 						float ZoHitResult = FVector::ZAxisVector.Dot(UnitVector);
@@ -161,8 +165,8 @@ void APowerConsumerFacility::OnUnlinkFromPowerProvider_Implementation()
 	if (IsValid(PowerWire))
 	{
 		PowerWire->Unlink();
-		PowerWire = nullptr;
 	}
+	PowerWire = nullptr;
 
 	if (LinkedPowerProvider)
 	{

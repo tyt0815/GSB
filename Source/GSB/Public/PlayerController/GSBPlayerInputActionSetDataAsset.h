@@ -101,6 +101,9 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	UInputAction* PreviewFacility0;
 
+	UPROPERTY(EditDefaultsOnly)
+	UInputAction* SwitchToTopDownBuildModeInputAction;
+
 	//////////////////////////////////////////////////////////
 	// Combat Inputs
 	//////////////////////////////////////////////////////////

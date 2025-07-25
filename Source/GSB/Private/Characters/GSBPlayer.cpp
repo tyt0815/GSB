@@ -12,6 +12,7 @@
 #include "PlayerController/GSBPlayerController.h"
 #include "PlayerController/GSBPlayerInputActionSetDataAsset.h"
 #include "BuildSystem/FacilityBuilder.h"
+#include "BuildSystem/TopDownBuildPawn.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "GSBGameInstance.h"
 #include "HUDs/GSBPlayerHUD.h"
@@ -92,6 +93,7 @@ void AGSBPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 			EnhancedInputComponent->BindAction(InputSet->PreviewFacility8, ETriggerEvent::Started, this, &AGSBPlayer::PreviewFacility8);
 			EnhancedInputComponent->BindAction(InputSet->PreviewFacility9, ETriggerEvent::Started, this, &AGSBPlayer::PreviewFacility9);
 			EnhancedInputComponent->BindAction(InputSet->PreviewFacility0, ETriggerEvent::Started, this, &AGSBPlayer::PreviewFacility0);
+			EnhancedInputComponent->BindAction(InputSet->SwitchToTopDownBuildModeInputAction, ETriggerEvent::Started, this, &AGSBPlayer::SwitchToTopDownBuildMode);
 
 			// Combat Mode
 			//// GameAndUI
@@ -135,6 +137,12 @@ void AGSBPlayer::BeginPlay()
 	}
 
 	SwitchToCombatMode();
+
+	if (UWorld* World = GetWorld())
+	{
+		TopDownBuildPawn = World->SpawnActor<ATopDownBuildPawn>();
+		TopDownBuildPawn->SetOwningPlayer(this);
+	}
 }
 
 void AGSBPlayer::Move(const FInputActionValue& Value)
@@ -328,11 +336,27 @@ void AGSBPlayer::SwitchToCombatMode()
 	}
 }
 
+void AGSBPlayer::SwitchToTopDownBuildMode()
+{
+	if (IsValid(TopDownBuildPawn))
+	{
+		if (AGSBPlayerController* PC = GetPlayerController())
+		{
+			PC->Possess(TopDownBuildPawn);
+			TopDownBuildPawn->OnPossessedByPlayerController();
+		}
+	}
+	else
+	{
+		TRACE_SCREEN_LOG(TEXT("TopDownBuildPawn가 nullptr 입니다."));
+	}
+}
+
 void AGSBPlayer::SwitchToBuildMode()
 {
 	if (AGSBPlayerController* PC = GetPlayerController())
 	{
-		PC->ActivateBuildInputContext();
+		PC->ActivateCharacterBuildInputContext();
 	}
 	if (UGSBPlayerOverlay * PlayerOverlay = GetOverlayWidget())
 	{

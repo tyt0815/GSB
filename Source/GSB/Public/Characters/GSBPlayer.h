@@ -67,6 +67,7 @@ protected:
 	void PreviewFacility9();
 	void PreviewFacility0();
 	void SwitchToCombatMode();
+	void SwitchToTopDownBuildMode();
 	virtual void Ability1_Started() {}
 	virtual void Ability2_Started() {}
 	virtual void Ability3_Started() {}
@@ -93,7 +94,11 @@ protected:
 private:
 	void UpdateFacilityBuilderLocation();
 
+	UPROPERTY(VisibleAnywhere, Category = "GSB|Build")
 	AFacilityBuilder* FacilityBuilder;
+
+	UPROPERTY(VisibleAnywhere, Category = "GSB|Build")
+	class ATopDownBuildPawn* TopDownBuildPawn;
 
 	///////////////////////////////////////////////////////////
 	// Interaction

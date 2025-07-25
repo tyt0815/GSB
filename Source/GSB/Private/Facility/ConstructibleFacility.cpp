@@ -39,8 +39,6 @@ void AConstructibleFacility::BeginPlay()
 	InitializeDeconstructionTimeline();
 
 	CreateAllDynamicMaterialInstances();
-
-	CompleteConstruction();
 }
 
 bool AConstructibleFacility::IsConstructed() const

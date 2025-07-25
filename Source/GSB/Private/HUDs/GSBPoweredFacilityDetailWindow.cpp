@@ -13,22 +13,34 @@ void UGSBPoweredFacilityDetailWindow::NativeConstruct()
 
 void UGSBPoweredFacilityDetailWindow::SetPowerStatus_Powered()
 {
-	PowerStatus->SetPowerStatus_Powered();
+	if (IsValid(PowerStatus))
+	{
+		PowerStatus->SetPowerStatus_Powered();
+	}
 }
 
 void UGSBPoweredFacilityDetailWindow::SetPowerStatus_TurnedOff()
 {
-	PowerStatus->SetPowerStatus_TurnedOff();
+	if (IsValid(PowerStatus))
+	{
+		PowerStatus->SetPowerStatus_TurnedOff();
+	}
 }
 
 void UGSBPoweredFacilityDetailWindow::SetPowerStatus_Unpowered()
 {
-	PowerStatus->SetPowerStatus_Unpowered();
+	if (IsValid(PowerStatus))
+	{
+		PowerStatus->SetPowerStatus_Unpowered();
+	}
 }
 
 void UGSBPoweredFacilityDetailWindow::SetPowerConsumption(int32 Value)
 {
-	PowerStatus->SetPowerConsumption(Value);
+	if(IsValid(PowerStatus))
+	{
+		PowerStatus->SetPowerConsumption(Value);
+	}
 }
 
 void UGSBPoweredFacilityDetailWindow::HandleOnPowerSwitchClicked()
