@@ -48,6 +48,8 @@ public:
 
 	FText GetFacilityName() const;
 
+	FVector GetFacilityMeshTop() const;
+
 protected:
 	virtual void AddDefaultInteractions();
 

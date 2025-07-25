@@ -4,12 +4,15 @@
 #include "Interfaces/InteractableActor.h"
 #include "Components/MeshOverlayHelperComponent.h"
 #include "SubSystems/GSBWindowSubsystem.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "GSBGameInstance.h"
 #include "GSBDefines.h"
 #include "DebugHeader.h"
 
 AFacility::AFacility()
 {
+	GetRootComponent()->Mobility = EComponentMobility::Static;
+
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	StaticMeshComponent->SetupAttachment(GetRootComponent());
 	StaticMeshComponent->SetCollisionProfileName(TEXT("FacilityMesh"));
@@ -107,6 +110,29 @@ void AFacility::ConnectFacilityAddon(AFacilityAddon* Addon)
 FText AFacility::GetFacilityName() const
 {
 	return IsValid(FacilityData) ? FacilityData->FacilityName : FText::FromString(TEXT("FacilityName_None"));
+}
+
+FVector AFacility::GetFacilityMeshTop() const
+{
+	FVector TraceStart = GetLocationOnTopXYPlane() - FVector::ZAxisVector;
+	FVector TraceEnd = TraceStart - FVector::ZAxisVector * GRID_CELL_SIZE;
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_GameTraceChannel2));
+	TArray<AActor*> ActorsToIgnore;
+	FHitResult OutHit;
+	UKismetSystemLibrary::LineTraceSingleForObjects(
+		this,
+		TraceStart,
+		TraceEnd,
+		ObjectTypes,
+		false,
+		ActorsToIgnore,
+		EDrawDebugTrace::None,
+		OutHit,
+		false
+	);
+
+	return OutHit.ImpactPoint;
 }
 
 void AFacility::AddDefaultInteractions()

@@ -14,6 +14,12 @@ class GSB_API UGSBGameInstance : public UGameInstance
 	GENERATED_BODY()
 
 public:
+	static UGSBGameInstance* Get(UObject* WorldContext);
+
+	static TSubclassOf<AActor> GetActorClass(UObject* WorldContext, const FName& Name);
+
+	static UCurveFloat* GetCurveFloat(UObject* WorldContext, const FName& Name);
+
 	TSubclassOf<AActor> GetActorClass(const FName& Name) const;
 
 	TSubclassOf<UUserWidget> GetUserWidgetClass(const FName& Name) const;

@@ -4,6 +4,37 @@
 #include "GSBGameInstance.h"
 #include "DebugHeader.h"
 
+UGSBGameInstance* UGSBGameInstance::Get(UObject* WorldContext)
+{
+	if (IsValid(WorldContext))
+	{
+		if (UWorld* World = WorldContext->GetWorld())
+		{
+			return Cast<UGSBGameInstance>(World->GetGameInstance());
+		}
+	}
+	
+	return nullptr;
+}
+
+TSubclassOf<AActor> UGSBGameInstance::GetActorClass(UObject* WorldContext, const FName& Name)
+{
+	if (UGSBGameInstance* GameInst = UGSBGameInstance::Get(WorldContext))
+	{
+		return GameInst->GetActorClass(Name);
+	}
+	return nullptr;
+}
+
+UCurveFloat* UGSBGameInstance::GetCurveFloat(UObject* WorldContext, const FName& Name)
+{
+	if (UGSBGameInstance* GameInst = UGSBGameInstance::Get(WorldContext))
+	{
+		return GameInst->GetCurveFloat(Name);
+	}
+	return nullptr;
+}
+
 TSubclassOf<AActor> UGSBGameInstance::GetActorClass(const FName& Name) const
 {
 	if (ActorClasses.Contains(Name))

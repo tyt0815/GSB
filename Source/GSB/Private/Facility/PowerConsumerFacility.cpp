@@ -2,10 +2,12 @@
 
 
 #include "Facility/PowerConsumerFacility.h"
+#include "Facility/Wire.h"
 #include "Facility/Addon/FacilityAddon.h"
 #include "HUDs/GSBPoweredFacilityDetailWindow.h"
 #include "Interfaces/PowerProviderFacility.h"
 #include "Kismet/KismetStringLibrary.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "GSBGameInstance.h"
 #include "DebugHeader.h"
 
@@ -68,6 +70,80 @@ bool APowerConsumerFacility::CanLinkToPowerProvider(IPowerProviderFacility* Powe
 
 void APowerConsumerFacility::OnLinkToPowerProvider_Implementation(AActor* PowerProviderActor)
 {
+	// PowerWire 연결
+	if (AFacility* PowerProviderFacility = Cast<AFacility>(PowerProviderActor))
+	{
+		if (UClass* PowerWireClass = UGSBGameInstance::GetActorClass(this, (TEXT("PowerWire"))))
+		{
+			if (UWorld* World = GetWorld())
+			{
+				if (!IsValid(PowerWire))
+				{
+					PowerWire = World->SpawnActor<AWire>(PowerWireClass);
+				}
+				if (PowerWire)
+				{
+					FVector Offset = FVector(0, 0, -2);
+					FVector Start = GetFacilityMeshTop() + Offset;
+					FVector PowerProviderTop = PowerProviderFacility->GetFacilityMeshTop();
+					FVector WireForward = PowerProviderTop - Start;
+					WireForward.Normalize();
+					FVector	WireRight = FVector::ZAxisVector.Cross(WireForward);
+					WireRight.Normalize();
+					FVector WireUp = WireForward.Cross(WireRight);
+
+					FVector TraceEnd = (Start + PowerProviderTop) / 2;
+					FVector TraceStart = TraceEnd + WireUp * 500;
+
+					TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+					ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_GameTraceChannel2));
+					TArray<AActor*> ActorsToIgnore;
+					TArray<FHitResult> OutHits;
+					UKismetSystemLibrary::BoxTraceMultiForObjects(
+						this,
+						TraceStart,
+						TraceEnd,
+						FVector(0, 0, (PowerProviderTop - Start).Length() / 2),
+						(-WireUp).Rotation(),
+						ObjectTypes,
+						false,
+						ActorsToIgnore,
+						EDrawDebugTrace::None,
+						OutHits,
+						true
+					);
+
+					float ZoHitResult1 = -1;
+					float ZoHitResult2 = -1;
+					FVector ImpactPoint1 = PowerProviderTop;
+					FVector ImpactPoint2 = PowerProviderTop;
+					for (const FHitResult& HitResult : OutHits)
+					{
+						FVector UnitVector = HitResult.ImpactPoint - Start;
+						UnitVector.Normalize();
+						float ZoHitResult = FVector::ZAxisVector.Dot(UnitVector);
+						if (ZoHitResult > ZoHitResult1)
+						{
+							ZoHitResult2 = ZoHitResult1;
+							ImpactPoint2 = ImpactPoint1;
+							ZoHitResult1 = ZoHitResult;
+							ImpactPoint1 = HitResult.ImpactPoint;
+						}
+						else if (ZoHitResult > ZoHitResult2)
+						{
+							ZoHitResult2 = ZoHitResult;
+							ImpactPoint2 = HitResult.ImpactPoint;
+						}
+					}
+					FVector End = (ImpactPoint1 + ImpactPoint2) / 2;
+
+					PowerWire->Link(Start, End);
+				}
+			}
+		}
+	}
+	
+
 	LinkedPowerProvider = TScriptInterface<IPowerProviderFacility>(PowerProviderActor);
 	if (LinkedPowerProvider)
 	{
@@ -82,6 +158,12 @@ void APowerConsumerFacility::OnLinkToPowerProvider_Implementation(AActor* PowerP
 
 void APowerConsumerFacility::OnUnlinkFromPowerProvider_Implementation()
 {
+	if (IsValid(PowerWire))
+	{
+		PowerWire->Unlink();
+		PowerWire = nullptr;
+	}
+
 	if (LinkedPowerProvider)
 	{
 		LinkedPowerProvider->UpdatePowerUsage(-PowerConsumption);

@@ -69,6 +69,7 @@ protected:
 	virtual void TurnOn();
 
 private:
+	class AWire* PowerWire;
 
 	UFUNCTION()
 	void HandleOnPowerSwitchClicked();

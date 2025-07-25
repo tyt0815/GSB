@@ -257,7 +257,7 @@ void AFacilityBuilder::Tick_ConveyorBeltBuildMode(float DeltaSeconds)
 	{
 		// 방향 평가
 		FVector StartForward = ConveyorBeltGhosts[0]->GetActorForwardVector();
-		FVector StartToEndVector = GetActorLocation() - ConveyorBeltGhosts[0]->GetLocationOnXYPlane();
+		FVector StartToEndVector = GetActorLocation() - ConveyorBeltGhosts[0]->GetLocationOnBottomXYPlane();
 		FVector EndDirection = StartToEndVector;
 		EndDirection.Normalize();
 		double SFoED = StartForward.Dot(EndDirection);
@@ -439,8 +439,8 @@ bool AFacilityBuilder::IsValidMiningFacilityPlace(AFacilityGhostActor* Ghost)
 
 	if (AMiningPoint* MiningPoint = Cast<AMiningPoint>(HitResult.GetActor()))
 	{
-		FVector GhostXYPlaneLocation = Ghost->GetLocationOnXYPlane();
-		FVector MiningPointXYPlaneLocation = MiningPoint->GetLocationOnXYPlane();
+		FVector GhostXYPlaneLocation = Ghost->GetLocationOnBottomXYPlane();
+		FVector MiningPointXYPlaneLocation = MiningPoint->GetLocationOnBottomXYPlane();
 		return GhostXYPlaneLocation.Equals(MiningPointXYPlaneLocation, 0.001);
 	}
 
