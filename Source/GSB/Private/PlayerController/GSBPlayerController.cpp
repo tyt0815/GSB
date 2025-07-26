@@ -63,6 +63,8 @@ void AGSBPlayerController::ClearAllInputMappingContext()
 
 void AGSBPlayerController::SwitchGamePlayMode_PlayerCombatGameOnly(AGSBPlayer* GSBPlayer)
 {
+	SetGamePlayMode_PlayerCombatGameOnly();
+
 	if (IsValid(GSBPlayer))
 	{
 		if (GetPawn() != GSBPlayer)
@@ -71,12 +73,12 @@ void AGSBPlayerController::SwitchGamePlayMode_PlayerCombatGameOnly(AGSBPlayer* G
 		}
 		GSBPlayer->OnEnterCombatModeGameOnly();
 	}
-	
-	SetGamePlayMode_PlayerCombatGameOnly();
 }
 
 void AGSBPlayerController::SwitchGamePlayMode_PlayerCombatGameAndUI(AGSBPlayer* GSBPlayer)
 {
+	SetGamePlayMode_PlayerCombatGameAndUI();
+
 	if (IsValid(GSBPlayer))
 	{
 		if (GetPawn() != GSBPlayer)
@@ -85,12 +87,12 @@ void AGSBPlayerController::SwitchGamePlayMode_PlayerCombatGameAndUI(AGSBPlayer* 
 		}
 		GSBPlayer->OnEnterCombatModeGameAndUI();
 	}
-
-	SetGamePlayMode_PlayerCombatGameAndUI();
 }
 
 void AGSBPlayerController::SwitchGamePlayMode_PlayerBuildGameOnly(AGSBPlayer* GSBPlayer)
 {
+	SetGamePlayMode_PlayerBuildGameOnly();
+
 	if (IsValid(GSBPlayer))
 	{
 		if (GetPawn() != GSBPlayer)
@@ -99,12 +101,12 @@ void AGSBPlayerController::SwitchGamePlayMode_PlayerBuildGameOnly(AGSBPlayer* GS
 		}
 		GSBPlayer->OnEnterBuildModeGameOnly();
 	}
-
-	SetGamePlayMode_PlayerBuildGameOnly();
 }
 
 void AGSBPlayerController::SwitchGamePlayMode_PlayerBuildGameAndUI(AGSBPlayer* GSBPlayer)
 {
+	SetGamePlayMode_PlayerBuildGameAndUI();
+
 	if (IsValid(GSBPlayer))
 	{
 		if (GetPawn() != GSBPlayer)
@@ -113,12 +115,12 @@ void AGSBPlayerController::SwitchGamePlayMode_PlayerBuildGameAndUI(AGSBPlayer* G
 		}
 		GSBPlayer->OnEnterBuildModeGameAndUI();
 	}
-
-	SetGamePlayMode_PlayerBuildGameAndUI();
 }
 
 void AGSBPlayerController::SwitchGamePlayMode_TopDownBuildGameAndUI(ATopDownBuildPawn* TopDownBuildPawn)
 {
+	SetGamePlayMode_TopDownBuildGameAndUI();
+
 	if (IsValid(TopDownBuildPawn))
 	{
 		if (GetPawn() != TopDownBuildPawn)
@@ -127,8 +129,6 @@ void AGSBPlayerController::SwitchGamePlayMode_TopDownBuildGameAndUI(ATopDownBuil
 		}
 		TopDownBuildPawn->OnEnterTopDownBuildModeGameAndUI();
 	}
-
-	SetGamePlayMode_TopDownBuildGameAndUI();
 }
 
 void AGSBPlayerController::SetGamePlayMode_PlayerCombatGameOnly()

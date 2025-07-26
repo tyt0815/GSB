@@ -66,7 +66,6 @@ void AGSBPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 		{
 			if (const UGSBPlayerInputActionSetDataAsset* InputSet = PlayerController->GetInputSet())
 			{
-				EnhancedInputComponent->ClearActionBindings();
 				// Locomotion
 				EnhancedInputComponent->BindAction(InputSet->IA_Move, ETriggerEvent::Triggered, this, &AGSBPlayer::Move);
 				EnhancedInputComponent->BindAction(InputSet->IA_Look, ETriggerEvent::Triggered, this, &AGSBPlayer::Look);

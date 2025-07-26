@@ -49,17 +49,10 @@ void ATopDownBuildPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		{
 			if (const UGSBPlayerInputActionSetDataAsset* InputSet = PlayerController->GetInputSet())
 			{
-				EnhancedInputComponent->ClearActionBindings();
-
 				EnhancedInputComponent->BindAction(InputSet->IA_Move, ETriggerEvent::Triggered, this, &ATopDownBuildPawn::Move);
 				EnhancedInputComponent->BindAction(InputSet->IA_ToggleTopDownAndThirdPersonBuildMode, ETriggerEvent::Started, this, &ATopDownBuildPawn::SwitchToThirdPersonBuildMode);
 			}
 		}
-	}
-
-	if (IsValid(OwningPlayer))
-	{
-		SetActorLocation(OwningPlayer->GetActorLocation() + FVector::ZAxisVector * 2000);
 	}
 }
 
@@ -76,6 +69,10 @@ bool ATopDownBuildPawn::IsControlled() const
 
 void ATopDownBuildPawn::OnEnterTopDownBuildModeGameAndUI()
 {
+	if (IsValid(OwningPlayer))
+	{
+		SetActorLocation(OwningPlayer->GetActorLocation() + FVector::ZAxisVector * 2000);
+	}
 }
 
 void ATopDownBuildPawn::Move(const FInputActionValue& Value)
@@ -92,16 +89,8 @@ void ATopDownBuildPawn::SwitchToThirdPersonBuildMode()
 	{
 		if (AGSBPlayerController* PC = GetController<AGSBPlayerController>())
 		{
-			PC->Possess(OwningPlayer);
+			PC->SwitchGamePlayMode_PlayerBuildGameOnly(OwningPlayer);
 		}
-		else
-		{
-			TRACE_SCREEN_LOG(TEXT("AGSBPlayerController 캐스팅 실패"));
-		}
-	}
-	else
-	{
-		TRACE_SCREEN_LOG(TEXT("OwningPlayer가 nullptr입니다."));
 	}
 }
 
