@@ -34,7 +34,6 @@ public:
 	void SwitchToCombatModeUI();
 	
 private:
-
 	UPROPERTY(meta = (BindWidget))
 	UGSBInteractionList* InteractionListWidget;
 
@@ -43,6 +42,4 @@ private:
 
 	UPROPERTY(meta = (BindWidget))
 	class UGSBPowerCapacity* PowerCapacity;
-
-	AGSBPlayerController* PlayerController;
 };

@@ -4,6 +4,8 @@
 #include "PlayerController/GSBPlayerController.h"
 #include "PlayerController/GSBPlayerInputActionSetDataAsset.h"
 #include "PlayerController/GSBTopDownBuildPawnInputSet.h"
+#include "BuildSystem/TopDownBuildPawn.h"
+#include "Characters/GSBPlayer.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
 #include "Components/Widget.h"
@@ -12,47 +14,13 @@
 void AGSBPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+
+	SetGamePlayMode_PlayerCombatGameOnly();
 }
 
-void AGSBPlayerController::ActivateCombatInputContext()
+UEnhancedInputLocalPlayerSubsystem* AGSBPlayerController::GetEnhancedInputLocalPlayerSubsystem()
 {
-	ClearAllInputMappingContext();
-	if (IsUIControlMode())
-	{
-		GamePlayMode = EGamePlayMode::EGPM_CombatGameAndUI;
-
-		AddCombatGameAndUIInputContexts();
-	}
-	else
-	{
-		GamePlayMode = EGamePlayMode::EGPM_CombatGameOnly;
-
-		AddCombatGameOnlyInputContexts();
-	}
-}
-
-void AGSBPlayerController::ActivateCharacterBuildInputContext()
-{
-	ClearAllInputMappingContext();
-	if (IsUIControlMode())
-	{
-		GamePlayMode = EGamePlayMode::EGPM_CharacterGameAndUI;
-
-		AddBuildGameAndUIInputContexts();
-	}
-	else
-	{
-		GamePlayMode = EGamePlayMode::EGPM_CharacterBuildGameOnly;
-
-		AddBuildGameOnlyInputContexts();
-	}
-}
-
-void AGSBPlayerController::ActivateTopDownBuildInputContext()
-{
-	ClearAllInputMappingContext();
-	
-	AddInputMappingContext(TopDownBuildPawnInputSet->DefaultInputMappingContext);
+	return ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
 }
 
 void AGSBPlayerController::AddInputMappingContext(UInputMappingContext* InputMappingContext)
@@ -62,7 +30,6 @@ void AGSBPlayerController::AddInputMappingContext(UInputMappingContext* InputMap
 		if (!EnhancedInputLocalPlayerSubsystem->HasMappingContext(InputMappingContext))
 		{
 			EnhancedInputLocalPlayerSubsystem->AddMappingContext(InputMappingContext, 0);
-			CurrentInputMappingContexts.Add(InputMappingContext);
 		}
 	}
 }
@@ -82,152 +49,212 @@ void AGSBPlayerController::RemoveInputMappingContext(UInputMappingContext* Input
 		if (EnhancedInputLocalPlayerSubsystem->HasMappingContext(InputMappingContext))
 		{
 			EnhancedInputLocalPlayerSubsystem->RemoveMappingContext(InputMappingContext);
-			CurrentInputMappingContexts.Remove(InputMappingContext);
 		}
 	}
 }
 
 void AGSBPlayerController::ClearAllInputMappingContext()
 {
-	for (UInputMappingContext* Context : CurrentInputMappingContexts)
+	if (UEnhancedInputLocalPlayerSubsystem* EnhancedInputLocalPlayerSubsystem = GetEnhancedInputLocalPlayerSubsystem())
 	{
-		RemoveInputMappingContext(Context);
+		EnhancedInputLocalPlayerSubsystem->ClearAllMappings();
 	}
 }
 
-void AGSBPlayerController::StoreInputMappingContexts(const TArray<UInputMappingContext*> Contexts)
+void AGSBPlayerController::SwitchGamePlayMode_PlayerCombatGameOnly(AGSBPlayer* GSBPlayer)
 {
-	StoredInputMappingContexts.Empty();
-	for (UInputMappingContext* Context : Contexts)
+	if (IsValid(GSBPlayer))
 	{
-		StoredInputMappingContexts.Add(Context);
+		if (GetPawn() != GSBPlayer)
+		{
+			Possess(GSBPlayer);
+		}
+		GSBPlayer->OnEnterCombatModeGameOnly();
 	}
+	
+	SetGamePlayMode_PlayerCombatGameOnly();
 }
 
-void AGSBPlayerController::SetUIControlMode(bool bUI)
+void AGSBPlayerController::SwitchGamePlayMode_PlayerCombatGameAndUI(AGSBPlayer* GSBPlayer)
 {
-	if (bUI)
+	if (IsValid(GSBPlayer))
 	{
-		EnterUIControlMode();
+		if (GetPawn() != GSBPlayer)
+		{
+			Possess(GSBPlayer);
+		}
+		GSBPlayer->OnEnterCombatModeGameAndUI();
 	}
-	else
+
+	SetGamePlayMode_PlayerCombatGameAndUI();
+}
+
+void AGSBPlayerController::SwitchGamePlayMode_PlayerBuildGameOnly(AGSBPlayer* GSBPlayer)
+{
+	if (IsValid(GSBPlayer))
 	{
-		ExitUIControlMode();
+		if (GetPawn() != GSBPlayer)
+		{
+			Possess(GSBPlayer);
+		}
+		GSBPlayer->OnEnterBuildModeGameOnly();
 	}
+
+	SetGamePlayMode_PlayerBuildGameOnly();
 }
 
-bool AGSBPlayerController::IsUIControlMode() const
+void AGSBPlayerController::SwitchGamePlayMode_PlayerBuildGameAndUI(AGSBPlayer* GSBPlayer)
 {
-	return GamePlayMode == EGamePlayMode::EGPM_CharacterGameAndUI ||
-		GamePlayMode == EGamePlayMode::EGPM_CombatGameAndUI;
+	if (IsValid(GSBPlayer))
+	{
+		if (GetPawn() != GSBPlayer)
+		{
+			Possess(GSBPlayer);
+		}
+		GSBPlayer->OnEnterBuildModeGameAndUI();
+	}
+
+	SetGamePlayMode_PlayerBuildGameAndUI();
 }
 
-bool AGSBPlayerController::IsCombatMode() const
+void AGSBPlayerController::SwitchGamePlayMode_TopDownBuildGameAndUI(ATopDownBuildPawn* TopDownBuildPawn)
 {
-	return GamePlayMode == EGamePlayMode::EGPM_CombatGameAndUI ||
-		GamePlayMode == EGamePlayMode::EGPM_CombatGameOnly;
+	if (IsValid(TopDownBuildPawn))
+	{
+		if (GetPawn() != TopDownBuildPawn)
+		{
+			Possess(TopDownBuildPawn);
+		}
+		TopDownBuildPawn->OnEnterTopDownBuildModeGameAndUI();
+	}
+
+	SetGamePlayMode_TopDownBuildGameAndUI();
 }
 
-bool AGSBPlayerController::IsCharacterBuildMode() const
+void AGSBPlayerController::SetGamePlayMode_PlayerCombatGameOnly()
 {
-	return GamePlayMode == EGamePlayMode::EGPM_CharacterGameAndUI ||
-		GamePlayMode == EGamePlayMode::EGPM_CharacterBuildGameOnly;
+	ClearAllInputMappingContext();
+
+	AddInputMappingContext(InputSet->IMC_Move);
+	AddInputMappingContext(InputSet->IMC_Look);
+	AddInputMappingContext(InputSet->IMC_Jump);
+	AddInputMappingContext(InputSet->IMC_Interaction);
+	AddInputMappingContext(InputSet->IMC_ToggleCombatAndBuildMode);
+	AddInputMappingContext(InputSet->IMC_Combat);
+	AddInputMappingContext(InputSet->IMC_ToggleInventoryWindow);
+	AddInputMappingContext(InputSet->IMC_SystemUI);
+
+	ControlledPawnType = EControlledPawn::ECP_GSBPlayer;
+	GSBPlayerGameMode = EGSBPlayerMode::EPGM_Combat;
+	SetInputMode_GameOnly();
 }
 
-bool AGSBPlayerController::IsTopDownBuildMode() const
+void AGSBPlayerController::SetGamePlayMode_PlayerCombatGameAndUI()
 {
-	return GamePlayMode == EGamePlayMode::EGPM_TopDownBuild;
+	ClearAllInputMappingContext();
+
+	AddInputMappingContext(InputSet->IMC_Move);
+	AddInputMappingContext(InputSet->IMC_Jump);
+	AddInputMappingContext(InputSet->IMC_ToggleInventoryWindow);
+	AddInputMappingContext(InputSet->IMC_SystemUI);
+
+	ControlledPawnType = EControlledPawn::ECP_GSBPlayer;
+	GSBPlayerGameMode = EGSBPlayerMode::EPGM_Combat;
+	SetInputMode_GameAndUI();
 }
 
-UEnhancedInputLocalPlayerSubsystem* AGSBPlayerController::GetEnhancedInputLocalPlayerSubsystem()
+void AGSBPlayerController::SetGamePlayMode_PlayerBuildGameOnly()
 {
-	return ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
+	ClearAllInputMappingContext();
+
+	AddInputMappingContext(InputSet->IMC_Move);
+	AddInputMappingContext(InputSet->IMC_Look);
+	AddInputMappingContext(InputSet->IMC_Jump);
+	AddInputMappingContext(InputSet->IMC_Interaction);
+	AddInputMappingContext(InputSet->IMC_ToggleCombatAndBuildMode);
+	AddInputMappingContext(InputSet->IMC_ToggleTopDownAndThirdPersonBuildMode);
+	AddInputMappingContext(InputSet->IMC_BuildFacility);
+	AddInputMappingContext(InputSet->IMC_ToggleInventoryWindow);
+	AddInputMappingContext(InputSet->IMC_ToggleConstructibleFacilityListWindow);
+	AddInputMappingContext(InputSet->IMC_SystemUI);
+
+	ControlledPawnType = EControlledPawn::ECP_GSBPlayer;
+	GSBPlayerGameMode = EGSBPlayerMode::EPGM_Build;
+	SetInputMode_GameOnly();
 }
 
-void AGSBPlayerController::AddDefaultGameOnlyInputContexts()
+void AGSBPlayerController::SetGamePlayMode_PlayerBuildGameAndUI()
 {
-	AddDefaultGameAndUIInputContexts();
-	AddInputMappingContext(PlayerInputSet->DefaultGameOnlyInputMapping);
+	ClearAllInputMappingContext();
+
+	AddInputMappingContext(InputSet->IMC_Move);
+	AddInputMappingContext(InputSet->IMC_Jump);
+	AddInputMappingContext(InputSet->IMC_ToggleInventoryWindow);
+	AddInputMappingContext(InputSet->IMC_ToggleConstructibleFacilityListWindow);
+	AddInputMappingContext(InputSet->IMC_SystemUI);
+
+	ControlledPawnType = EControlledPawn::ECP_GSBPlayer;
+	GSBPlayerGameMode = EGSBPlayerMode::EPGM_Build;
+	SetInputMode_GameAndUI();
 }
 
-void AGSBPlayerController::AddDefaultGameAndUIInputContexts()
+void AGSBPlayerController::SetGamePlayMode_TopDownBuildGameAndUI()
 {
-	AddInputMappingContext(PlayerInputSet->DefaultGameAndUIInputMapping);
+	ClearAllInputMappingContext();
+
+	AddInputMappingContext(InputSet->IMC_Move);
+	AddInputMappingContext(InputSet->IMC_BuildFacility);
+	AddInputMappingContext(InputSet->IMC_ToggleConstructibleFacilityListWindow);
+	AddInputMappingContext(InputSet->IMC_ToggleTopDownAndThirdPersonBuildMode);
+	AddInputMappingContext(InputSet->IMC_SystemUI);
+
+	ControlledPawnType = EControlledPawn::ECP_TopDownBuildPawn;
+	SetInputMode_GameAndUI();
 }
 
-void AGSBPlayerController::AddCombatGameOnlyInputContexts()
+bool AGSBPlayerController::IsGSBPlayerControlled() const
 {
-	AddDefaultGameOnlyInputContexts();
-	AddCombatGameAndUIInputContexts();
-	AddInputMappingContext(PlayerInputSet->CombatGameOnlyInputMapping);
+	return ControlledPawnType == EControlledPawn::ECP_GSBPlayer;
 }
 
-void AGSBPlayerController::AddCombatGameAndUIInputContexts()
+bool AGSBPlayerController::IsTopDownBuildPawnControlled() const
 {
-	AddDefaultGameAndUIInputContexts();
-	AddInputMappingContext(PlayerInputSet->CombatGameAndUIInputMapping);
+	return ControlledPawnType == EControlledPawn::ECP_TopDownBuildPawn;
 }
 
-void AGSBPlayerController::AddBuildGameOnlyInputContexts()
+bool AGSBPlayerController::IsPlayerCombatMode() const
 {
-	AddDefaultGameOnlyInputContexts();
-	AddBuildGameAndUIInputContexts();
-	AddInputMappingContext(PlayerInputSet->BuildGameOnlyInputMapping);
+	return IsGSBPlayerControlled() && GSBPlayerGameMode == EGSBPlayerMode::EPGM_Combat;
 }
 
-void AGSBPlayerController::AddBuildGameAndUIInputContexts()
+bool AGSBPlayerController::IsPlayerBuildMode() const
 {
-	AddDefaultGameAndUIInputContexts();
-	AddInputMappingContext(PlayerInputSet->BuildGameAndUIInputMapping);
+	return IsGSBPlayerControlled() && GSBPlayerGameMode == EGSBPlayerMode::EPGM_Build;
 }
 
-void AGSBPlayerController::EnterUIControlMode()
+void AGSBPlayerController::SetInputMode_GameOnly()
 {
-	SetShowMouseCursor(true);
+	FInputModeGameOnly InputMode;
+	SetInputMode(InputMode);
 
+	InputModeType = EInputModeType::EIMT_GameOnly;
+}
+
+void AGSBPlayerController::SetInputMode_UIOnly()
+{
+	FInputModeUIOnly InputMode;
+	InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::LockInFullscreen);
+	SetInputMode(InputMode);
+
+	InputModeType = EInputModeType::EIMT_UIOnly;
+}
+
+void AGSBPlayerController::SetInputMode_GameAndUI()
+{
 	FInputModeGameAndUI InputMode;
 	InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::LockInFullscreen);
 	InputMode.SetHideCursorDuringCapture(false);
 	SetInputMode(InputMode);
 
-	if (IsCharacterBuildMode())
-	{
-		GamePlayMode = EGamePlayMode::EGPM_CharacterGameAndUI;
-
-		ClearAllInputMappingContext();
-		AddBuildGameAndUIInputContexts();
-	}
-	else
-	{
-		GamePlayMode = EGamePlayMode::EGPM_CombatGameAndUI;
-
-		ClearAllInputMappingContext();
-		AddCombatGameAndUIInputContexts();
-	}
-}
-
-void AGSBPlayerController::ExitUIControlMode()
-{
-	SetShowMouseCursor(false);
-
-	FInputModeGameOnly InputMode;
-	SetInputMode(InputMode);
-
-	ClearAllInputMappingContext();
-	AddInputMappingContexts(StoredInputMappingContexts);
-
-	if (IsCharacterBuildMode())
-	{
-		GamePlayMode = EGamePlayMode::EGPM_CharacterBuildGameOnly;
-
-		ClearAllInputMappingContext();
-		AddBuildGameOnlyInputContexts();
-	}
-	else
-	{
-		GamePlayMode = EGamePlayMode::EGPM_CombatGameOnly;
-
-		ClearAllInputMappingContext();
-		AddCombatGameOnlyInputContexts();
-	}
+	InputModeType = EInputModeType::EIMT_GameAndUI;
 }

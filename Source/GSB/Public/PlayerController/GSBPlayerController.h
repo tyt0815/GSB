@@ -6,19 +6,31 @@
 #include "GameFramework/PlayerController.h"
 #include "GSBPlayerController.generated.h"
 
+class AGSBPlayer;
+class ATopDownBuildPawn;
 class UWidget;
 class UInputMappingContext;
 class UEnhancedInputLocalPlayerSubsystem;
 class UGSBPlayerInputActionSetDataAsset;
 class UGSBTopDownBuildPawnInputSet;
 
-enum class EGamePlayMode : uint8
+enum class EControlledPawn
 {
-	EGPM_CombatGameOnly,
-	EGPM_CombatGameAndUI,
-	EGPM_CharacterBuildGameOnly,
-	EGPM_CharacterGameAndUI,
-	EGPM_TopDownBuild
+	ECP_GSBPlayer,
+	ECP_TopDownBuildPawn
+};
+
+enum class EGSBPlayerMode
+{
+	EPGM_Combat,
+	EPGM_Build
+};
+
+enum class EInputModeType
+{
+	EIMT_GameOnly,
+	EIMT_UIOnly,
+	EIMT_GameAndUI
 };
 
 UCLASS()
@@ -26,15 +38,11 @@ class GSB_API AGSBPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
-public:
+protected:
 	virtual void BeginPlay() override;
 	
 public:
-	void ActivateCombatInputContext();
-
-	void ActivateCharacterBuildInputContext();
-
-	void ActivateTopDownBuildInputContext();
+	UEnhancedInputLocalPlayerSubsystem* GetEnhancedInputLocalPlayerSubsystem();
 
 	void AddInputMappingContext(UInputMappingContext* InputMappingContext);
 
@@ -44,56 +52,55 @@ public:
 
 	void ClearAllInputMappingContext();
 
-	void StoreInputMappingContexts(const TArray<UInputMappingContext*> Contexts);
+	void SwitchGamePlayMode_PlayerCombatGameOnly(AGSBPlayer* GSBPlayer);
 
-	void SetUIControlMode(bool bUI);
+	void SwitchGamePlayMode_PlayerCombatGameAndUI(AGSBPlayer* GSBPlayer);
 
-	bool IsUIControlMode() const;
+	void SwitchGamePlayMode_PlayerBuildGameOnly(AGSBPlayer* GSBPlayer);
 
-	bool IsCombatMode() const;
+	void SwitchGamePlayMode_PlayerBuildGameAndUI(AGSBPlayer* GSBPlayer);
 
-	bool IsCharacterBuildMode() const;
+	void SwitchGamePlayMode_TopDownBuildGameAndUI(ATopDownBuildPawn* TopDownBuildPawn);
 
-	bool IsTopDownBuildMode() const;
+	void SetGamePlayMode_PlayerCombatGameOnly();
 
-	UEnhancedInputLocalPlayerSubsystem* GetEnhancedInputLocalPlayerSubsystem();
+	void SetGamePlayMode_PlayerCombatGameAndUI();
+
+	void SetGamePlayMode_PlayerBuildGameOnly();
+
+	void SetGamePlayMode_PlayerBuildGameAndUI();
+
+	void SetGamePlayMode_TopDownBuildGameAndUI();
+
+	bool IsGSBPlayerControlled() const;
+
+	bool IsTopDownBuildPawnControlled() const;
+
+	bool IsPlayerCombatMode() const;
+
+	bool IsPlayerBuildMode() const;
 
 protected:
 	UPROPERTY(EditAnywhere)
-	UGSBPlayerInputActionSetDataAsset* PlayerInputSet;
-
-	UPROPERTY(EditAnywhere)
-	UGSBTopDownBuildPawnInputSet* TopDownBuildPawnInputSet;
+	UGSBPlayerInputActionSetDataAsset* InputSet;
 
 private:
-	void AddDefaultGameOnlyInputContexts();
 
-	void AddDefaultGameAndUIInputContexts();
+	void SetInputMode_GameOnly();
 
-	void AddCombatGameOnlyInputContexts();
+	void SetInputMode_UIOnly();
 
-	void AddCombatGameAndUIInputContexts();;
+	void SetInputMode_GameAndUI();
 
-	void AddBuildGameOnlyInputContexts();
+	EControlledPawn ControlledPawnType;
 
-	void AddBuildGameAndUIInputContexts();
+	EGSBPlayerMode GSBPlayerGameMode;
 
-	void EnterUIControlMode();
-
-	void ExitUIControlMode();
-
-	EGamePlayMode GamePlayMode;
-
-	TArray<UInputMappingContext*> CurrentInputMappingContexts;
-	TArray<UInputMappingContext*> StoredInputMappingContexts;
+	EInputModeType InputModeType;
 
 public:
-	FORCEINLINE UGSBPlayerInputActionSetDataAsset* GetPlayerInputSet() const
+	FORCEINLINE UGSBPlayerInputActionSetDataAsset* GetInputSet() const
 	{
-		return PlayerInputSet;
-	}
-	FORCEINLINE UGSBTopDownBuildPawnInputSet* GetTopDownBuildPawnInputSet() const
-	{
-		return TopDownBuildPawnInputSet;
+		return InputSet;
 	}
 };

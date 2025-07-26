@@ -14,114 +14,117 @@ class GSB_API UGSBPlayerInputActionSetDataAsset : public UDataAsset
 {
 	GENERATED_BODY()
 public:
-	//////////////////////////////////////////////////////////
-	// Default Inputs
-	//////////////////////////////////////////////////////////
 	UPROPERTY(EditDefaultsOnly)
-	UInputMappingContext* DefaultGameAndUIInputMapping;
+	UInputMappingContext* IMC_Move;
 
 	UPROPERTY(EditDefaultsOnly)
-	UInputAction* MoveInputAction;
+	UInputAction* IA_Move;
 
 	UPROPERTY(EditDefaultsOnly)
-	UInputAction* LookInputAction;
+	UInputMappingContext* IMC_Look;
 
 	UPROPERTY(EditDefaultsOnly)
-	UInputAction* JumpInputAction;
+	UInputAction* IA_Look;
 
 	UPROPERTY(EditDefaultsOnly)
-	UInputAction* ToggleInventoryInputAction;
+	UInputMappingContext* IMC_Jump;
 
 	UPROPERTY(EditDefaultsOnly)
-	UInputAction* EscInputAction;
+	UInputAction* IA_Jump;
 
 	UPROPERTY(EditDefaultsOnly)
-	UInputMappingContext* DefaultGameOnlyInputMapping;
+	UInputMappingContext* IMC_Interaction;
 
 	UPROPERTY(EditDefaultsOnly)
-	UInputAction* InteractionInputAction;
+	UInputAction* IA_Interaction;
 
 	UPROPERTY(EditDefaultsOnly)
-	UInputAction* SelectInteractionScrollUpInputAction;
+	UInputAction* IA_SelectInteractionScrollUp;
 
 	UPROPERTY(EditDefaultsOnly)
-	UInputAction* SelectInteractionScrollDownInputAction;
-
-	//////////////////////////////////////////////////////////
-	// Build Inputs
-	//////////////////////////////////////////////////////////
-	UPROPERTY(EditDefaultsOnly)
-	UInputMappingContext* BuildGameAndUIInputMapping;
+	UInputAction* IA_SelectInteractionScrollDown;
 
 	UPROPERTY(EditDefaultsOnly)
-	UInputAction* SwitchToCombatModeInputAction;
+	UInputMappingContext* IMC_BuildFacility;
 
 	UPROPERTY(EditDefaultsOnly)
-	UInputAction* ToggleBuildableFacilityListInputAction;
+	UInputAction* IA_RotatePreview;
 
 	UPROPERTY(EditDefaultsOnly)
-	UInputMappingContext* BuildGameOnlyInputMapping;
+	UInputAction* IA_ConfirmFacilityPlacement;
 
 	UPROPERTY(EditDefaultsOnly)
-	UInputAction* RotatePreview;
+	UInputAction* IA_CancelFacilityPreview;
 
 	UPROPERTY(EditDefaultsOnly)
-	UInputAction* ConfirmFacilityPlacementInputAction;
+	UInputAction* IA_PreviewFacility1;
 
 	UPROPERTY(EditDefaultsOnly)
-	UInputAction* CancelFacilityPreviewInputAction;
+	UInputAction* IA_PreviewFacility2;
 
 	UPROPERTY(EditDefaultsOnly)
-	UInputAction* PreviewFacility1;
+	UInputAction* IA_PreviewFacility3;
 
 	UPROPERTY(EditDefaultsOnly)
-	UInputAction* PreviewFacility2;
+	UInputAction* IA_PreviewFacility4;
 
 	UPROPERTY(EditDefaultsOnly)
-	UInputAction* PreviewFacility3;
+	UInputAction* IA_PreviewFacility5;
 
 	UPROPERTY(EditDefaultsOnly)
-	UInputAction* PreviewFacility4;
+	UInputAction* IA_PreviewFacility6;
 
 	UPROPERTY(EditDefaultsOnly)
-	UInputAction* PreviewFacility5;
+	UInputAction* IA_PreviewFacility7;
 
 	UPROPERTY(EditDefaultsOnly)
-	UInputAction* PreviewFacility6;
+	UInputAction* IA_PreviewFacility8;
 
 	UPROPERTY(EditDefaultsOnly)
-	UInputAction* PreviewFacility7;
+	UInputAction* IA_PreviewFacility9;
 
 	UPROPERTY(EditDefaultsOnly)
-	UInputAction* PreviewFacility8;
+	UInputAction* IA_PreviewFacility0;
 
 	UPROPERTY(EditDefaultsOnly)
-	UInputAction* PreviewFacility9;
+	UInputMappingContext* IMC_ToggleCombatAndBuildMode;
 
 	UPROPERTY(EditDefaultsOnly)
-	UInputAction* PreviewFacility0;
+	UInputAction* IA_ToggleCombatAndBuildMode;
 
 	UPROPERTY(EditDefaultsOnly)
-	UInputAction* SwitchToTopDownBuildModeInputAction;
-
-	//////////////////////////////////////////////////////////
-	// Combat Inputs
-	//////////////////////////////////////////////////////////
-	UPROPERTY(EditDefaultsOnly)
-	UInputMappingContext* CombatGameAndUIInputMapping;
+	UInputMappingContext* IMC_ToggleTopDownAndThirdPersonBuildMode;
 
 	UPROPERTY(EditDefaultsOnly)
-	UInputAction* SwitchToBuildModeInputAction;
+	UInputAction* IA_ToggleTopDownAndThirdPersonBuildMode;
 
 	UPROPERTY(EditDefaultsOnly)
-	UInputMappingContext* CombatGameOnlyInputMapping;
+	UInputMappingContext* IMC_Combat;
 
 	UPROPERTY(EditDefaultsOnly)
-	UInputAction* Ability1InputAction;
+	UInputAction* IA_Ability1;
 
 	UPROPERTY(EditDefaultsOnly)
-	UInputAction* Ability2InputAction;
+	UInputAction* IA_Ability2;
 
 	UPROPERTY(EditDefaultsOnly)
-	UInputAction* Ability3InputAction;
+	UInputAction* IA_Ability3;
+
+	UPROPERTY(EditDefaultsOnly)
+	UInputMappingContext* IMC_ToggleInventoryWindow;
+
+	UPROPERTY(EditDefaultsOnly)
+	UInputAction* IA_ToggleInventoryWindow;
+
+	UPROPERTY(EditDefaultsOnly)
+	UInputMappingContext* IMC_ToggleConstructibleFacilityListWindow;
+
+	UPROPERTY(EditDefaultsOnly)
+	UInputAction* IA_ToggleConstructibleFacilityListWindow;
+
+	UPROPERTY(EditDefaultsOnly)
+	UInputMappingContext* IMC_SystemUI;
+
+	UPROPERTY(EditDefaultsOnly)
+	UInputAction* IA_Esc;
 };

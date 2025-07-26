@@ -9,20 +9,36 @@
 
 void UGSBPlayerOverlay::InitializeOverlay()
 {
-	PlayerController = GetOwningPlayer<AGSBPlayerController>();
-
 	HideInteractionList();
 }
 
 void UGSBPlayerOverlay::UpdatePlayerControllMode()
 {
-	if (OpenedWindows.Num() == 0)
+	if (AGSBPlayerController* PC = GetOwningPlayer<AGSBPlayerController>())
 	{
-		PlayerController->SetUIControlMode(false);
-	}
-	else if (OpenedWindows.Num() == 1 && IsValid(PlayerController))
-	{
-		PlayerController->SetUIControlMode(true);
+		
+		if (OpenedWindows.Num() == 0)
+		{
+			if (PC->IsPlayerCombatMode())
+			{
+				PC->SetGamePlayMode_PlayerCombatGameOnly();
+			}
+			else if (PC->IsPlayerBuildMode())
+			{
+				PC->SetGamePlayMode_PlayerBuildGameOnly();
+			}
+		}
+		else if (OpenedWindows.Num() == 1)
+		{
+			if (PC->IsPlayerCombatMode())
+			{
+				PC->SetGamePlayMode_PlayerCombatGameAndUI();
+			}
+			else if (PC->IsPlayerBuildMode())
+			{
+				PC->SetGamePlayMode_PlayerBuildGameAndUI();
+			}
+		}
 	}
 }
 

@@ -2,12 +2,13 @@
 
 
 #include "BuildSystem/TopDownBuildPawn.h"
+#include "BuildSystem/FacilityBuilder.h"
 #include "Camera/CameraComponent.h"
 #include "Characters/GSBPlayer.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/FloatingPawnMovement.h"
 #include "PlayerController/GSBPlayerController.h"
-#include "PlayerController/GSBTopDownBuildPawnInputSet.h"
+#include "PlayerController/GSBPlayerInputActionSetDataAsset.h"
 #include "EnhancedInputComponent.h"
 #include "InputMappingContext.h"
 #include "DebugHeader.h"
@@ -32,7 +33,10 @@ void ATopDownBuildPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-
+	if (IsControlled())
+	{
+		UpdateFacilityBuilderLocation();
+	}
 }
 
 void ATopDownBuildPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -41,13 +45,15 @@ void ATopDownBuildPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 	if (AGSBPlayerController* PlayerController = GetController<AGSBPlayerController>())
 	{
-		PlayerController->ActivateTopDownBuildInputContext();
 		if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 		{
-			const UGSBTopDownBuildPawnInputSet* InputSet = PlayerController->GetTopDownBuildPawnInputSet();
-			// Default
-			EnhancedInputComponent->BindAction(InputSet->MoveInputAction, ETriggerEvent::Triggered, this, &ATopDownBuildPawn::Move);
-			EnhancedInputComponent->BindAction(InputSet->SwitchToCharacterBuildModeInputAction, ETriggerEvent::Started, this, &ATopDownBuildPawn::SwitchToCharacterBuildMode);
+			if (const UGSBPlayerInputActionSetDataAsset* InputSet = PlayerController->GetInputSet())
+			{
+				EnhancedInputComponent->ClearActionBindings();
+
+				EnhancedInputComponent->BindAction(InputSet->IA_Move, ETriggerEvent::Triggered, this, &ATopDownBuildPawn::Move);
+				EnhancedInputComponent->BindAction(InputSet->IA_ToggleTopDownAndThirdPersonBuildMode, ETriggerEvent::Started, this, &ATopDownBuildPawn::SwitchToThirdPersonBuildMode);
+			}
 		}
 	}
 
@@ -63,12 +69,13 @@ void ATopDownBuildPawn::BeginPlay()
 	
 }
 
-void ATopDownBuildPawn::OnPossessedByPlayerController()
+bool ATopDownBuildPawn::IsControlled() const
 {
-	if (AGSBPlayerController* PC = GetController<AGSBPlayerController>())
-	{
-		// PC->ActivateTopDownBuildInputContext();
-	}
+	return GetController<AGSBPlayerController>() != nullptr;
+}
+
+void ATopDownBuildPawn::OnEnterTopDownBuildModeGameAndUI()
+{
 }
 
 void ATopDownBuildPawn::Move(const FInputActionValue& Value)
@@ -79,7 +86,7 @@ void ATopDownBuildPawn::Move(const FInputActionValue& Value)
 	AddMovementInput(GetActorRightVector(), MovementVector.X);
 }
 
-void ATopDownBuildPawn::SwitchToCharacterBuildMode()
+void ATopDownBuildPawn::SwitchToThirdPersonBuildMode()
 {
 	if (IsValid(OwningPlayer))
 	{
@@ -96,4 +103,8 @@ void ATopDownBuildPawn::SwitchToCharacterBuildMode()
 	{
 		TRACE_SCREEN_LOG(TEXT("OwningPlayer가 nullptr입니다."));
 	}
+}
+
+void ATopDownBuildPawn::UpdateFacilityBuilderLocation()
+{
 }

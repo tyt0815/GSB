@@ -45,12 +45,15 @@ void AGSBPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	UpdateFacilityBuilderLocation();
-
-	if (!IsUIMode())
+	if (IsControlled())
 	{
-		AActor* Candidate = TraceInteractableActor();
-		UpdateInteractableActor(Candidate);
+		UpdateFacilityBuilderLocation();
+
+		if (!IsUIMode())
+		{
+			AActor* Candidate = TraceInteractableActor();
+			UpdateInteractableActor(Candidate);
+		}
 	}
 }
 
@@ -59,49 +62,50 @@ void AGSBPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	if (AGSBPlayerController* PlayerController = GetPlayerController())
 	{
-		PlayerController->ActivateCombatInputContext();
 		if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 		{
-			const UGSBPlayerInputActionSetDataAsset* InputSet = PlayerController->GetPlayerInputSet();
-			// Default
-			//// GameAndUI
-			EnhancedInputComponent->BindAction(InputSet->MoveInputAction, ETriggerEvent::Triggered, this, &AGSBPlayer::Move);
-			EnhancedInputComponent->BindAction(InputSet->LookInputAction, ETriggerEvent::Triggered, this, &AGSBPlayer::Look);
-			EnhancedInputComponent->BindAction(InputSet->JumpInputAction, ETriggerEvent::Triggered, this, &AGSBPlayer::Jump);
-			EnhancedInputComponent->BindAction(InputSet->ToggleInventoryInputAction, ETriggerEvent::Started, this, &AGSBPlayer::ToggleInventory);
-			EnhancedInputComponent->BindAction(InputSet->EscInputAction, ETriggerEvent::Started, this, &AGSBPlayer::Esc_Triggered);
-			//// GameOnly
-			EnhancedInputComponent->BindAction(InputSet->InteractionInputAction, ETriggerEvent::Started, this, &AGSBPlayer::Interaction);
-			EnhancedInputComponent->BindAction(InputSet->SelectInteractionScrollUpInputAction, ETriggerEvent::Started, this, &AGSBPlayer::SelectInteractionScrollUp);
-			EnhancedInputComponent->BindAction(InputSet->SelectInteractionScrollDownInputAction, ETriggerEvent::Started, this, &AGSBPlayer::SelectInteractionScrollDown);
+			if (const UGSBPlayerInputActionSetDataAsset* InputSet = PlayerController->GetInputSet())
+			{
+				EnhancedInputComponent->ClearActionBindings();
+				// Locomotion
+				EnhancedInputComponent->BindAction(InputSet->IA_Move, ETriggerEvent::Triggered, this, &AGSBPlayer::Move);
+				EnhancedInputComponent->BindAction(InputSet->IA_Look, ETriggerEvent::Triggered, this, &AGSBPlayer::Look);
+				EnhancedInputComponent->BindAction(InputSet->IA_Jump, ETriggerEvent::Triggered, this, &AGSBPlayer::Jump);
 
-			// Build Mode
-			//// GameAndUI
-			EnhancedInputComponent->BindAction(InputSet->SwitchToCombatModeInputAction, ETriggerEvent::Started, this, &AGSBPlayer::SwitchToCombatMode);
-			EnhancedInputComponent->BindAction(InputSet->ToggleBuildableFacilityListInputAction, ETriggerEvent::Started, this, &AGSBPlayer::ToggleBuildableFacilityList);
-			//// GameOnly
-			EnhancedInputComponent->BindAction(InputSet->RotatePreview, ETriggerEvent::Started, this, &AGSBPlayer::RotatePreview);
-			EnhancedInputComponent->BindAction(InputSet->ConfirmFacilityPlacementInputAction, ETriggerEvent::Started, this, &AGSBPlayer::ConfirmFacilityPlacement);
-			EnhancedInputComponent->BindAction(InputSet->CancelFacilityPreviewInputAction, ETriggerEvent::Started, this, &AGSBPlayer::CancelFacilityPreview);
-			EnhancedInputComponent->BindAction(InputSet->PreviewFacility1, ETriggerEvent::Started, this, &AGSBPlayer::PreviewFacility1);
-			EnhancedInputComponent->BindAction(InputSet->PreviewFacility2, ETriggerEvent::Started, this, &AGSBPlayer::PreviewFacility2);
-			EnhancedInputComponent->BindAction(InputSet->PreviewFacility3, ETriggerEvent::Started, this, &AGSBPlayer::PreviewFacility3);
-			EnhancedInputComponent->BindAction(InputSet->PreviewFacility4, ETriggerEvent::Started, this, &AGSBPlayer::PreviewFacility4);
-			EnhancedInputComponent->BindAction(InputSet->PreviewFacility5, ETriggerEvent::Started, this, &AGSBPlayer::PreviewFacility5);
-			EnhancedInputComponent->BindAction(InputSet->PreviewFacility6, ETriggerEvent::Started, this, &AGSBPlayer::PreviewFacility6);
-			EnhancedInputComponent->BindAction(InputSet->PreviewFacility7, ETriggerEvent::Started, this, &AGSBPlayer::PreviewFacility7);
-			EnhancedInputComponent->BindAction(InputSet->PreviewFacility8, ETriggerEvent::Started, this, &AGSBPlayer::PreviewFacility8);
-			EnhancedInputComponent->BindAction(InputSet->PreviewFacility9, ETriggerEvent::Started, this, &AGSBPlayer::PreviewFacility9);
-			EnhancedInputComponent->BindAction(InputSet->PreviewFacility0, ETriggerEvent::Started, this, &AGSBPlayer::PreviewFacility0);
-			EnhancedInputComponent->BindAction(InputSet->SwitchToTopDownBuildModeInputAction, ETriggerEvent::Started, this, &AGSBPlayer::SwitchToTopDownBuildMode);
+				// Interaction
+				EnhancedInputComponent->BindAction(InputSet->IA_Interaction, ETriggerEvent::Started, this, &AGSBPlayer::Interaction);
+				EnhancedInputComponent->BindAction(InputSet->IA_SelectInteractionScrollUp, ETriggerEvent::Started, this, &AGSBPlayer::SelectInteractionScrollUp);
+				EnhancedInputComponent->BindAction(InputSet->IA_SelectInteractionScrollDown, ETriggerEvent::Started, this, &AGSBPlayer::SelectInteractionScrollDown);
 
-			// Combat Mode
-			//// GameAndUI
-			EnhancedInputComponent->BindAction(InputSet->SwitchToBuildModeInputAction, ETriggerEvent::Started, this, &AGSBPlayer::SwitchToBuildMode);
-			//// GameOnly
-			EnhancedInputComponent->BindAction(InputSet->Ability1InputAction, ETriggerEvent::Started, this, &AGSBPlayer::Ability1_Started);
-			EnhancedInputComponent->BindAction(InputSet->Ability2InputAction, ETriggerEvent::Started, this, &AGSBPlayer::Ability2_Started);
-			EnhancedInputComponent->BindAction(InputSet->Ability3InputAction, ETriggerEvent::Started, this, &AGSBPlayer::Ability3_Started);
+				// Mode Switch
+				EnhancedInputComponent->BindAction(InputSet->IA_ToggleCombatAndBuildMode, ETriggerEvent::Started, this, &AGSBPlayer::ToggleCombatAndBuildMode);
+				EnhancedInputComponent->BindAction(InputSet->IA_ToggleTopDownAndThirdPersonBuildMode, ETriggerEvent::Started, this, &AGSBPlayer::SwitchToTopDownBuildMode);
+				
+				// Build System
+				EnhancedInputComponent->BindAction(InputSet->IA_RotatePreview, ETriggerEvent::Started, this, &AGSBPlayer::RotatePreview);
+				EnhancedInputComponent->BindAction(InputSet->IA_ConfirmFacilityPlacement, ETriggerEvent::Started, this, &AGSBPlayer::ConfirmFacilityPlacement);
+				EnhancedInputComponent->BindAction(InputSet->IA_CancelFacilityPreview, ETriggerEvent::Started, this, &AGSBPlayer::CancelFacilityPreview);
+				EnhancedInputComponent->BindAction(InputSet->IA_PreviewFacility1, ETriggerEvent::Started, this, &AGSBPlayer::PreviewFacility1);
+				EnhancedInputComponent->BindAction(InputSet->IA_PreviewFacility2, ETriggerEvent::Started, this, &AGSBPlayer::PreviewFacility2);
+				EnhancedInputComponent->BindAction(InputSet->IA_PreviewFacility3, ETriggerEvent::Started, this, &AGSBPlayer::PreviewFacility3);
+				EnhancedInputComponent->BindAction(InputSet->IA_PreviewFacility4, ETriggerEvent::Started, this, &AGSBPlayer::PreviewFacility4);
+				EnhancedInputComponent->BindAction(InputSet->IA_PreviewFacility5, ETriggerEvent::Started, this, &AGSBPlayer::PreviewFacility5);
+				EnhancedInputComponent->BindAction(InputSet->IA_PreviewFacility6, ETriggerEvent::Started, this, &AGSBPlayer::PreviewFacility6);
+				EnhancedInputComponent->BindAction(InputSet->IA_PreviewFacility7, ETriggerEvent::Started, this, &AGSBPlayer::PreviewFacility7);
+				EnhancedInputComponent->BindAction(InputSet->IA_PreviewFacility8, ETriggerEvent::Started, this, &AGSBPlayer::PreviewFacility8);
+				EnhancedInputComponent->BindAction(InputSet->IA_PreviewFacility9, ETriggerEvent::Started, this, &AGSBPlayer::PreviewFacility9);
+				EnhancedInputComponent->BindAction(InputSet->IA_PreviewFacility0, ETriggerEvent::Started, this, &AGSBPlayer::PreviewFacility0);
+
+				// Combat
+				EnhancedInputComponent->BindAction(InputSet->IA_Ability1, ETriggerEvent::Started, this, &AGSBPlayer::Ability1_Started);
+				EnhancedInputComponent->BindAction(InputSet->IA_Ability2, ETriggerEvent::Started, this, &AGSBPlayer::Ability2_Started);
+				EnhancedInputComponent->BindAction(InputSet->IA_Ability3, ETriggerEvent::Started, this, &AGSBPlayer::Ability3_Started);
+
+				// UI
+				EnhancedInputComponent->BindAction(InputSet->IA_Esc, ETriggerEvent::Started, this, &AGSBPlayer::Esc_Triggered);
+				EnhancedInputComponent->BindAction(InputSet->IA_ToggleInventoryWindow, ETriggerEvent::Started, this, &AGSBPlayer::ToggleInventory);
+				EnhancedInputComponent->BindAction(InputSet->IA_ToggleConstructibleFacilityListWindow, ETriggerEvent::Started, this, &AGSBPlayer::ToggleBuildableFacilityList);
+			}
 		}
 	}
 }
@@ -142,6 +146,7 @@ void AGSBPlayer::BeginPlay()
 	{
 		TopDownBuildPawn = World->SpawnActor<ATopDownBuildPawn>();
 		TopDownBuildPawn->SetOwningPlayer(this);
+		TopDownBuildPawn->SetFacilityBuilder(FacilityBuilder);
 	}
 }
 
@@ -322,17 +327,18 @@ void AGSBPlayer::PreviewFacility0()
 	FacilityBuilder->PreviewFacilityAt(0);
 }
 
-void AGSBPlayer::SwitchToCombatMode()
+void AGSBPlayer::ToggleCombatAndBuildMode()
 {
-	if (AGSBPlayerController* PC = GetPlayerController())
+	if (AGSBPlayerController* PlayerController = GetPlayerController())
 	{
-		PC->ActivateCombatInputContext();
-	}
-	FacilityBuilder->CancelPreview();
-
-	if (UGSBPlayerOverlay* PlayerOverlay = GetOverlayWidget())
-	{
-		PlayerOverlay->SwitchToCombatModeUI();
+		if (PlayerController->IsPlayerCombatMode())
+		{
+			SwitchToBuildMode();
+		}
+		else
+		{
+			SwitchToCombatMode();
+		}
 	}
 }
 
@@ -342,13 +348,17 @@ void AGSBPlayer::SwitchToTopDownBuildMode()
 	{
 		if (AGSBPlayerController* PC = GetPlayerController())
 		{
-			PC->Possess(TopDownBuildPawn);
-			TopDownBuildPawn->OnPossessedByPlayerController();
+			PC->SwitchGamePlayMode_TopDownBuildGameAndUI(TopDownBuildPawn);
+			GetCharacterMovement()->StopMovementImmediately();
 		}
 	}
-	else
+}
+
+void AGSBPlayer::SwitchToCombatMode()
+{
+	if (AGSBPlayerController* PC = GetPlayerController())
 	{
-		TRACE_SCREEN_LOG(TEXT("TopDownBuildPawn가 nullptr 입니다."));
+		PC->SwitchGamePlayMode_PlayerCombatGameOnly(this);
 	}
 }
 
@@ -356,17 +366,45 @@ void AGSBPlayer::SwitchToBuildMode()
 {
 	if (AGSBPlayerController* PC = GetPlayerController())
 	{
-		PC->ActivateCharacterBuildInputContext();
-	}
-	if (UGSBPlayerOverlay * PlayerOverlay = GetOverlayWidget())
-	{
-		PlayerOverlay->SwitchToBuildModeUI();
+		PC->SwitchGamePlayMode_PlayerBuildGameOnly(this);
 	}
 }
 
 AGSBPlayerController* AGSBPlayer::GetPlayerController() const
 {
 	return GetController<AGSBPlayerController>();
+}
+
+bool AGSBPlayer::IsControlled() const
+{
+	return GetPlayerController() != nullptr;
+}
+
+void AGSBPlayer::OnEnterCombatModeGameOnly()
+{
+	FacilityBuilder->CancelPreview();
+
+	if (UGSBPlayerOverlay* PlayerOverlay = GetOverlayWidget())
+	{
+		PlayerOverlay->SwitchToCombatModeUI();
+	}
+	
+}
+
+void AGSBPlayer::OnEnterCombatModeGameAndUI()
+{
+}
+
+void AGSBPlayer::OnEnterBuildModeGameOnly()
+{
+	if (UGSBPlayerOverlay* PlayerOverlay = GetOverlayWidget())
+	{
+		PlayerOverlay->SwitchToBuildModeUI();
+	}
+}
+
+void AGSBPlayer::OnEnterBuildModeGameAndUI()
+{
 }
 
 void AGSBPlayer::UpdateFacilityBuilderLocation()

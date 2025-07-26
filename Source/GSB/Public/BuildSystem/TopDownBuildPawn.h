@@ -24,7 +24,9 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	void OnPossessedByPlayerController();
+	bool IsControlled() const;
+
+	void OnEnterTopDownBuildModeGameAndUI();
 
 protected:
 	UPROPERTY(VisibleAnywhere)
@@ -38,13 +40,23 @@ protected:
 
 private:
 	void Move(const FInputActionValue& Value);
-	void SwitchToCharacterBuildMode();
+
+	void SwitchToThirdPersonBuildMode();
+
+	void UpdateFacilityBuilderLocation();
 
 	class AGSBPlayer* OwningPlayer;
+
+	class AFacilityBuilder* FacilityBuilder;
 
 public:
 	FORCEINLINE void SetOwningPlayer(class AGSBPlayer* NewPlayer)
 	{
 		OwningPlayer = NewPlayer;
 	}
+	FORCEINLINE void SetFacilityBuilder(class AFacilityBuilder* NewFacilityBuilder)
+	{
+		FacilityBuilder = NewFacilityBuilder;
+	}
+
 };

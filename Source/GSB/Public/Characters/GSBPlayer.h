@@ -66,14 +66,17 @@ protected:
 	void PreviewFacility8();
 	void PreviewFacility9();
 	void PreviewFacility0();
-	void SwitchToCombatMode();
+	void ToggleCombatAndBuildMode();
 	void SwitchToTopDownBuildMode();
+	void SwitchToCombatMode();
+	void SwitchToBuildMode();
 	virtual void Ability1_Started() {}
 	virtual void Ability2_Started() {}
 	virtual void Ability3_Started() {}
-	void SwitchToBuildMode();
 
 	AGSBPlayerController* GetPlayerController() const;
+
+	bool IsControlled() const;
 
 	///////////////////////////////////////////////////////////
 	// Components
@@ -89,8 +92,22 @@ protected:
 	UInventoryComponent* InventoryComponent;
 
 	///////////////////////////////////////////////////////////
+	// 전투 모드
+	///////////////////////////////////////////////////////////
+public:
+	void OnEnterCombatModeGameOnly();
+
+	void OnEnterCombatModeGameAndUI();
+
+	///////////////////////////////////////////////////////////
 	// 건설 모드
 	///////////////////////////////////////////////////////////
+public:
+	void OnEnterBuildModeGameOnly();
+
+	void OnEnterBuildModeGameAndUI();
+
+
 private:
 	void UpdateFacilityBuilderLocation();
 
