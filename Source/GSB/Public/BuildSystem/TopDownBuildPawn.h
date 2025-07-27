@@ -43,6 +43,10 @@ private:
 
 	void SwitchToThirdPersonBuildMode();
 
+	void GetMouseWorldPosition(FVector& WorldLocation, FVector& WorldDirection);
+
+	void TraceUnderMouseCursor();
+
 	void UpdateFacilityBuilderLocation();
 
 	class AGSBPlayer* OwningPlayer;
@@ -50,6 +54,8 @@ private:
 	class AFacilityBuilder* FacilityBuilder;
 
 	class UGSBPlayerOverlay* PlayerOverlay;
+
+	FHitResult MouseDownTraceHit;
 
 public:
 	FORCEINLINE void SetOwningPlayer(class AGSBPlayer* NewPlayer)

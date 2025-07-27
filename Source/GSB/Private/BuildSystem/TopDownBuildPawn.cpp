@@ -12,11 +12,14 @@
 #include "HUDs/GSBPlayerOverlay.h"
 #include "EnhancedInputComponent.h"
 #include "InputMappingContext.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "DebugHeader.h"
 
 ATopDownBuildPawn::ATopDownBuildPawn()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	PrimaryActorTick.TickGroup = ETickingGroup::TG_PostPhysics;
 
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SetRootComponent(SpringArm);
@@ -36,6 +39,7 @@ void ATopDownBuildPawn::Tick(float DeltaTime)
 
 	if (IsControlled())
 	{
+		TraceUnderMouseCursor();
 		UpdateFacilityBuilderLocation();
 	}
 }
@@ -100,6 +104,39 @@ void ATopDownBuildPawn::SwitchToThirdPersonBuildMode()
 	}
 }
 
+void ATopDownBuildPawn::GetMouseWorldPosition(FVector& WorldLocation, FVector& WorldDirection)
+{
+	if (AGSBPlayerController* PC = GetController<AGSBPlayerController>())
+	{
+		PC->DeprojectMousePositionToWorld(WorldLocation, WorldDirection);
+	}
+}
+
+void ATopDownBuildPawn::TraceUnderMouseCursor()
+{
+	FVector MouseWorldPosition;
+	FVector MouseWorldDirection;
+	GetMouseWorldPosition(MouseWorldPosition, MouseWorldDirection);
+
+	FVector LineTraceEnd = MouseWorldPosition + MouseWorldDirection * 10000.0f;
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(this);
+	ActorsToIgnore.Add(OwningPlayer);
+	ActorsToIgnore.Add(FacilityBuilder);
+	UKismetSystemLibrary::LineTraceSingle(
+		this,
+		MouseWorldPosition,
+		LineTraceEnd,
+		UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_Visibility),
+		false,
+		ActorsToIgnore,
+		EDrawDebugTrace::ForOneFrame,
+		MouseDownTraceHit,
+		true
+	);
+}
+
 void ATopDownBuildPawn::UpdateFacilityBuilderLocation()
 {
+
 }
