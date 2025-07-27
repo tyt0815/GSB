@@ -54,5 +54,6 @@ void UGSBContextMenu::ClearContextMenuEntries()
 
 void UGSBContextMenu::CloseContextMenu()
 {
+	OnClosed.Broadcast(this);
 	RemoveFromParent();
 }

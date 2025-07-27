@@ -9,6 +9,8 @@
 
 class UVerticalBox;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGSBContextMenuClosed, UGSBContextMenu*, ContextMenu);
+
 UCLASS()
 class GSB_API UGSBContextMenu : public UUserWidget
 {
@@ -28,6 +30,7 @@ public:
 
 	void CloseContextMenu();
 	
+	FOnGSBContextMenuClosed OnClosed;
 
 private:
 	UPROPERTY(meta = (BindWidget))

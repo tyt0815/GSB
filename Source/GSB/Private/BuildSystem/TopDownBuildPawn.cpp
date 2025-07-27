@@ -282,13 +282,23 @@ void ATopDownBuildPawn::OpenFacilityInteractionContextMenu(AFacility* Facility)
 		if (UGSBContextMenu* ContextMenu = WindowManager->OpenDefaultContextMenu(Facility, FName(Facility->GetFacilityName().ToString() + TEXT(": FacilityInteractionContextMenu"))))
 		{
 			TArray<FString> InteractionDescriptions;
+			Facility->SetHighlighInteractableActor(true);
 			Facility->GetInteractionDescriptions(InteractionDescriptions);
+			ContextMenu->OnClosed.AddDynamic(this, &ATopDownBuildPawn::HandleOnFacilityInteractionContextMenuClosed);
 			for (const FString& Description : InteractionDescriptions)
 			{
 				UGSBContextMenuEntry* Entry = ContextMenu->AddContextMenuEntry(Description);
 				Entry->OnClicked.AddDynamic(this, &ATopDownBuildPawn::HandleOnFacilityInteractionContextMenuEntryClicked);
 			}
 		}
+	}
+}
+
+void ATopDownBuildPawn::HandleOnFacilityInteractionContextMenuClosed(UGSBContextMenu* Menu)
+{
+	if (AFacility* Facility = Cast<AFacility>(Menu->GetContextTarget()))
+	{
+		Facility->SetHighlighInteractableActor(false);
 	}
 }
 
