@@ -63,7 +63,10 @@ void UGSBOverlayPanel::CloseWindow(UGSBWindow* Window)
 	if (IsValid(Window))
 	{
 		OnWindowClosed.Broadcast(Window);
-		Window->OnClosed();
+		if (IsValid(Window))
+		{
+			Window->OnClosed();
+		}
 	}
 }
 
