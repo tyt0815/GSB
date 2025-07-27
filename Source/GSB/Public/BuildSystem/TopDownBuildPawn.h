@@ -76,7 +76,7 @@ private:
 	void OpenFacilityInteractionContextMenu(AFacility* Facility);
 
 	UFUNCTION()
-	void HandleFacilityInteractionContextMenuEntry(class UGSBContextMenuEntry* Entry);
+	void HandleOnFacilityInteractionContextMenuEntryClicked(class UGSBContextMenuEntry* Entry);
 
 	void UpdateFacilityBuilderLocation();
 

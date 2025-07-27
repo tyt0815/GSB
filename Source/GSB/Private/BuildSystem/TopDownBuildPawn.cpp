@@ -34,6 +34,8 @@ ATopDownBuildPawn::ATopDownBuildPawn()
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(GetRootComponent());
 	Camera->SetRelativeRotation(FRotator(-90, 0, 0));
+	Camera->ProjectionMode = ECameraProjectionMode::Orthographic;
+	Camera->OrthoWidth = 3000;
 
 	FloatingPawnMovement = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("FloatingPawnMovement"));
 }
@@ -284,13 +286,13 @@ void ATopDownBuildPawn::OpenFacilityInteractionContextMenu(AFacility* Facility)
 			for (const FString& Description : InteractionDescriptions)
 			{
 				UGSBContextMenuEntry* Entry = ContextMenu->AddContextMenuEntry(Description);
-				Entry->OnClicked.AddDynamic(this, &ATopDownBuildPawn::HandleFacilityInteractionContextMenuEntry);
+				Entry->OnClicked.AddDynamic(this, &ATopDownBuildPawn::HandleOnFacilityInteractionContextMenuEntryClicked);
 			}
 		}
 	}
 }
 
-void ATopDownBuildPawn::HandleFacilityInteractionContextMenuEntry(UGSBContextMenuEntry* Entry)
+void ATopDownBuildPawn::HandleOnFacilityInteractionContextMenuEntryClicked(UGSBContextMenuEntry* Entry)
 {
 	if (IsValid(Entry))
 	{
@@ -299,6 +301,7 @@ void ATopDownBuildPawn::HandleFacilityInteractionContextMenuEntry(UGSBContextMen
 			Facility->InteractionByDescription(Entry->GetEntryDescriptionText().ToString(), OwningPlayer);
 		}
 	}
+	Entry->CloseContextMenu();
 }
 
 void ATopDownBuildPawn::UpdateFacilityBuilderLocation()
