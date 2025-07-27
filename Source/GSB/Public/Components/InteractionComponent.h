@@ -30,6 +30,8 @@ protected:
 public:
 	void Interaction(int32 Index, AActor* Interactor);
 
+	void InteractionByDescription(const FString& Description, AActor* Interactor);
+
 	int32 GetInteractionIndex(const FString& Description);
 
 	FComponentOnInteractionSignature& AddInteraction_Internal(const FString& Description);

@@ -7,6 +7,7 @@
 #include "TopDownBuildPawn.generated.h"
 
 struct FInputActionValue;
+class AFacility;
 
 UCLASS()
 class GSB_API ATopDownBuildPawn : public APawn
@@ -63,9 +64,19 @@ private:
 	void PreviewFacility9();
 	void PreviewFacility0();
 	void SelectFacility();
-	void OpenFacilityContextMenu();
 
 	void GetMouseWorldPosition(FVector& WorldLocation, FVector& WorldDirection);
+
+	void LineTraceSingleToMouseDown(
+		const TArray<TEnumAsByte<EObjectTypeQuery>>& ObjectTypes,
+		const TArray<AActor*>& ActorsToIgnore,
+		FHitResult& OutHit
+	);
+
+	void OpenFacilityInteractionContextMenu(AFacility* Facility);
+
+	UFUNCTION()
+	void HandleFacilityInteractionContextMenuEntry(class UGSBContextMenuEntry* Entry);
 
 	void UpdateFacilityBuilderLocation();
 

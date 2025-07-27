@@ -28,6 +28,9 @@ protected:
 	TSubclassOf<UGSBConstructableFacilitySlot> ConstructableFacilitySlotClass;
 	
 private:
+	UFUNCTION()
+	void CloseByFacilitySlot(UGSBConstructableFacilitySlot* FacilitySlot);
+
 	UPROPERTY(meta = (BindWidget))
 	class UScrollBox* ConstructableFacilityList;
 

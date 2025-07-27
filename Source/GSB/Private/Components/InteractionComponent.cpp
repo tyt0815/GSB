@@ -19,6 +19,11 @@ void UInteractionComponent::Interaction(int32 Index, AActor* Interactor)
 	}
 }
 
+void UInteractionComponent::InteractionByDescription(const FString& Description, AActor* Interactor)
+{
+	Interaction(GetInteractionIndex(Description), Interactor);
+}
+
 int32 UInteractionComponent::GetInteractionIndex(const FString& Description)
 {
 	for (int32 i = 0; i < InteractionData.InteractionDescriptions.Num(); ++i)

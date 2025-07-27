@@ -5,6 +5,7 @@
 #include "HUDs/GSBConstructableFacilitySlot.h"
 #include "BuildSystem/FacilityBuilder.h"
 #include "Components/ScrollBox.h"
+#include "PlayerController/GSBPlayerController.h"
 #include "DebugHeader.h"
 
 void UGSBConstructableFacilityListWindow::NativeConstruct()
@@ -40,10 +41,27 @@ void UGSBConstructableFacilityListWindow::AddConstructableFacilitySlot(UGSBFacil
 			ConstructableFacilityList->AddChild(FacilitySlot);
 			FacilitySlot->SetFacilityBuilder(FacilityBuilder);
 			FacilitySlot->UpdateFacilityData(FacilityData);
+			FacilitySlot->OnLeftClicked.AddDynamic(this, &UGSBConstructableFacilityListWindow::CloseByFacilitySlot);
 		}
 	}
 	else
 	{
 		TRACE_SCREEN_LOG(TEXT("ConstructableFacilitySlotClass가 nullptr 입니다."));
+	}
+}
+
+void UGSBConstructableFacilityListWindow::CloseByFacilitySlot(UGSBConstructableFacilitySlot* FacilitySlot)
+{
+	Close();
+	if (AGSBPlayerController* PC = GetOwningPlayer<AGSBPlayerController>())
+	{
+		if (PC->IsGSBPlayerControlled())
+		{
+			PC->SetGamePlayMode_PlayerBuildGameOnly();
+		}
+		else if (PC->IsTopDownBuildPawnControlled())
+		{
+			PC->SetGamePlayMode_TopViewBuild();
+		}
 	}
 }

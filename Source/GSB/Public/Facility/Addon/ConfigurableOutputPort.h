@@ -24,6 +24,8 @@ public:
 
 	virtual void Interaction(int32 Index, AActor* Interactor) override;
 
+	virtual void InteractionByDescription(const FString& Description, AActor* Interactor) override;
+
 	virtual int32 GetNumInteractions() const override;
 
 	virtual bool IsInteractable() const override;

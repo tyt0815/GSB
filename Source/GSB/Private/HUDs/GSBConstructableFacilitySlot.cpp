@@ -23,6 +23,7 @@ FReply UGSBConstructableFacilitySlot::NativeOnMouseButtonUp(const FGeometry& InG
 	if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
 	{
 		PreviewFacility();
+		OnLeftClicked.Broadcast(this);
 	}
 
 	return FReply::Handled();

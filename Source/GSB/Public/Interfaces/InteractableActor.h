@@ -26,6 +26,8 @@ public:
 
 	virtual void Interaction(int32 Index, AActor* Interactor) = 0;
 
+	virtual void InteractionByDescription(const FString& Description, AActor* Interactor) = 0;
+
 	virtual int32 GetNumInteractions() const = 0;
 
 	virtual bool IsInteractable() const = 0;

@@ -12,9 +12,13 @@
 #include "PlayerController/GSBPlayerController.h"
 #include "PlayerController/GSBPlayerInputActionSetDataAsset.h"
 #include "HUDs/GSBPlayerOverlay.h"
+#include "HUDs/GSBContextMenu.h"
+#include "HUDs/GSBContextMenuEntry.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "SubSystems/GSBWindowSubsystem.h"
 #include "DebugHeader.h"
+
+constexpr float TOP_DOWN_BUILD_PAWN_HEIGHT = 2000;
 
 ATopDownBuildPawn::ATopDownBuildPawn()
 {
@@ -74,7 +78,6 @@ void ATopDownBuildPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 				EnhancedInputComponent->BindAction(InputSet->IA_CancelFacilityPreview, ETriggerEvent::Started, this, &ATopDownBuildPawn::CancelFacilityPreview);
 
 				EnhancedInputComponent->BindAction(InputSet->IA_SelectFacility, ETriggerEvent::Started, this, &ATopDownBuildPawn::SelectFacility);
-				EnhancedInputComponent->BindAction(InputSet->IA_OpenFacilityContextMenu, ETriggerEvent::Started, this, &ATopDownBuildPawn::OpenFacilityContextMenu);
 
 			}
 		}
@@ -100,7 +103,7 @@ void ATopDownBuildPawn::OnEnterTopViewExploreMode()
 	}
 	if (IsValid(OwningPlayer))
 	{
-		SetActorLocation(OwningPlayer->GetActorLocation() + FVector::ZAxisVector * 2000);
+		SetActorLocation(OwningPlayer->GetActorLocation() + FVector::ZAxisVector * TOP_DOWN_BUILD_PAWN_HEIGHT);
 	}
 }
 
@@ -127,6 +130,7 @@ void ATopDownBuildPawn::SwitchToThirdPersonBuildMode()
 	{
 		if (AGSBPlayerController* PC = GetController<AGSBPlayerController>())
 		{
+			CancelFacilityPreview();
 			PC->SwitchGamePlayMode_PlayerBuildGameOnly(OwningPlayer);
 		}
 	}
@@ -220,14 +224,16 @@ void ATopDownBuildPawn::PreviewFacility0()
 
 void ATopDownBuildPawn::SelectFacility()
 {
-	// TODO
-	TRACE_SCREEN_LOG(TEXT("SelectFacility"));
-}
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_GameTraceChannel1));
+	TArray<AActor*> ActorsToIgnore;
+	FHitResult OutHit;
+	LineTraceSingleToMouseDown(ObjectTypes, ActorsToIgnore, OutHit);
 
-void ATopDownBuildPawn::OpenFacilityContextMenu()
-{
-	// TODO
-	TRACE_SCREEN_LOG(TEXT("OpenFacilityContextMenu"));
+	if (AFacility* Facility = Cast<AFacility>(OutHit.GetActor()))
+	{
+		OpenFacilityInteractionContextMenu(Facility);
+	}
 }
 
 void ATopDownBuildPawn::GetMouseWorldPosition(FVector& WorldLocation, FVector& WorldDirection)
@@ -238,26 +244,17 @@ void ATopDownBuildPawn::GetMouseWorldPosition(FVector& WorldLocation, FVector& W
 	}
 }
 
-void ATopDownBuildPawn::UpdateFacilityBuilderLocation()
+void ATopDownBuildPawn::LineTraceSingleToMouseDown(
+	const TArray<TEnumAsByte<EObjectTypeQuery>>& ObjectTypes,
+	const TArray<AActor*>& ActorsToIgnore,
+	FHitResult& OutHit
+)
 {
-	if (!IsValid(FacilityBuilder))
-	{
-		return;
-	}
-
 	FVector MouseWorldPosition;
 	FVector MouseWorldDirection;
 	GetMouseWorldPosition(MouseWorldPosition, MouseWorldDirection);
 
-	FVector LineTraceEnd = MouseWorldPosition + MouseWorldDirection * 10000.0f;
-	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldStatic));
-	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldDynamic));
-	TArray<AActor*> ActorsToIgnore;
-	ActorsToIgnore.Add(this);
-	ActorsToIgnore.Add(OwningPlayer);
-	ActorsToIgnore.Add(FacilityBuilder);
-	FHitResult OutHit;
+	FVector LineTraceEnd = MouseWorldPosition + MouseWorldDirection * TOP_DOWN_BUILD_PAWN_HEIGHT * 10;
 	UKismetSystemLibrary::LineTraceSingleForObjects(
 		this,
 		MouseWorldPosition,
@@ -269,6 +266,56 @@ void ATopDownBuildPawn::UpdateFacilityBuilderLocation()
 		OutHit,
 		true
 	);
+}
+
+void ATopDownBuildPawn::OpenFacilityInteractionContextMenu(AFacility* Facility)
+{
+	if (!IsValid(Facility))
+	{
+		return;
+	}
+
+	if (UGSBWindowSubsystem* WindowManager = UGSBWindowSubsystem::Get(this))
+	{
+		if (UGSBContextMenu* ContextMenu = WindowManager->OpenDefaultContextMenu(Facility, FName(Facility->GetFacilityName().ToString() + TEXT(": FacilityInteractionContextMenu"))))
+		{
+			TArray<FString> InteractionDescriptions;
+			Facility->GetInteractionDescriptions(InteractionDescriptions);
+			for (const FString& Description : InteractionDescriptions)
+			{
+				UGSBContextMenuEntry* Entry = ContextMenu->AddContextMenuEntry(Description);
+				Entry->OnClicked.AddDynamic(this, &ATopDownBuildPawn::HandleFacilityInteractionContextMenuEntry);
+			}
+		}
+	}
+}
+
+void ATopDownBuildPawn::HandleFacilityInteractionContextMenuEntry(UGSBContextMenuEntry* Entry)
+{
+	if (IsValid(Entry))
+	{
+		if (AFacility* Facility = Cast<AFacility>(Entry->GetContextTarget()))
+		{
+			Facility->InteractionByDescription(Entry->GetEntryDescriptionText().ToString(), OwningPlayer);
+		}
+	}
+}
+
+void ATopDownBuildPawn::UpdateFacilityBuilderLocation()
+{
+	if (!IsValid(FacilityBuilder))
+	{
+		return;
+	}
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldStatic));
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldDynamic));
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(this);
+	ActorsToIgnore.Add(OwningPlayer);
+	ActorsToIgnore.Add(FacilityBuilder);
+	FHitResult OutHit;
+	LineTraceSingleToMouseDown(ObjectTypes, ActorsToIgnore, OutHit);
 
 	FacilityBuilder->SetActorLocation(OutHit.ImpactPoint);
 }

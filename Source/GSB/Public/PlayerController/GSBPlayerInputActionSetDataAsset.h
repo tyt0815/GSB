@@ -108,9 +108,6 @@ public:
 	UInputAction* IA_SelectFacility;
 
 	UPROPERTY(EditDefaultsOnly)
-	UInputAction* IA_OpenFacilityContextMenu;
-
-	UPROPERTY(EditDefaultsOnly)
 	UInputMappingContext* IMC_Combat;
 
 	UPROPERTY(EditDefaultsOnly)

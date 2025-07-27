@@ -53,6 +53,11 @@ void AFacility::Interaction(int32 Index, AActor* Interactor)
 	InteractionComponent->Interaction(Index, Interactor);
 }
 
+void AFacility::InteractionByDescription(const FString& Description, AActor* Interactor)
+{
+	InteractionComponent->InteractionByDescription(Description, Interactor);
+}
+
 int32 AFacility::GetNumInteractions() const
 {
 	return InteractionComponent->GetNumInteractions();

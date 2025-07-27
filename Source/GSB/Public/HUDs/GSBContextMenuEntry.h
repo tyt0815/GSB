@@ -19,7 +19,9 @@ public:
 	virtual void NativeConstruct() override;
 
 public:
-	void SetLabelText(const FText& Text);
+	FText GetEntryDescriptionText();
+
+	void SetEntryDescription(const FText& Text);
 
 	void OnAddedtoContextMenu(UGSBContextMenu* InParentContextMenu, const FText& Text);
 
@@ -34,10 +36,10 @@ private:
 	void HandleOnLabelButtonClicked();
 
 	UPROPERTY(meta = (BindWidget))
-	class UButton* LabelButton;
+	class UButton* EntryButton;
 
 	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* LabelText;
+	class UTextBlock* EntryDescription;
 
 	UGSBContextMenu* ParentContextMenu;
 

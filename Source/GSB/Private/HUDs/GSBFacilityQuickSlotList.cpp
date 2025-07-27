@@ -28,7 +28,6 @@ void UGSBFacilityQuickSlotList::SyncronizeFacilityQuickSlots()
 {
 	if (IsValid(FacilityBuilder))
 	{
-		TRACE_SCREEN_LOG(TEXT("sibal"));
 		FacilityBuilder->SetFacilityQuickSlotListWidget(this);
 		const auto& FacilityPreviewQuickSlots = FacilityBuilder->GetFacilityPreviewQuickSlot();
 		for (int32 i = 0; i < FacilityPreviewQuickSlots.Num(); ++i)

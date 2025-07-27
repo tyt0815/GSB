@@ -27,6 +27,11 @@ void AConfigurableOutputPort::Interaction(int32 Index, AActor* Interactor)
 	InteractionComponent->Interaction(Index, Interactor);
 }
 
+void AConfigurableOutputPort::InteractionByDescription(const FString& Description, AActor* Interactor)
+{
+	InteractionComponent->InteractionByDescription(Description, Interactor);
+}
+
 int32 AConfigurableOutputPort::GetNumInteractions() const
 {
 	return InteractionComponent->GetNumInteractions();

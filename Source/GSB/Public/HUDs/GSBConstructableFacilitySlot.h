@@ -8,6 +8,9 @@
 
 class AFacilityBuilder;
 class UGSBFacilityDataAsset;
+class UGSBConstructableFacilitySlot;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnConstructableFacilitySlotLeftClicked, UGSBConstructableFacilitySlot*, Slot);
 
 UCLASS()
 class GSB_API UGSBConstructableFacilitySlot : public UUserWidget
@@ -22,6 +25,8 @@ public:
 
 public:
 	void UpdateFacilityData(UGSBFacilityDataAsset* InFacilityData);
+
+	FOnConstructableFacilitySlotLeftClicked OnLeftClicked;
 	
 private:
 	UFUNCTION()

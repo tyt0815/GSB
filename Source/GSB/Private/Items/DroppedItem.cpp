@@ -39,6 +39,11 @@ void ADroppedItem::Interaction(int32 Index, AActor* Interactor)
 	InteractionComponent->Interaction(Index, Interactor);
 }
 
+void ADroppedItem::InteractionByDescription(const FString& Description, AActor* Interactor)
+{
+	InteractionComponent->InteractionByDescription(Description, Interactor);
+}
+
 int32 ADroppedItem::GetNumInteractions() const
 {
 	return InteractionComponent->GetNumInteractions();

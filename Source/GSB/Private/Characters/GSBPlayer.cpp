@@ -374,8 +374,9 @@ void AGSBPlayer::SwitchToTopDownBuildMode()
 	{
 		if (AGSBPlayerController* PC = GetPlayerController())
 		{
-			PC->SwitchGamePlayMode_TopViewExplore(TopDownBuildPawn);
+			CancelFacilityPreview();
 			GetCharacterMovement()->StopMovementImmediately();
+			PC->SwitchGamePlayMode_TopViewExplore(TopDownBuildPawn);
 		}
 	}
 }

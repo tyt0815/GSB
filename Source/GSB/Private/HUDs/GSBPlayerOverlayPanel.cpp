@@ -124,11 +124,11 @@ void UGSBPlayerOverlayPanel::SwitchToCombatModeUI()
 
 void UGSBPlayerOverlayPanel::SwitchToTopViewModeUI()
 {
+	HideInteractionList();
 	if (IsValid(ConstructableFacilityQuickSlotList))
 	{
 		ShowConstructibleFacilityQuickSlotList();
 	}
-
 	if (IsValid(ModeShortcutSwitcher))
 	{
 		ModeShortcutSwitcher->SetActiveWidgetIndex(2);
@@ -178,7 +178,7 @@ void UGSBPlayerOverlayPanel::HandleOnWindowClosed(UGSBWindow* Window)
 			}
 			else if (PC->IsTopDownBuildPawnControlled())
 			{
-				PC->SetGamePlayMode_TopViewBuild();
+				PC->SetGamePlayMode_TopViewExplore();
 			}
 		}
 	}

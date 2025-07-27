@@ -11,18 +11,23 @@ void UGSBContextMenuEntry::NativeConstruct()
 	Super::NativeConstruct();
 
 	SetIsFocusable(false);
-	LabelButton->SetClickMethod(EButtonClickMethod::MouseDown);
-	LabelButton->OnClicked.AddDynamic(this, &UGSBContextMenuEntry::HandleOnLabelButtonClicked);
+	EntryButton->SetClickMethod(EButtonClickMethod::MouseDown);
+	EntryButton->OnClicked.AddDynamic(this, &UGSBContextMenuEntry::HandleOnLabelButtonClicked);
 }
 
-void UGSBContextMenuEntry::SetLabelText(const FText& Text)
+FText UGSBContextMenuEntry::GetEntryDescriptionText()
 {
-	LabelText->SetText(Text);
+	return EntryDescription->GetText();
+}
+
+void UGSBContextMenuEntry::SetEntryDescription(const FText& Text)
+{
+	EntryDescription->SetText(Text);
 }
 
 void UGSBContextMenuEntry::OnAddedtoContextMenu(UGSBContextMenu* InParentContextMenu, const FText& Text)
 {
-	SetLabelText(Text);
+	SetEntryDescription(Text);
 	ParentContextMenu = InParentContextMenu;
 }
 
