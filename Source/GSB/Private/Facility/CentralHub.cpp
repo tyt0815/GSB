@@ -29,6 +29,20 @@ ACentralHub::ACentralHub()
 	OutputPortHandler = CreateDefaultSubobject<URetryPrioritizedActorRequestHandlerComponent>(TEXT("OutputPortHandler"));
 }
 
+void ACentralHub::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	if (UGameInstance* GameInst = GetGameInstance())
+	{
+		if (UGSBFacilitySubsystem* FacilityManager = Cast<UGSBFacilitySubsystem>(GameInst->GetSubsystem<UGSBFacilitySubsystem>()))
+		{
+			FacilityManager->AddHub(this);
+			FacilityManager->SetCentralHub(this);
+		}
+	}
+}
+
 bool ACentralHub::CanProvidePower()
 {
 	return PowerCapacity >= PowerProviderComponent->GetCurrentPowerUsage();
@@ -47,7 +61,7 @@ void ACentralHub::UnlinkPowerConsumerFacility(APowerConsumerFacility* PowerConsu
 void ACentralHub::UpdatePowerUsage(int32 Addition)
 {
 	PowerProviderComponent->UpdatePowerUsage(Addition);
-	UpdatePowerCapacityWidget();
+	OnUpdatePowerUsage.Broadcast(PowerProviderComponent->GetCurrentPowerUsage());
 }
 
 void ACentralHub::SetPowerInfluenceAreaVisibility(bool bVisibilty)
@@ -74,15 +88,6 @@ UItemStorageComponent* ACentralHub::GetHubStorageComponent()
 void ACentralHub::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	if (UGameInstance* GameInst = GetGameInstance())
-	{
-		if (UGSBFacilitySubsystem* FacilityManager = Cast<UGSBFacilitySubsystem>(GameInst->GetSubsystem<UGSBFacilitySubsystem>()))
-		{
-			FacilityManager->AddHub(this);
-			FacilityManager->SetCentralHub(this);
-		}
-	}
 
 	PowerProviderComponent->SetPowerInfluenceAreaMeshComponent(PowerInfluenceAreaStaticMeshComponent);
 	PowerProviderComponent->SetPowerInfluenceAreaVisibility(false, false);
@@ -90,33 +95,12 @@ void ACentralHub::BeginPlay()
 	InputPortHandler->OnProcess.BindDynamic(this, &ACentralHub::TryReceiveItemFromInputPort);
 	OutputPortHandler->OnProcess.BindDynamic(this, &ACentralHub::TrySendItemToOutputPort);
 
-	if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
-	{
-		GSBHUD = PlayerController->GetHUD<AGSBHUD>();
-		if (GSBHUD)
-		{
-			SetOverlayWidget();
-			if (!Overlay)
-			{
-				GSBHUD->OnEndBeginPlay.AddDynamic(this, &ACentralHub::SetOverlayWidget);
-			}
-		}
-		else
-		{
-			TRACE_SCREEN_LOG(TEXT("HUD 캐스팅 실패"));
-		}
-	}
-	else
-	{
-		TRACE_SCREEN_LOG(TEXT("PlayerController 캐스팅 실패"));
-	}
-
 }
 
 void ACentralHub::UpdatePowerCapacity(int32 Addition)
 {
 	PowerCapacity += Addition;
-	UpdatePowerCapacityWidget();
+	OnUpdatePowerCapacity.Broadcast(PowerCapacity);
 }
 
 bool ACentralHub::TryReceiveItemFromInputPort(AActor* Actor)
@@ -170,18 +154,4 @@ bool ACentralHub::TrySendItemToOutputPort(AActor* Actor)
 bool ACentralHub::CanReceiveItem(const AInputPort* InputPort)
 {
 	return InputPort->HasToken();
-}
-
-void ACentralHub::SetOverlayWidget()
-{
-	Overlay = Cast<UGSBPlayerOverlay>(GSBHUD->GetOverlayWidget());
-	UpdatePowerCapacityWidget();
-}
-
-void ACentralHub::UpdatePowerCapacityWidget()
-{
-	if (Overlay)
-	{
-		Overlay->UpdatePowerCapacity(PowerProviderComponent->GetCurrentPowerUsage(), PowerCapacity);
-	}
 }

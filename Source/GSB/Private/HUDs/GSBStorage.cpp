@@ -162,7 +162,7 @@ void UGSBStorage::HandleOnContextMenuEntryClicked_DropItem(UGSBContextMenuEntry*
 	if (UItemDataAsset* ItemData = Cast<UItemDataAsset>(Entry->GetContextTarget()))
 	{
 		UGSBWindowSubsystem* WindowManager = GetGameInstance()->GetSubsystem<UGSBWindowSubsystem>();
-		if (UGSBNumberInputDialog* Dialog = WindowManager->OpenDefaultNumberInputDialog(TEXT("DropItemDialog"), ItemData))
+		if (UGSBNumberInputDialog* Dialog = WindowManager->OpenDefaultNumberInputDialog(ItemData, TEXT("DropItemDialog")))
 		{
 			Dialog->SetNumberInput(GetItemStack(ItemData).Stack);
 			Dialog->OnOKButtonClicked.AddDynamic(this, &UGSBStorage::HandleOnNumberInputDialogOKButtonClicked_DropItem);
@@ -176,7 +176,7 @@ void UGSBStorage::HandleOnContextMenuEntryClicked_DeleteItem(UGSBContextMenuEntr
 	if (UItemDataAsset* ItemData = Cast<UItemDataAsset>(Entry->GetContextTarget()))
 	{
 		UGSBWindowSubsystem* WindowManager = GetGameInstance()->GetSubsystem<UGSBWindowSubsystem>();
-		if (UGSBNumberInputDialog* Dialog = WindowManager->OpenDefaultNumberInputDialog(TEXT("DeleteItemDialog"), ItemData))
+		if (UGSBNumberInputDialog* Dialog = WindowManager->OpenDefaultNumberInputDialog(ItemData, TEXT("DeleteItemDialog")))
 		{
 			Dialog->OnOKButtonClicked.AddDynamic(this, &UGSBStorage::HandleOnNumberInputDialogOKButtonClicked_DeleteItem);
 		}
@@ -204,7 +204,7 @@ void UGSBStorage::OpenItemSlotContextMenu(UGSBItemSlot* ItemSlot)
 {
 	UGSBWindowSubsystem* WindowManager = GetGameInstance()->GetSubsystem<UGSBWindowSubsystem>();
 
-	if (UGSBContextMenu* ContextMenu = WindowManager->OpenDefaultContextMenu(TEXT("ItemSlotContextMenu"), ItemSlot->GetItemData()))
+	if (UGSBContextMenu* ContextMenu = WindowManager->OpenDefaultContextMenu(ItemSlot->GetItemData(), TEXT("ItemSlotContextMenu")))
 	{
 		OnItemSlotContextMenuOpened.Broadcast(this, ContextMenu);
 	}

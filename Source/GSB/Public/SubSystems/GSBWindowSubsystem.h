@@ -18,32 +18,32 @@ class GSB_API UGSBWindowSubsystem : public UGameInstanceSubsystem
 public:
 	static UGSBWindowSubsystem* Get(UObject* WorldContext);
 
-	UGSBWindow* OpenWindow(UClass* WindowClass, const FName& WindowName);
+	UGSBWindow* OpenWindow(UClass* WindowClass, const FName& DebugName);
 
 	template<typename WindowT>
-	void ToggleWindow(WindowT*& Window, UClass* WindowClass, const FName& WindowName);
+	void ToggleWindow(WindowT*& Window, UClass* WindowClass, const FName& DebugName);
 
 	template<typename WindowT>
-	void ToggleWindow(WindowT*& Window, const FName& WindowClassName, const FName& WindowName);
+	void ToggleWindow(WindowT*& Window, const FName& WindowClassName, const FName& DebugName);
 
-	UGSBNumberInputDialog* OpenNumberInputDialog(UClass* NumberInputDialogClass, const FName& DialogName, UObject* TargetObject);
+	UGSBNumberInputDialog* OpenNumberInputDialog(UClass* NumberInputDialogClass, UObject* TargetObject, const FName& DebugName);
 
-	UGSBNumberInputDialog* OpenDefaultNumberInputDialog(const FName& DialogName, UObject* TargetObject);
+	UGSBNumberInputDialog* OpenDefaultNumberInputDialog(UObject* TargetObject, const FName& DebugName);
 
 	void CloseWindow(UGSBWindow* Window);
 
 	bool IsWindowOpened(UGSBWindow* Window);
 
-	void CloseAllWindows();
+	void CloseAllWindowsOnCurrentOverlay();
 
-	UGSBContextMenu* OpenContextMenu(UClass* ContextMenuClass, const FName& ContextMenuName, UObject* ContextTarget);
+	UGSBContextMenu* OpenContextMenu(UClass* ContextMenuClass, UObject* ContextTarget, const FName& DebugName);
 
-	UGSBContextMenu* OpenDefaultContextMenu(const FName& ContextMenuName, UObject* ContextTarget);
+	UGSBContextMenu* OpenDefaultContextMenu(UObject* ContextTarget, const FName& DebugName);
 
 private	:
-	UGSBWindow* ToggleWindow_Internal(UGSBWindow* Window, UClass* WindowClass, const FName& WindowName);
+	UGSBWindow* ToggleWindow_Internal(UGSBWindow* Window, UClass* WindowClass, const FName& DebugName);
 
-	UGSBWindow* ToggleWindow_Internal(UGSBWindow* Window, const FName& WindowClassName, const FName& WindowName);
+	UGSBWindow* ToggleWindow_Internal(UGSBWindow* Window, const FName& WindowClassName, const FName& DebugName);
 
 	UClass* GetWidgetClass(const FName& ClassName);
 
@@ -53,13 +53,13 @@ private	:
 };
 
 template<typename WindowT>
-inline void UGSBWindowSubsystem::ToggleWindow(WindowT*& Window, UClass* WindowClass, const FName& WindowName)
+inline void UGSBWindowSubsystem::ToggleWindow(WindowT*& Window, UClass* WindowClass, const FName& DebugName)
 {
-	Window = Cast<WindowT>(ToggleWindow_Internal(Window, WindowClass, WindowName));
+	Window = Cast<WindowT>(ToggleWindow_Internal(Window, WindowClass, DebugName));
 }
 
 template<typename WindowT>
-inline void UGSBWindowSubsystem::ToggleWindow(WindowT*& Window, const FName& WindowClassName, const FName& WindowName)
+inline void UGSBWindowSubsystem::ToggleWindow(WindowT*& Window, const FName& WindowClassName, const FName& DebugName)
 {
-	Window = Cast<WindowT>(ToggleWindow_Internal(Window, WindowClassName, WindowName));
+	Window = Cast<WindowT>(ToggleWindow_Internal(Window, WindowClassName, DebugName));
 }

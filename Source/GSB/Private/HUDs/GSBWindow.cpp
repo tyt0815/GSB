@@ -3,7 +3,7 @@
 
 #include "HUDs/GSBWindow.h"
 #include "HUDs/GSBWindowFrame.h"
-#include "HUDs/GSBOverlay.h"
+#include "HUDs/GSBOverlayPanel.h"
 #include "Components/Button.h"
 
 void UGSBWindow::NativeConstruct()
@@ -15,7 +15,7 @@ void UGSBWindow::NativeConstruct()
 	SetFocus();
 }
 
-void UGSBWindow::OnOpened(UGSBOverlay* InParentOverlay)
+void UGSBWindow::OnOpened(UGSBOverlayPanel* InParentOverlay)
 {
 	ParentOverlay = InParentOverlay;
 	

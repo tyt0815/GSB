@@ -3,7 +3,6 @@
 
 #include "PlayerController/GSBPlayerController.h"
 #include "PlayerController/GSBPlayerInputActionSetDataAsset.h"
-#include "PlayerController/GSBTopDownBuildPawnInputSet.h"
 #include "BuildSystem/TopDownBuildPawn.h"
 #include "Characters/GSBPlayer.h"
 #include "EnhancedInputSubsystems.h"

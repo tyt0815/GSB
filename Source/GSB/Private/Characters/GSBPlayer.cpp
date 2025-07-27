@@ -139,14 +139,30 @@ void AGSBPlayer::BeginPlay()
 		TRACE_SCREEN_LOG(TEXT("UGSBGameInstance 캐스팅 실패"));
 	}
 
-	SwitchToCombatMode();
-
 	if (UWorld* World = GetWorld())
 	{
 		TopDownBuildPawn = World->SpawnActor<ATopDownBuildPawn>();
 		TopDownBuildPawn->SetOwningPlayer(this);
 		TopDownBuildPawn->SetFacilityBuilder(FacilityBuilder);
 	}
+
+	if (PlayerOverlayClass)
+	{
+		if (AGSBHUD* HUD = GetHUD())
+		{
+			PlayerOverlay = Cast<UGSBPlayerOverlay>(HUD->AddOverlay(PlayerOverlayClass));
+			if (!IsValid(PlayerOverlay))
+			{
+				TRACE_SCREEN_LOG(TEXT("UGSBPlayerOverlay 캐스팅 실패"));
+			}
+		}
+	}
+	else
+	{
+		TRACE_SCREEN_LOG(TEXT("PlayerOverlayClass 가 nullptr 입니다."));
+	}
+
+	SwitchToCombatMode();
 }
 
 void AGSBPlayer::Move(const FInputActionValue& Value)
@@ -196,9 +212,9 @@ void AGSBPlayer::Interaction()
 	{
 		InteractableActor->Interaction(SelectedInteractionIndex, this);
 		InteractableActor = nullptr;
-		if (UGSBPlayerOverlay* OverlayWidget = GetOverlayWidget())
+		if (IsValid(PlayerOverlay))
 		{
-			OverlayWidget->HideInteractionList();
+			PlayerOverlay->HideInteractionList();
 		}
 	}
 }
@@ -208,9 +224,9 @@ void AGSBPlayer::SelectInteractionScrollUp()
 	if (InteractableActor)
 	{
 		SelectedInteractionIndex = FMath::Clamp(SelectedInteractionIndex - 1, 0, InteractableActor->GetNumInteractions() - 1);
-		if (UGSBPlayerOverlay* OverlayWidget = GetOverlayWidget())
+		if (IsValid(PlayerOverlay))
 		{
-			OverlayWidget->UpdateInteractionFocusing(SelectedInteractionIndex);
+			PlayerOverlay->UpdateInteractionFocusing(SelectedInteractionIndex);
 		}
 	}
 }
@@ -220,9 +236,9 @@ void AGSBPlayer::SelectInteractionScrollDown()
 	if (InteractableActor)
 	{
 		SelectedInteractionIndex = FMath::Clamp(SelectedInteractionIndex + 1, 0, InteractableActor->GetNumInteractions() - 1);
-		if (UGSBPlayerOverlay* OverlayWidget = GetOverlayWidget())
+		if (IsValid(PlayerOverlay))
 		{
-			OverlayWidget->UpdateInteractionFocusing(SelectedInteractionIndex);
+			PlayerOverlay->UpdateInteractionFocusing(SelectedInteractionIndex);
 		}
 	}
 }
@@ -249,7 +265,7 @@ void AGSBPlayer::HideWindow()
 {
 	if (IsUIMode())
 	{
-		GetGameInstance()->GetSubsystem<UGSBWindowSubsystem>()->CloseAllWindows();
+		GetGameInstance()->GetSubsystem<UGSBWindowSubsystem>()->CloseAllWindowsOnCurrentOverlay();
 	}
 }
 
@@ -383,7 +399,7 @@ void AGSBPlayer::OnEnterCombatModeGameOnly()
 {
 	FacilityBuilder->CancelPreview();
 
-	if (UGSBPlayerOverlay* PlayerOverlay = GetOverlayWidget())
+	if (IsValid(PlayerOverlay))
 	{
 		PlayerOverlay->SwitchToCombatModeUI();
 	}
@@ -396,7 +412,7 @@ void AGSBPlayer::OnEnterCombatModeGameAndUI()
 
 void AGSBPlayer::OnEnterBuildModeGameOnly()
 {
-	if (UGSBPlayerOverlay* PlayerOverlay = GetOverlayWidget())
+	if (IsValid(PlayerOverlay))
 	{
 		PlayerOverlay->SwitchToBuildModeUI();
 	}
@@ -482,17 +498,17 @@ void AGSBPlayer::UpdateInteractableActor(AActor* Candidate)
 		InteractableActor->GetInteractionDescriptions(Descriptions);
 		InteractableActor->ClearInteractionListDirtyFlag();
 		SelectedInteractionIndex = 0;
-		if (UGSBPlayerOverlay* OverlayWidget = GetOverlayWidget())
+		if (IsValid(PlayerOverlay))
 		{
-			OverlayWidget->ShowInteractionList();
-			OverlayWidget->UpdateInteractionList(Descriptions);
+			PlayerOverlay->ShowInteractionList();
+			PlayerOverlay->UpdateInteractionList(Descriptions);
 		}
 	}
 	else
 	{
-		if (UGSBPlayerOverlay* OverlayWidget = GetOverlayWidget())
+		if (IsValid(PlayerOverlay))
 		{
-			OverlayWidget->HideInteractionList();
+			PlayerOverlay->HideInteractionList();
 		}
 	}
 }
@@ -562,15 +578,6 @@ AGSBPlayerHUD* AGSBPlayer::GetHUD() const
 	if (AGSBPlayerController* PlayerController = GetPlayerController())
 	{
 		return PlayerController->GetHUD<AGSBPlayerHUD>();
-	}
-	return nullptr;
-}
-
-UGSBPlayerOverlay* AGSBPlayer::GetOverlayWidget() const
-{
-	if (AGSBPlayerHUD* HUD = GetHUD())
-	{
-		return Cast<UGSBPlayerOverlay>(HUD->GetOverlayWidget());
 	}
 	return nullptr;
 }

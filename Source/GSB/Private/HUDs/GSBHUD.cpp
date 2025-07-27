@@ -8,70 +8,138 @@
 void AGSBHUD::BeginPlay()
 {
 	Super::BeginPlay();
+}
 
-	UWorld* World = GetWorld();
-	if (IsValid(World))
+UGSBOverlay* AGSBHUD::AddOverlay(TSubclassOf<UGSBOverlay> OverlayClass)
+{
+	if (OverlayClass)
 	{
-		if (OverlayWidgetClass)
+		if (APlayerController* PC = GetOwningPlayerController())
 		{
-			OverlayWidget = CreateWidget <UGSBOverlay>(GetWorld(), OverlayWidgetClass);
-			if (OverlayWidget)
+			if (UGSBOverlay* NewOverlay = CreateWidget<UGSBOverlay>(PC, OverlayClass))
 			{
-				OverlayWidget->AddToViewport();
-				OverlayWidget->InitializeOverlay();
+				if (UGSBOverlay* CurrentOverlay = GetCurrentOverlay())
+				{
+					CurrentOverlay->RemoveFromParent();
+				}
+				Overlays.Add(NewOverlay);
+				NewOverlay->AddToViewport();
+				NewOverlay->InitializeOverlay();
+
+				return NewOverlay;
 			}
 		}
-		else
-		{
-			OverlayWidget = CreateWidget<UGSBOverlay>(GetOwningPlayerController());
-			TRACE_SCREEN_LOG(TEXT("OverlayWidgetClass가 nullptr입니다."))
-		}
+	}
+	return nullptr;
+}
+
+void AGSBHUD::RemoveOverlayAtTop()
+{
+	if (Overlays.IsEmpty())
+	{
+		return;
 	}
 
-	OnEndBeginPlay.Broadcast();
+	Overlays.RemoveAt(Overlays.Num() - 1);
+
+	if (UGSBOverlay* CurrentOverlay = GetCurrentOverlay())
+	{
+		CurrentOverlay->AddToViewport();
+	}
 }
 
-UGSBWindow* AGSBHUD::OpenWindow(UClass* WindowClass, const FName& WindowName)
+UGSBWindow* AGSBHUD::OpenWindow(UClass* WindowClass, const FName& DebugName)
 {
-	return OverlayWidget->OpenWindow(WindowClass, WindowName);
+	if (UGSBOverlay* CurrentOverlay = GetCurrentOverlay())
+	{
+		CurrentOverlay->OpenWindow(WindowClass, DebugName);
+	}
+	return nullptr;
 }
 
-UGSBWindow* AGSBHUD::ToggleWindow(UGSBWindow* Window, UClass* WindowClass, const FName& WindowName)
+UGSBWindow* AGSBHUD::ToggleWindow(UGSBWindow* Window, UClass* WindowClass, const FName& DebugName)
 {
-	return OverlayWidget->ToggleWindow(Window, WindowClass, WindowName);
+	if (UGSBOverlay* CurrentOverlay = GetCurrentOverlay())
+	{
+		CurrentOverlay->ToggleWindow(Window, WindowClass, DebugName);
+	}
+	return nullptr;
 }
 
-UGSBNumberInputDialog* AGSBHUD::OpenNumberInputDialog(UClass* NumberInputDialogClass, const FName& DialogName, UObject* TargetObject)
+UGSBNumberInputDialog* AGSBHUD::OpenNumberInputDialog(UClass* NumberInputDialogClass, UObject* TargetObject, const FName& DebugName)
 {
-	return OverlayWidget->OpenNumberInputDialog(NumberInputDialogClass, DialogName, TargetObject);
+	if (UGSBOverlay* CurrentOverlay = GetCurrentOverlay())
+	{
+		CurrentOverlay->OpenNumberInputDialog(NumberInputDialogClass, TargetObject, DebugName);
+	}
+	return nullptr;
 }
 
-UGSBNumberInputDialog* AGSBHUD::OpenDefaultNumberInputDialog(const FName& DialogName, UObject* TargetObject)
+UGSBNumberInputDialog* AGSBHUD::OpenDefaultNumberInputDialog(UObject* TargetObject, const FName& DebugName)
 {
-	return OverlayWidget->OpenDefaultNumberInputDialog(DialogName, TargetObject);
+	if (UGSBOverlay* CurrentOverlay = GetCurrentOverlay())
+	{
+		CurrentOverlay->OpenDefaultNumberInputDialog(TargetObject, DebugName);
+	}
+	return nullptr;
+}
+
+UGSBOverlay* AGSBHUD::GetOverlayByWindow(UGSBWindow* Window)
+{
+	for (UGSBOverlay* Overlay : Overlays)
+	{
+		if (Overlay->IsWindowOpened(Window))
+		{
+			return Overlay;
+		}
+	}
+	return nullptr;
 }
 
 void AGSBHUD::CloseWindow(UGSBWindow* Window)
 {
-	OverlayWidget->CloseWindow(Window);
+	if (UGSBOverlay* Overlay = GetOverlayByWindow(Window))
+	{
+		Overlay->CloseWindow(Window);
+	}
 }
 
 bool AGSBHUD::IsWindowOpened(UGSBWindow* Window)
 {
-	return OverlayWidget->IsWindowOpened(Window);
+	return GetOverlayByWindow(Window) != nullptr;
 }
 
-void AGSBHUD::CloseAllWindows()
+void AGSBHUD::CloseAllWindowsOnCurrentOverlay()
 {
-	OverlayWidget->CloseAllWindows();
+	if (UGSBOverlay* CurrentOverlay = GetCurrentOverlay())
+	{
+		CurrentOverlay->CloseAllWindows();
+	}
 }
 
-UGSBContextMenu* AGSBHUD::OpenContextMenu(UClass* ContextMenuClass, const FName& ContextMenuName, UObject* ContextTarget)
+UGSBContextMenu* AGSBHUD::OpenContextMenu(UClass* ContextMenuClass, UObject* ContextTarget, const FName& DebugName)
 {
-	return OverlayWidget->OpenContextMenu(ContextMenuClass, ContextMenuName, ContextTarget);
+	if (UGSBOverlay* CurrentOverlay = GetCurrentOverlay())
+	{
+		CurrentOverlay->OpenContextMenu(ContextMenuClass, ContextTarget, DebugName);
+	}
+	return nullptr;
 }
 
-UGSBContextMenu* AGSBHUD::OpenDefaultContextMenu(const FName& ContextMenuName, UObject* ContextTarget)
+UGSBContextMenu* AGSBHUD::OpenDefaultContextMenu(UObject* ContextTarget, const FName& DebugName)
 {
-	return OverlayWidget->OpenDefaultContextMenu(ContextMenuName, ContextTarget);
+	if (UGSBOverlay* CurrentOverlay = GetCurrentOverlay())
+	{
+		CurrentOverlay->OpenDefaultContextMenu(ContextTarget, DebugName);
+	}
+	return nullptr;
+}
+
+UGSBOverlay* AGSBHUD::GetCurrentOverlay() const
+{
+	if (!Overlays.IsEmpty())
+	{
+		return Overlays.Last();
+	}
+	return nullptr;
 }

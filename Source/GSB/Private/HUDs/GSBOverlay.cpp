@@ -2,109 +2,93 @@
 
 
 #include "HUDs/GSBOverlay.h"
+#include "HUDs/GSBOverlayPanel.h"
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
 
-
 void UGSBOverlay::InitializeOverlay()
 {
+	if (IsValid(OverlayPanel))
+	{
+		OverlayPanel->InitializeOverlayPanel();
+	}
 }
 
-UGSBWindow* UGSBOverlay::OpenWindow(TSubclassOf<UGSBWindow> WindowClass, const FName& WindowName)
+UGSBWindow* UGSBOverlay::OpenWindow(UClass* WindowClass, const FName& DebugName)
 {
-	if (UGSBWindow* Window = CreateWidget_GSB<UGSBWindow>(WindowClass, WindowName))
+	if (IsValid(OverlayPanel))
 	{
-		OpenedWindows.Add(Window);
-		Window->OnOpened(this);
-		UCanvasPanelSlot* CanvasPanelSlot = RootCanvas->AddChildToCanvas(Window);
-		FAnchors Anchors;
-		Anchors.Minimum = { 0.5,0.5 };
-		Anchors.Maximum = { 0.5,0.5 };
-		CanvasPanelSlot->SetAnchors(Anchors);
-		CanvasPanelSlot->SetPosition({ 0,0 });
-		CanvasPanelSlot->SetAlignment({ 0.5, 0.5f });
-		CanvasPanelSlot->SetAutoSize(true);
-		UpdatePlayerControllMode();
-		return Window;
+		return OverlayPanel->OpenWindow(WindowClass, DebugName);
 	}
 	return nullptr;
 }
 
-UGSBWindow* UGSBOverlay::ToggleWindow(UGSBWindow* Window, TSubclassOf<UGSBWindow> WindowClass, const FName& WindowName)
+UGSBWindow* UGSBOverlay::ToggleWindow(UGSBWindow* Window, UClass* WindowClass, const FName& DebugName)
 {
-	if (IsWindowOpened(Window))
+	if (IsValid(OverlayPanel))
 	{
-		CloseWindow(Window);
-		return nullptr;
-	}
-	else
-	{
-		return OpenWindow(WindowClass, WindowName);
-	}
-}
-
-UGSBNumberInputDialog* UGSBOverlay::OpenNumberInputDialog(TSubclassOf<UGSBNumberInputDialog> NumberInputDialogClass, const FName& DialogName, UObject* TargetObject)
-{
-	if (UGSBNumberInputDialog* Dialog = Cast<UGSBNumberInputDialog>(OpenWindow(NumberInputDialogClass, DialogName)))
-	{
-		Dialog->SetTargetObject(TargetObject);
-		return Dialog;
+		return OverlayPanel->ToggleWindow(Window, WindowClass, DebugName);
 	}
 	return nullptr;
 }
 
-UGSBNumberInputDialog* UGSBOverlay::OpenDefaultNumberInputDialog(const FName& DialogName, UObject* TargetObject)
+UGSBNumberInputDialog* UGSBOverlay::OpenNumberInputDialog(UClass* NumberInputDialogClass, UObject* TargetObject, const FName& DebugName)
 {
-	return OpenNumberInputDialog(DefaultNumberInputDialogClass, DialogName, TargetObject);
+	if (IsValid(OverlayPanel))
+	{
+		return OverlayPanel->OpenNumberInputDialog(NumberInputDialogClass, TargetObject, DebugName);
+	}
+	return nullptr;
+}
+
+UGSBNumberInputDialog* UGSBOverlay::OpenDefaultNumberInputDialog(UObject* TargetObject, const FName& DebugName)
+{
+	if (IsValid(OverlayPanel))
+	{
+		return OverlayPanel->OpenDefaultNumberInputDialog(TargetObject, DebugName);
+	}
+	return nullptr;
 }
 
 void UGSBOverlay::CloseWindow(UGSBWindow* Window)
 {
-	if (IsValid(Window))
+	if (IsValid(OverlayPanel))
 	{
-		Window->OnClosed();
+		return OverlayPanel->CloseWindow(Window);
 	}
-	OpenedWindows.Remove(Window);
-	UpdatePlayerControllMode();
 }
 
 bool UGSBOverlay::IsWindowOpened(const UGSBWindow* Window) const
 {
-	return IsValid(Window) && OpenedWindows.Contains(Window);
+	if (IsValid(OverlayPanel))
+	{
+		return OverlayPanel->IsWindowOpened(Window);
+	}
+	return false;
 }
 
 void UGSBOverlay::CloseAllWindows()
 {
-	for (UGSBWindow* Window : OpenedWindows)
+	if (IsValid(OverlayPanel))
 	{
-		CloseWindow(Window);
+		return OverlayPanel->CloseAllWindows();
 	}
-	OpenedWindows.Empty();
 }
 
-UGSBContextMenu* UGSBOverlay::OpenContextMenu(TSubclassOf<UGSBContextMenu> ContextMenuClass, const FName& ContextMenuName, UObject* ContextTarget)
+UGSBContextMenu* UGSBOverlay::OpenContextMenu(UClass* ContextMenuClass, UObject* ContextTarget, const FName& DebugName)
 {
-	if (UGSBContextMenu* ContextMenu = CreateWidget_GSB<UGSBContextMenu>(ContextMenuClass, ContextMenuName))
+	if (IsValid(OverlayPanel))
 	{
-		ContextMenu->AddToViewport();
-		FVector2D MousePos;
-		if (GetOwningPlayer()->GetMousePosition(MousePos.X, MousePos.Y))
-		{
-			ContextMenu->SetPositionInViewport(MousePos);
-		}
-		ContextMenu->OnOpened(ContextTarget);
-		return ContextMenu;
+		return OverlayPanel->OpenContextMenu(ContextMenuClass, ContextTarget, DebugName);
 	}
 	return nullptr;
 }
 
-UGSBContextMenu* UGSBOverlay::OpenDefaultContextMenu(const FName& ContextMenuName, UObject* ContextTarget)
+UGSBContextMenu* UGSBOverlay::OpenDefaultContextMenu(UObject* ContextTarget, const FName& DebugName)
 {
-	if (DefaultContextMenuClass)
+	if (IsValid(OverlayPanel))
 	{
-		return OpenContextMenu(DefaultContextMenuClass, ContextMenuName, ContextTarget);
+		return OverlayPanel->OpenDefaultContextMenu(ContextTarget, DebugName);
 	}
-	
-	TRACE_SCREEN_LOG(TEXT("DefaultContextMenuClass가 nullptr 입니다."));
 	return nullptr;
 }

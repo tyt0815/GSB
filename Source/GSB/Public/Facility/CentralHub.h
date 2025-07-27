@@ -10,8 +10,13 @@
 #include "Interfaces/OutputPortHandler.h"
 #include "CentralHub.generated.h"
 
+class ACentralHub;
 class URetryPrioritizedActorRequestHandlerComponent;
 class UItemStorageComponent;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUpdatePowerUsage, int32, PowerUsage);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUpdatePowerCapacity, int32, PowerCapacity);
 
 UCLASS()
 class GSB_API ACentralHub : 
@@ -25,6 +30,8 @@ class GSB_API ACentralHub :
 	
 public:
 	ACentralHub();
+
+	virtual void PostInitializeComponents() override;
 
 	virtual bool CanProvidePower() override;
 
@@ -43,10 +50,15 @@ public:
 	virtual UItemStorageComponent* GetHubStorageComponent() override;
 
 protected:
+
 	virtual void BeginPlay() override;
 
 public:
 	void UpdatePowerCapacity(int32 Addition);
+
+	FOnUpdatePowerUsage OnUpdatePowerUsage;
+
+	FOnUpdatePowerCapacity OnUpdatePowerCapacity;
 
 protected:
 	UPROPERTY(VisibleAnywhere)
@@ -76,15 +88,4 @@ protected:
 private:
 	UPROPERTY(EditAnywhere, Category = "ACentralHub|Power")
 	int PowerCapacity = 500;
-
-	class UGSBFacilityPowerStatus* PowerStatusWidget;
-
-	class AGSBHUD* GSBHUD;
-
-	class UGSBPlayerOverlay* Overlay;
-
-	UFUNCTION()
-	void SetOverlayWidget();
-
-	void UpdatePowerCapacityWidget();
 };

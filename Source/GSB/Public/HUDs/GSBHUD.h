@@ -4,14 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
+#include "HUDs/GSBOverlay.h"
 #include "GSBHUD.generated.h"
 
-class UGSBOverlay;
 class UGSBWindow;
 class UGSBContextMenu;
 class UGSBNumberInputDialog;
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEndBeginPlaySignature);
 
 UCLASS()
 class GSB_API AGSBHUD : public AHUD
@@ -22,36 +20,33 @@ public:
 	virtual void BeginPlay() override;
 
 public:
-	UGSBWindow* OpenWindow(UClass* WindowClass, const FName& WindowName);
+	UGSBOverlay* AddOverlay(TSubclassOf<UGSBOverlay> OverlayClass);
 
-	UGSBWindow* ToggleWindow(UGSBWindow* Window, UClass* WindowClass, const FName& WindowName);
+	void RemoveOverlayAtTop();
 
-	UGSBNumberInputDialog* OpenNumberInputDialog(UClass* NumberInputDialogClass, const FName& DialogName, UObject* TargetObject);
+	UGSBWindow* OpenWindow(UClass* WindowClass, const FName& DebugName);
 
-	UGSBNumberInputDialog* OpenDefaultNumberInputDialog(const FName& DialogName, UObject* TargetObject);
+	UGSBWindow* ToggleWindow(UGSBWindow* Window, UClass* WindowClass, const FName& DebugName);
+
+	UGSBNumberInputDialog* OpenNumberInputDialog(UClass* NumberInputDialogClass, UObject* TargetObject, const FName& DebugName);
+
+	UGSBNumberInputDialog* OpenDefaultNumberInputDialog(UObject* TargetObject, const FName& DebugName);
+
+	UGSBOverlay* GetOverlayByWindow(UGSBWindow* Window);
 
 	void CloseWindow(UGSBWindow* Window);
 
 	bool IsWindowOpened(UGSBWindow* Window);
 
-	void CloseAllWindows();
+	void CloseAllWindowsOnCurrentOverlay();
 
-	UGSBContextMenu* OpenContextMenu(UClass* ContextMenuClass, const FName& ContextMenuName, UObject* ContextTarget);
+	UGSBContextMenu* OpenContextMenu(UClass* ContextMenuClass, UObject* ContextTarget, const FName& DebugName);
 
-	UGSBContextMenu* OpenDefaultContextMenu(const FName& ContextMenuName, UObject* ContextTarget);
+	UGSBContextMenu* OpenDefaultContextMenu(UObject* ContextTarget, const FName& DebugName);
 
-	FOnEndBeginPlaySignature OnEndBeginPlay;
+	UGSBOverlay* GetCurrentOverlay() const;
 
 protected:
-	UPROPERTY(EditDefaultsOnly, Category = "AGSBHUD")
-	TSubclassOf<UGSBOverlay> OverlayWidgetClass;
-
 	UPROPERTY()
-	UGSBOverlay* OverlayWidget;
-
-public:
-	FORCEINLINE UGSBOverlay* GetOverlayWidget() const
-	{
-		return OverlayWidget;
-	}	
+	TArray<UGSBOverlay*> Overlays;
 };

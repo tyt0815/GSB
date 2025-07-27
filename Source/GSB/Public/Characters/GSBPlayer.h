@@ -6,6 +6,7 @@
 #include "Characters/GSBCharacter.h"
 #include "Interfaces/InteractableActor.h"
 #include "Interfaces/ItemPickupActor.h"
+#include "HUDs/GSBPlayerOverlay.h"
 #include "GSBPlayer.generated.h"
 
 class UInputMappingContext;
@@ -17,7 +18,6 @@ class UGSBStorageWindow;
 class UGSBInventoryWindow;
 class UGSBConstructableFacilityListWindow;
 class UGSBStorage;
-class UGSBPlayerOverlay;
 class AGSBPlayerHUD;
 class AGSBPlayerController;
 class AConstructibleFacility;
@@ -142,7 +142,10 @@ protected:
 
 	AGSBPlayerHUD* GetHUD() const;
 
-	UGSBPlayerOverlay* GetOverlayWidget() const;
+	UPROPERTY(EditDefaultsOnly, Category = "GSB|UI")
+	TSubclassOf<UGSBPlayerOverlay> PlayerOverlayClass;
+
+	UGSBPlayerOverlay* PlayerOverlay;
 
 	UGSBInventoryWindow* InventoryWindow;
 

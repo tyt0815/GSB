@@ -4,32 +4,27 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "HUDs/GSBWindow.h"
-#include "HUDs/GSBNumberInputDialog.h"
-#include "HUDs/GSBContextMenu.h"
-#include "DebugHeader.h"
 #include "GSBOverlay.generated.h"
 
-class UCanvasPanel;
+class UGSBOverlayPanel;
+class UGSBWindow;
+class UGSBNumberInputDialog;
+class UGSBContextMenu;
 
 UCLASS()
 class GSB_API UGSBOverlay : public UUserWidget
 {
 	GENERATED_BODY()
-	
 public:
+	void InitializeOverlay();
 
-	virtual void InitializeOverlay();
+	UGSBWindow* OpenWindow(UClass* WindowClass, const FName& DebugName);
 
-	virtual void UpdatePlayerControllMode() {};
+	UGSBWindow* ToggleWindow(UGSBWindow* Window, UClass* WindowClass, const FName& DebugName);
 
-	UGSBWindow* OpenWindow(TSubclassOf<UGSBWindow> WindowClass, const FName& WindowName);
+	UGSBNumberInputDialog* OpenNumberInputDialog(UClass* NumberInputDialogClass, UObject* TargetObject, const FName& DebugName);
 
-	UGSBWindow* ToggleWindow(UGSBWindow* Window, TSubclassOf<UGSBWindow> WindowClass, const FName& WindowName);
-
-	UGSBNumberInputDialog* OpenNumberInputDialog(TSubclassOf<UGSBNumberInputDialog> NumberInputDialogClass, const FName& DialogName, UObject* TargetObject);
-	
-	UGSBNumberInputDialog* OpenDefaultNumberInputDialog(const FName& DialogName, UObject* TargetObject);
+	UGSBNumberInputDialog* OpenDefaultNumberInputDialog(UObject* TargetObject, const FName& DebugName);
 
 	void CloseWindow(UGSBWindow* Window);
 
@@ -37,33 +32,11 @@ public:
 
 	void CloseAllWindows();
 
-	UGSBContextMenu* OpenContextMenu(TSubclassOf<UGSBContextMenu> ContextMenuClass, const FName& ContextMenuName, UObject* ContextTarget);
+	UGSBContextMenu* OpenContextMenu(UClass* ContextMenuClass, UObject* ContextTarget, const FName& DebugName);
 
-	UGSBContextMenu* OpenDefaultContextMenu(const FName& ContextMenuName, UObject* ContextTarget);
-
+	UGSBContextMenu* OpenDefaultContextMenu(UObject* ContextTarget, const FName& DebugName);
+	
 protected:
-	template<typename WidgetT>
-	WidgetT* CreateWidget_GSB(TSubclassOf<UUserWidget> UserWidgetClass, FName WidgetName);
-
-	UPROPERTY(EditDefaultsOnly, Category = "Subclasses")
-	TSubclassOf<UGSBContextMenu> DefaultContextMenuClass;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Subclasses")
-	TSubclassOf<UGSBNumberInputDialog> DefaultNumberInputDialogClass;
-
 	UPROPERTY(meta = (BindWidget))
-	UCanvasPanel* RootCanvas;
-
-	TArray<UGSBWindow*> OpenedWindows;
+	UGSBOverlayPanel* OverlayPanel;
 };
-
-template<typename WidgetT>
-inline WidgetT* UGSBOverlay::CreateWidget_GSB(TSubclassOf<UUserWidget> UserWidgetClass, FName WidgetName)
-{
-	if (WidgetT* Widget = CreateWidget<WidgetT>(GetOwningPlayer(), UserWidgetClass, NAME_None))
-	{
-		return Widget;
-	}
-	TRACE_SCREEN_LOG(WidgetName.ToString() + TEXT(" 위젯 생성 실패"));
-	return nullptr;
-}

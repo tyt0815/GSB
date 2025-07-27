@@ -18,19 +18,19 @@ UGSBWindowSubsystem* UGSBWindowSubsystem::Get(UObject* WorldContext)
 	return nullptr;
 }
 
-UGSBWindow* UGSBWindowSubsystem::OpenWindow(UClass* WindowClass, const FName& WindowName)
+UGSBWindow* UGSBWindowSubsystem::OpenWindow(UClass* WindowClass, const FName& DebugName)
 {
-	return GetHUD()->OpenWindow(WindowClass, WindowName);
+	return GetHUD()->OpenWindow(WindowClass, DebugName);
 }
 
-UGSBNumberInputDialog* UGSBWindowSubsystem::OpenNumberInputDialog(UClass* NumberInputDialogClass, const FName& DialogName, UObject* TargetObject)
+UGSBNumberInputDialog* UGSBWindowSubsystem::OpenNumberInputDialog(UClass* NumberInputDialogClass, UObject* TargetObject, const FName& DebugName)
 {
-	return GetHUD()->OpenNumberInputDialog(NumberInputDialogClass, DialogName, TargetObject);
+	return GetHUD()->OpenNumberInputDialog(NumberInputDialogClass, TargetObject, DebugName);
 }
 
-UGSBNumberInputDialog* UGSBWindowSubsystem::OpenDefaultNumberInputDialog(const FName& DialogName, UObject* TargetObject)
+UGSBNumberInputDialog* UGSBWindowSubsystem::OpenDefaultNumberInputDialog(UObject* TargetObject, const FName& DebugName)
 {
-	return GetHUD()->OpenDefaultNumberInputDialog(DialogName, TargetObject);
+	return GetHUD()->OpenDefaultNumberInputDialog(TargetObject, DebugName);
 }
 
 void UGSBWindowSubsystem::CloseWindow(UGSBWindow* Window)
@@ -43,31 +43,31 @@ bool UGSBWindowSubsystem::IsWindowOpened(UGSBWindow* Window)
 	return GetHUD()->IsWindowOpened(Window);
 }
 
-void UGSBWindowSubsystem::CloseAllWindows()
+void UGSBWindowSubsystem::CloseAllWindowsOnCurrentOverlay()
 {
-	GetHUD()->CloseAllWindows();
+	GetHUD()->CloseAllWindowsOnCurrentOverlay();
 }
 
-UGSBContextMenu* UGSBWindowSubsystem::OpenContextMenu(UClass* ContextMenuClass, const FName& ContextMenuName, UObject* ContextTarget)
+UGSBContextMenu* UGSBWindowSubsystem::OpenContextMenu(UClass* ContextMenuClass, UObject* ContextTarget, const FName& DebugName)
 {
-	return GetHUD()->OpenContextMenu(ContextMenuClass, ContextMenuName, ContextTarget);
+	return GetHUD()->OpenContextMenu(ContextMenuClass, ContextTarget, DebugName);
 }
 
-UGSBContextMenu* UGSBWindowSubsystem::OpenDefaultContextMenu(const FName& ContextMenuName, UObject* ContextTarget)
+UGSBContextMenu* UGSBWindowSubsystem::OpenDefaultContextMenu(UObject* ContextTarget, const FName& DebugName)
 {
-	return GetHUD()->OpenDefaultContextMenu(ContextMenuName, ContextTarget);
+	return GetHUD()->OpenDefaultContextMenu(ContextTarget, DebugName);
 }
 
-UGSBWindow* UGSBWindowSubsystem::ToggleWindow_Internal(UGSBWindow* Window, UClass* WindowClass, const FName& WindowName)
+UGSBWindow* UGSBWindowSubsystem::ToggleWindow_Internal(UGSBWindow* Window, UClass* WindowClass, const FName& DebugName)
 {
-	return GetHUD()->ToggleWindow(Window, WindowClass, WindowName);
+	return GetHUD()->ToggleWindow(Window, WindowClass, DebugName);
 }
 
-UGSBWindow* UGSBWindowSubsystem::ToggleWindow_Internal(UGSBWindow* Window, const FName& WindowClassName, const FName& WindowName)
+UGSBWindow* UGSBWindowSubsystem::ToggleWindow_Internal(UGSBWindow* Window, const FName& WindowClassName, const FName& DebugName)
 {
 	if (UClass* Class = GetWidgetClass(WindowClassName))
 	{
-		return ToggleWindow_Internal(Window, Class, WindowName);
+		return ToggleWindow_Internal(Window, Class, DebugName);
 	}
 	else
 	{
@@ -90,6 +90,5 @@ AGSBHUD* UGSBWindowSubsystem::GetHUD()
 	{
 		HUD = Cast<AGSBHUD>(GetGameInstance()->GetPrimaryPlayerController()->GetHUD());
 	}
-	
 	return HUD;
 }

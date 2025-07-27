@@ -7,7 +7,7 @@
 #include "GSBWindow.generated.h"
 
 class UGSBWindowFrame;
-class UGSBOverlay;
+class UGSBOverlayPanel;
 
 UCLASS()
 class GSB_API UGSBWindow : public UUserWidget
@@ -17,7 +17,7 @@ public:
 	virtual void NativeConstruct() override;
 
 public:
-	virtual void OnOpened(UGSBOverlay* InParentOverlay);
+	virtual void OnOpened(UGSBOverlayPanel* InParentOverlay);
 
 	virtual void OnClosed();
 
@@ -28,5 +28,5 @@ private	:
 	UPROPERTY(meta = (BindWidget))
 	UGSBWindowFrame* WindowFrame;
 
-	UGSBOverlay* ParentOverlay;
+	UGSBOverlayPanel* ParentOverlay;
 };
