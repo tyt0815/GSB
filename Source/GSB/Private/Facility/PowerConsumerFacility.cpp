@@ -65,7 +65,7 @@ bool APowerConsumerFacility::TryLinkToPowerProvider(IPowerProviderFacility* Powe
 
 bool APowerConsumerFacility::CanLinkToPowerProvider(IPowerProviderFacility* PowerProvider)
 {
-	return PowerProvider != nullptr && IsOn();
+	return PowerProvider != nullptr && IsOn() && PowerProvider->CanProvidePower();
 }
 
 void APowerConsumerFacility::OnLinkToPowerProvider_Implementation(AActor* PowerProviderActor)
@@ -168,15 +168,24 @@ void APowerConsumerFacility::OnUnlinkFromPowerProvider_Implementation()
 	}
 	PowerWire = nullptr;
 
+	TArray<IPowerProviderFacility*> PowerProviderToIgnore;
 	if (LinkedPowerProvider)
 	{
+		PowerProviderToIgnore.Add(LinkedPowerProvider.GetInterface());
 		LinkedPowerProvider->UpdatePowerUsage(-PowerConsumption);
 	}
 	LinkedPowerProvider = nullptr;
+
+	if (IsOn())
+	{
+		TRACE_SCREEN_LOG(FString::Printf(TEXT("%s: Sibal"), *GetFacilityName().ToString()));
+		TryLinkToNearByPowerProvider(PowerProviderToIgnore);
+	}
+
 	UpdatePowerWidgets();
 }
 
-bool APowerConsumerFacility::TryLinkToNearByPowerProvider()
+bool APowerConsumerFacility::TryLinkToNearByPowerProvider(const TArray<IPowerProviderFacility*> PowerProvidersToIgnore)
 {
 	if (IsLinkedToPowerProvider())
 	{
@@ -194,6 +203,10 @@ bool APowerConsumerFacility::TryLinkToNearByPowerProvider()
 	for (const FHitResult& HitResult : HitResults)
 	{
 		IPowerProviderFacility* PowerProvider = Cast<IPowerProviderFacility>(HitResult.GetActor());
+		if (PowerProvidersToIgnore.Contains(PowerProvider))
+		{
+			continue;
+		}
 		if (TryLinkToPowerProvider(PowerProvider))
 		{
 			return true;
@@ -270,35 +283,41 @@ void APowerConsumerFacility::UpdatePowerWidgets()
 
 void APowerConsumerFacility::UpdatePowerStatusWidget()
 {
-	if (UGSBPoweredFacilityDetailWindow* Window = Cast<UGSBPoweredFacilityDetailWindow>(DetailWindow))
+	if (IsValid(DetailWindow))
 	{
-		if (!IsOn())
+		if (UGSBPoweredFacilityDetailWindow* Window = Cast<UGSBPoweredFacilityDetailWindow>(DetailWindow))
 		{
-			Window->SetPowerStatus_TurnedOff();
+			if (!IsOn())
+			{
+				Window->SetPowerStatus_TurnedOff();
+			}
+			else if (IsOperating())
+			{
+				Window->SetPowerStatus_Powered();
+			}
+			else
+			{
+				Window->SetPowerStatus_Unpowered();
+			}
 		}
-		else if (IsOperating())
-		{
-			Window->SetPowerStatus_Powered();
-		}
-		else
-		{
-			Window->SetPowerStatus_Unpowered();
-		}
-	}
+	}	
 }
 
 void APowerConsumerFacility::UpdatePowerConsumptionWidget()
 {
-	if (UGSBPoweredFacilityDetailWindow* Window = Cast<UGSBPoweredFacilityDetailWindow>(DetailWindow))
+	if (IsValid(DetailWindow))
 	{
-		Window->SetPowerConsumption(GetTotalPowerUsage());
+		if (UGSBPoweredFacilityDetailWindow* Window = Cast<UGSBPoweredFacilityDetailWindow>(DetailWindow))
+		{
+			Window->SetPowerConsumption(GetTotalPowerUsage());
+		}
 	}
 }
 
 void APowerConsumerFacility::TurnOn()
 {
 	bOn = true;
-	TryLinkToNearByPowerProvider();
+	TryLinkToNearByPowerProvider({});
 	UpdatePowerWidgets();
 }
 

@@ -42,7 +42,7 @@ public:
 	void OnUnlinkFromPowerProvider();
 	virtual void OnUnlinkFromPowerProvider_Implementation();
 
-	bool TryLinkToNearByPowerProvider();
+	bool TryLinkToNearByPowerProvider(const TArray<IPowerProviderFacility*> PowerProvidersToIgnore);
 
 	void UnlinkFromPowerProvider();
 

@@ -68,7 +68,7 @@ void APowerRelayFacility::UpdatePowerUsage(int32 Addition)
 
 bool APowerRelayFacility::CanProvidePower()
 {
-	return IsLinkedToPowerProvider() && LinkedPowerProvider->CanProvidePower();
+	return IsLinkedToPowerProvider() && LinkedPowerProvider->CanProvidePower() && IsOperating();
 }
 
 void APowerRelayFacility::SetPowerInfluenceAreaVisibility(bool bVisibilty)
