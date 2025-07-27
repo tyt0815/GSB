@@ -52,7 +52,7 @@ UGSBWindow* AGSBHUD::OpenWindow(UClass* WindowClass, const FName& DebugName)
 {
 	if (UGSBOverlay* CurrentOverlay = GetCurrentOverlay())
 	{
-		CurrentOverlay->OpenWindow(WindowClass, DebugName);
+		return CurrentOverlay->OpenWindow(WindowClass, DebugName);
 	}
 	return nullptr;
 }
@@ -61,7 +61,7 @@ UGSBWindow* AGSBHUD::ToggleWindow(UGSBWindow* Window, UClass* WindowClass, const
 {
 	if (UGSBOverlay* CurrentOverlay = GetCurrentOverlay())
 	{
-		CurrentOverlay->ToggleWindow(Window, WindowClass, DebugName);
+		return CurrentOverlay->ToggleWindow(Window, WindowClass, DebugName);
 	}
 	return nullptr;
 }
@@ -70,7 +70,7 @@ UGSBNumberInputDialog* AGSBHUD::OpenNumberInputDialog(UClass* NumberInputDialogC
 {
 	if (UGSBOverlay* CurrentOverlay = GetCurrentOverlay())
 	{
-		CurrentOverlay->OpenNumberInputDialog(NumberInputDialogClass, TargetObject, DebugName);
+		return CurrentOverlay->OpenNumberInputDialog(NumberInputDialogClass, TargetObject, DebugName);
 	}
 	return nullptr;
 }
@@ -79,7 +79,7 @@ UGSBNumberInputDialog* AGSBHUD::OpenDefaultNumberInputDialog(UObject* TargetObje
 {
 	if (UGSBOverlay* CurrentOverlay = GetCurrentOverlay())
 	{
-		CurrentOverlay->OpenDefaultNumberInputDialog(TargetObject, DebugName);
+		return CurrentOverlay->OpenDefaultNumberInputDialog(TargetObject, DebugName);
 	}
 	return nullptr;
 }
@@ -121,7 +121,7 @@ UGSBContextMenu* AGSBHUD::OpenContextMenu(UClass* ContextMenuClass, UObject* Con
 {
 	if (UGSBOverlay* CurrentOverlay = GetCurrentOverlay())
 	{
-		CurrentOverlay->OpenContextMenu(ContextMenuClass, ContextTarget, DebugName);
+		return CurrentOverlay->OpenContextMenu(ContextMenuClass, ContextTarget, DebugName);
 	}
 	return nullptr;
 }
@@ -130,7 +130,7 @@ UGSBContextMenu* AGSBHUD::OpenDefaultContextMenu(UObject* ContextTarget, const F
 {
 	if (UGSBOverlay* CurrentOverlay = GetCurrentOverlay())
 	{
-		CurrentOverlay->OpenDefaultContextMenu(ContextTarget, DebugName);
+		return CurrentOverlay->OpenDefaultContextMenu(ContextTarget, DebugName);
 	}
 	return nullptr;
 }

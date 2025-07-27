@@ -30,7 +30,9 @@ void UGSBPlayerOverlayPanel::InitializeOverlayPanel()
 				if (ACentralHub * CentralHub = FacilitySubsystem->GetCentralHub())
 				{
 					CentralHub->OnUpdatePowerUsage.AddDynamic(PowerCapacity, &UGSBPowerCapacity::UpdatePowerUsage);
-					CentralHub->OnUpdatePowerCapacity.AddDynamic(PowerCapacity, &UGSBPowerCapacity::UpdatePowerCapacity);
+					CentralHub->OnUpdatePowerCapacity.AddDynamic(PowerCapacity, &UGSBPowerCapacity::UpdatePowerCapacity); 
+					CentralHub->UpdatePowerUsage(0);
+					CentralHub->UpdatePowerCapacity(0);
 				}
 				else
 				{
@@ -44,38 +46,55 @@ void UGSBPlayerOverlayPanel::InitializeOverlayPanel()
 
 void UGSBPlayerOverlayPanel::ShowInteractionList()
 {
-	InteractionListWidget->SetVisibility(ESlateVisibility::Visible);
+	if (IsValid(InteractionListWidget))
+	{
+		InteractionListWidget->SetVisibility(ESlateVisibility::Visible);
+	}
 }
 
 void UGSBPlayerOverlayPanel::HideInteractionList()
 {
-	InteractionListWidget->SetVisibility(ESlateVisibility::Hidden);
+	if (IsValid(InteractionListWidget))
+	{
+		InteractionListWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
 }
 
 void UGSBPlayerOverlayPanel::UpdateInteractionFocusing(int32 Index)
 {
-	InteractionListWidget->UpdateFocusing(Index);
+	if (IsValid(InteractionListWidget))
+	{
+		InteractionListWidget->UpdateFocusing(Index);
+	}
 }
 
 void UGSBPlayerOverlayPanel::UpdateInteractionList(const TArray<FString>& Descriptions)
 {
-	InteractionListWidget->UpdateInteractionList(Descriptions);
+	if (IsValid(InteractionListWidget))
+	{
+		InteractionListWidget->UpdateInteractionList(Descriptions);
+	}
 }
 
 void UGSBPlayerOverlayPanel::SwitchToBuildModeUI()
 {
-	ConstructableFacilityQuickSlotList->SyncronizeFacilityQuickSlots();
-	ConstructableFacilityQuickSlotList->SetVisibility(ESlateVisibility::Visible);
+	if (IsValid(ConstructableFacilityQuickSlotList))
+	{
+		ConstructableFacilityQuickSlotList->SyncronizeFacilityQuickSlots();
+		ConstructableFacilityQuickSlotList->SetVisibility(ESlateVisibility::Visible);
+	}
 }
 
 void UGSBPlayerOverlayPanel::SwitchToCombatModeUI()
 {
-	ConstructableFacilityQuickSlotList->SetVisibility(ESlateVisibility::Hidden);
+	if (IsValid(ConstructableFacilityQuickSlotList))
+	{
+		ConstructableFacilityQuickSlotList->SetVisibility(ESlateVisibility::Hidden);
+	}
 }
 
 void UGSBPlayerOverlayPanel::HandleOnWindowOpened(UGSBWindow* Window)
 {
-	TRACE_SCREEN_LOG(TEXT("sibal2"));
 	if (AGSBPlayerController* PC = GetOwningPlayer<AGSBPlayerController>())
 	{
 		if (OpenedWindows.Num() == 1)

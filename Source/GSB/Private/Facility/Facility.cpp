@@ -144,15 +144,16 @@ void AFacility::OnShowDetailInteraction(AActor* Interactor)
 {
 	if (DetailWindowClass)
 	{
-		if (UGSBGameInstance* GameInst = GetGameInstance<UGSBGameInstance>())
+		if (UGSBWindowSubsystem* WindowManager = UGSBWindowSubsystem::Get(this))
 		{
-			if (UGSBWindowSubsystem* WindowManager = GameInst->GetSubsystem<UGSBWindowSubsystem>())
+			DetailWindow = Cast<UGSBFacilityDetailWindow>(WindowManager->OpenWindow(DetailWindowClass, FName(GetFacilityName().ToString() + TEXT(" Detail Window"))));
+			if (DetailWindow)
 			{
-				DetailWindow = Cast<UGSBFacilityDetailWindow>(WindowManager->OpenWindow(DetailWindowClass, FName(GetFacilityName().ToString() + TEXT(" Detail Window"))));
-				if (DetailWindow)
-				{
-					DetailWindow->OnLinkedToFacility(this);
-				}
+				DetailWindow->OnLinkedToFacility(this);
+			}
+			else
+			{
+				TRACE_SCREEN_LOG(TEXT("UGSBFacilityDetailWindow 캐스팅 실패.") + GetFacilityName().ToString());
 			}
 		}
 	}

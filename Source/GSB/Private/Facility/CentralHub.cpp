@@ -95,6 +95,9 @@ void ACentralHub::BeginPlay()
 	InputPortHandler->OnProcess.BindDynamic(this, &ACentralHub::TryReceiveItemFromInputPort);
 	OutputPortHandler->OnProcess.BindDynamic(this, &ACentralHub::TrySendItemToOutputPort);
 
+	// Power Usage/Capacity Widget 업데이트용
+	UpdatePowerUsage(0);
+	UpdatePowerCapacity(0);
 }
 
 void ACentralHub::UpdatePowerCapacity(int32 Addition)
