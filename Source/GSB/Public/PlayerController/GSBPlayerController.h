@@ -60,6 +60,8 @@ public:
 
 	void SwitchGamePlayMode_PlayerBuildGameAndUI(AGSBPlayer* GSBPlayer);
 
+	void SwitchGamePlayMode_TopViewExplore(ATopDownBuildPawn* TopDownBuildPawn);
+
 	void SwitchGamePlayMode_TopViewBuild(ATopDownBuildPawn* TopDownBuildPawn);
 
 	void SwitchGamePlayMode_TopViewWindowHandle(ATopDownBuildPawn* TopDownBuildPawn);
@@ -71,6 +73,8 @@ public:
 	void SetGamePlayMode_PlayerBuildGameOnly();
 
 	void SetGamePlayMode_PlayerBuildGameAndUI();
+
+	void SetGamePlayMode_TopViewExplore();
 
 	void SetGamePlayMode_TopViewBuild();
 

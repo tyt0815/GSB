@@ -123,6 +123,7 @@ void AFacilityBuilder::CancelPreview()
 
 void AFacilityBuilder::RotatePreview()
 {
+	AddActorWorldRotation(FRotator(0, 90, 0));
 	if (IsValid(FacilityGhost))
 	{
 		FacilityGhost->AddActorWorldRotation(FRotator(0, 90, 0));
@@ -338,7 +339,7 @@ void AFacilityBuilder::Tick_ConveyorBeltBuildMode(float DeltaSeconds)
 
 		// ChainPreview 생성
 		double ChainLength = StartToEndVector.Length();
-		int GhostsNum = (ChainLength - GRID_CELL_SIZE / 2) / GRID_CELL_SIZE + 1;
+		int GhostsNum = (ChainLength - GRID_CELL_SIZE / 2) / GRID_CELL_SIZE + 2;
 		GhostsNum = FMath::Max(1, GhostsNum);
 		FVector ChainConveyorBeltLocationOffset;
 		FRotator ChainConveyorBeltsRotation;
@@ -481,6 +482,7 @@ AFacilityGhostActor* AFacilityBuilder::SpawnFacilityGhost(const TSubclassOf<ACon
 		AFacilityGhostActor* Ghost = World->SpawnActor<AFacilityGhostActor>();
 
 		Ghost->BuildGhostPreview(TempFacility);
+		Ghost->SetActorRotation(GetActorRotation());
 		Ghost->SnapActorToGrid(GetActorLocation());
 
 		TempFacility->Destroy();

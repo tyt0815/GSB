@@ -116,6 +116,20 @@ void AGSBPlayerController::SwitchGamePlayMode_PlayerBuildGameAndUI(AGSBPlayer* G
 	}
 }
 
+void AGSBPlayerController::SwitchGamePlayMode_TopViewExplore(ATopDownBuildPawn* TopDownBuildPawn)
+{
+	SetGamePlayMode_TopViewExplore();
+
+	if (IsValid(TopDownBuildPawn))
+	{
+		if (GetPawn() != TopDownBuildPawn)
+		{
+			Possess(TopDownBuildPawn);
+		}
+		TopDownBuildPawn->OnEnterTopViewExploreMode();
+	}
+}
+
 void AGSBPlayerController::SwitchGamePlayMode_TopViewBuild(ATopDownBuildPawn* TopDownBuildPawn)
 {
 	SetGamePlayMode_TopViewBuild();
@@ -186,7 +200,8 @@ void AGSBPlayerController::SetGamePlayMode_PlayerBuildGameOnly()
 	AddInputMappingContext(InputSet->IMC_Interaction);
 	AddInputMappingContext(InputSet->IMC_ToggleCombatAndBuildMode);
 	AddInputMappingContext(InputSet->IMC_ToggleTopDownAndThirdPersonBuildMode);
-	AddInputMappingContext(InputSet->IMC_BuildFacility);
+	AddInputMappingContext(InputSet->IMC_PreviewFacility);
+	AddInputMappingContext(InputSet->IMC_OnPreviewFacility);
 	AddInputMappingContext(InputSet->IMC_ToggleInventoryWindow);
 	AddInputMappingContext(InputSet->IMC_ToggleConstructibleFacilityListWindow);
 	AddInputMappingContext(InputSet->IMC_SystemUI);
@@ -211,12 +226,28 @@ void AGSBPlayerController::SetGamePlayMode_PlayerBuildGameAndUI()
 	SetInputMode_GameAndUI();
 }
 
+void AGSBPlayerController::SetGamePlayMode_TopViewExplore()
+{
+	ClearAllInputMappingContext();
+
+	AddInputMappingContext(InputSet->IMC_Move);
+	AddInputMappingContext(InputSet->IMC_PreviewFacility);
+	AddInputMappingContext(InputSet->IMC_HandleFacility);
+	AddInputMappingContext(InputSet->IMC_ToggleConstructibleFacilityListWindow);
+	AddInputMappingContext(InputSet->IMC_ToggleTopDownAndThirdPersonBuildMode);
+	AddInputMappingContext(InputSet->IMC_SystemUI);
+
+	ControlledPawnType = EControlledPawn::ECP_TopDownBuildPawn;
+	SetInputMode_GameAndUI();
+}
+
 void AGSBPlayerController::SetGamePlayMode_TopViewBuild()
 {
 	ClearAllInputMappingContext();
 
 	AddInputMappingContext(InputSet->IMC_Move);
-	AddInputMappingContext(InputSet->IMC_BuildFacility);
+	AddInputMappingContext(InputSet->IMC_PreviewFacility);
+	AddInputMappingContext(InputSet->IMC_OnPreviewFacility);
 	AddInputMappingContext(InputSet->IMC_ToggleConstructibleFacilityListWindow);
 	AddInputMappingContext(InputSet->IMC_ToggleTopDownAndThirdPersonBuildMode);
 	AddInputMappingContext(InputSet->IMC_SystemUI);

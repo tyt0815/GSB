@@ -26,6 +26,8 @@ protected:
 public:	
 	bool IsControlled() const;
 
+	void OnEnterTopViewExploreMode();
+
 	void OnEnterTopViewBuildMode();
 
 	void OnEnterTopViewWindowHandleMode();
@@ -49,6 +51,7 @@ private:
 	void RotatePreview();
 	void ConfirmFacilityPlacement();
 	void CancelFacilityPreview();
+	void PreviewFacility(int32 Index);
 	void PreviewFacility1();
 	void PreviewFacility2();
 	void PreviewFacility3();
@@ -59,6 +62,8 @@ private:
 	void PreviewFacility8();
 	void PreviewFacility9();
 	void PreviewFacility0();
+	void SelectFacility();
+	void OpenFacilityContextMenu();
 
 	void GetMouseWorldPosition(FVector& WorldLocation, FVector& WorldDirection);
 

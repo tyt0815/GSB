@@ -45,16 +45,7 @@ public:
 	UInputAction* IA_SelectInteractionScrollDown;
 
 	UPROPERTY(EditDefaultsOnly)
-	UInputMappingContext* IMC_BuildFacility;
-
-	UPROPERTY(EditDefaultsOnly)
-	UInputAction* IA_RotatePreview;
-
-	UPROPERTY(EditDefaultsOnly)
-	UInputAction* IA_ConfirmFacilityPlacement;
-
-	UPROPERTY(EditDefaultsOnly)
-	UInputAction* IA_CancelFacilityPreview;
+	UInputMappingContext* IMC_PreviewFacility;
 
 	UPROPERTY(EditDefaultsOnly)
 	UInputAction* IA_PreviewFacility1;
@@ -87,6 +78,18 @@ public:
 	UInputAction* IA_PreviewFacility0;
 
 	UPROPERTY(EditDefaultsOnly)
+	UInputMappingContext* IMC_OnPreviewFacility;
+
+	UPROPERTY(EditDefaultsOnly)
+	UInputAction* IA_RotatePreview;
+
+	UPROPERTY(EditDefaultsOnly)
+	UInputAction* IA_ConfirmFacilityPlacement;
+
+	UPROPERTY(EditDefaultsOnly)
+	UInputAction* IA_CancelFacilityPreview;
+
+	UPROPERTY(EditDefaultsOnly)
 	UInputMappingContext* IMC_ToggleCombatAndBuildMode;
 
 	UPROPERTY(EditDefaultsOnly)
@@ -97,6 +100,15 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	UInputAction* IA_ToggleTopDownAndThirdPersonBuildMode;
+
+	UPROPERTY(EditDefaultsOnly)
+	UInputMappingContext* IMC_HandleFacility;
+
+	UPROPERTY(EditDefaultsOnly)
+	UInputAction* IA_SelectFacility;
+
+	UPROPERTY(EditDefaultsOnly)
+	UInputAction* IA_OpenFacilityContextMenu;
 
 	UPROPERTY(EditDefaultsOnly)
 	UInputMappingContext* IMC_Combat;

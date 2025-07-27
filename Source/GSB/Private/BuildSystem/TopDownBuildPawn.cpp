@@ -58,9 +58,6 @@ void ATopDownBuildPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 				EnhancedInputComponent->BindAction(InputSet->IA_ToggleTopDownAndThirdPersonBuildMode, ETriggerEvent::Started, this, &ATopDownBuildPawn::SwitchToThirdPersonBuildMode);
 				EnhancedInputComponent->BindAction(InputSet->IA_ToggleConstructibleFacilityListWindow, ETriggerEvent::Started, this, &ATopDownBuildPawn::ToggleBuildableFacilityList);
 
-				EnhancedInputComponent->BindAction(InputSet->IA_RotatePreview, ETriggerEvent::Started, this, &ATopDownBuildPawn::RotatePreview);
-				EnhancedInputComponent->BindAction(InputSet->IA_ConfirmFacilityPlacement, ETriggerEvent::Started, this, &ATopDownBuildPawn::ConfirmFacilityPlacement);
-				EnhancedInputComponent->BindAction(InputSet->IA_CancelFacilityPreview, ETriggerEvent::Started, this, &ATopDownBuildPawn::CancelFacilityPreview);
 				EnhancedInputComponent->BindAction(InputSet->IA_PreviewFacility1, ETriggerEvent::Started, this, &ATopDownBuildPawn::PreviewFacility1);
 				EnhancedInputComponent->BindAction(InputSet->IA_PreviewFacility2, ETriggerEvent::Started, this, &ATopDownBuildPawn::PreviewFacility2);
 				EnhancedInputComponent->BindAction(InputSet->IA_PreviewFacility3, ETriggerEvent::Started, this, &ATopDownBuildPawn::PreviewFacility3);
@@ -71,6 +68,13 @@ void ATopDownBuildPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 				EnhancedInputComponent->BindAction(InputSet->IA_PreviewFacility8, ETriggerEvent::Started, this, &ATopDownBuildPawn::PreviewFacility8);
 				EnhancedInputComponent->BindAction(InputSet->IA_PreviewFacility9, ETriggerEvent::Started, this, &ATopDownBuildPawn::PreviewFacility9);
 				EnhancedInputComponent->BindAction(InputSet->IA_PreviewFacility0, ETriggerEvent::Started, this, &ATopDownBuildPawn::PreviewFacility0);
+
+				EnhancedInputComponent->BindAction(InputSet->IA_RotatePreview, ETriggerEvent::Started, this, &ATopDownBuildPawn::RotatePreview);
+				EnhancedInputComponent->BindAction(InputSet->IA_ConfirmFacilityPlacement, ETriggerEvent::Started, this, &ATopDownBuildPawn::ConfirmFacilityPlacement);
+				EnhancedInputComponent->BindAction(InputSet->IA_CancelFacilityPreview, ETriggerEvent::Started, this, &ATopDownBuildPawn::CancelFacilityPreview);
+
+				EnhancedInputComponent->BindAction(InputSet->IA_SelectFacility, ETriggerEvent::Started, this, &ATopDownBuildPawn::SelectFacility);
+				EnhancedInputComponent->BindAction(InputSet->IA_OpenFacilityContextMenu, ETriggerEvent::Started, this, &ATopDownBuildPawn::OpenFacilityContextMenu);
 
 			}
 		}
@@ -88,17 +92,21 @@ bool ATopDownBuildPawn::IsControlled() const
 	return GetController<AGSBPlayerController>() != nullptr;
 }
 
-void ATopDownBuildPawn::OnEnterTopViewBuildMode()
+void ATopDownBuildPawn::OnEnterTopViewExploreMode()
 {
-	if (IsValid(OwningPlayer))
-	{
-		SetActorLocation(OwningPlayer->GetActorLocation() + FVector::ZAxisVector * 2000);
-	}
-	
 	if (IsValid(PlayerOverlay))
 	{
 		PlayerOverlay->SwitchToTopViewModeUI();
 	}
+	if (IsValid(OwningPlayer))
+	{
+		SetActorLocation(OwningPlayer->GetActorLocation() + FVector::ZAxisVector * 2000);
+	}
+}
+
+void ATopDownBuildPawn::OnEnterTopViewBuildMode()
+{
+	
 }
 
 void ATopDownBuildPawn::OnEnterTopViewWindowHandleMode()
@@ -144,57 +152,82 @@ void ATopDownBuildPawn::ConfirmFacilityPlacement()
 
 void ATopDownBuildPawn::CancelFacilityPreview()
 {
+	if (AGSBPlayerController* PC = GetController<AGSBPlayerController>())
+	{
+		PC->SetGamePlayMode_TopViewExplore();
+	}
 	FacilityBuilder->CancelPreview();
+}
+
+void ATopDownBuildPawn::PreviewFacility(int32 Index)
+{
+	if (AGSBPlayerController* PC = GetController<AGSBPlayerController>())
+	{
+		PC->SetGamePlayMode_TopViewBuild();
+	}
+	FacilityBuilder->PreviewFacilityAt(Index);
 }
 
 void ATopDownBuildPawn::PreviewFacility1()
 {
-	FacilityBuilder->PreviewFacilityAt(1);
+	PreviewFacility(1);
 }
 
 void ATopDownBuildPawn::PreviewFacility2()
 {
-	FacilityBuilder->PreviewFacilityAt(2);
+	PreviewFacility(2);
 }
 
 void ATopDownBuildPawn::PreviewFacility3()
 {
-	FacilityBuilder->PreviewFacilityAt(3);
+	PreviewFacility(3);
 }
 
 void ATopDownBuildPawn::PreviewFacility4()
 {
-	FacilityBuilder->PreviewFacilityAt(4);
+	PreviewFacility(4);
 }
 
 void ATopDownBuildPawn::PreviewFacility5()
 {
-	FacilityBuilder->PreviewFacilityAt(5);
+	PreviewFacility(5);
 }
 
 void ATopDownBuildPawn::PreviewFacility6()
 {
-	FacilityBuilder->PreviewFacilityAt(6);
+	PreviewFacility(6);
 }
 
 void ATopDownBuildPawn::PreviewFacility7()
 {
-	FacilityBuilder->PreviewFacilityAt(7);
+	PreviewFacility(7);
 }
 
 void ATopDownBuildPawn::PreviewFacility8()
 {
-	FacilityBuilder->PreviewFacilityAt(8);
+	PreviewFacility(8);
 }
 
 void ATopDownBuildPawn::PreviewFacility9()
 {
-	FacilityBuilder->PreviewFacilityAt(9);
+	PreviewFacility(9);
 }
 
 void ATopDownBuildPawn::PreviewFacility0()
 {
-	FacilityBuilder->PreviewFacilityAt(0);
+	PreviewFacility(0);
+}
+
+void ATopDownBuildPawn::SelectFacility()
+{
+	// TODO
+	TRACE_SCREEN_LOG(TEXT("SelectFacility"));
+}
+
+void ATopDownBuildPawn::OpenFacilityContextMenu()
+{
+	// TODO
+	TRACE_SCREEN_LOG(TEXT("OpenFacilityContextMenu"));
 }
 
 void ATopDownBuildPawn::GetMouseWorldPosition(FVector& WorldLocation, FVector& WorldDirection)
@@ -232,7 +265,7 @@ void ATopDownBuildPawn::UpdateFacilityBuilderLocation()
 		ObjectTypes,
 		false,
 		ActorsToIgnore,
-		EDrawDebugTrace::ForOneFrame,
+		EDrawDebugTrace::None,
 		OutHit,
 		true
 	);
