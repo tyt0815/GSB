@@ -2,8 +2,8 @@
 
 
 #include "HUDs/GSBFacilityQuickSlotList.h"
-#include "Components/VerticalBox.h"
-#include "Components/VerticalBoxSlot.h"
+#include "Components/HorizontalBox.h"
+// #include "Components/HorizontalBoxSlot.h"
 #include "Characters/GSBPlayer.h"
 #include "BuildSystem/FacilityBuilder.h"
 
@@ -18,10 +18,11 @@ void UGSBFacilityQuickSlotList::NativeConstruct()
 		{
 			if (UGSBFacilityQuickSlot* QuickSlot = CreateWidget<UGSBFacilityQuickSlot>(GetOwningPlayer(), QuickSlotClass))
 			{
-				if (UVerticalBoxSlot* VerticalBoxSlot = Cast<UVerticalBoxSlot>(ConstructableFacilityQuickSlotList->AddChild(QuickSlot)))
+				ConstructableFacilityQuickSlotList->AddChild(QuickSlot);
+				/*if (UHorizontalBoxSlot* HorizontalBoxSlot = Cast<UHorizontalBoxSlot>(ConstructableFacilityQuickSlotList->AddChild(QuickSlot)))
 				{
-					VerticalBoxSlot->SetHorizontalAlignment(EHorizontalAlignment::HAlign_Fill);
-				}
+					HorizontalBoxSlot->SetHorizontalAlignment(EHorizontalAlignment::HAlign_Fill);
+				}*/
 			}
 		}
 	}

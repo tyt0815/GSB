@@ -233,6 +233,7 @@ bool AGSBPlayerController::IsPlayerBuildMode() const
 
 void AGSBPlayerController::SetInputMode_GameOnly()
 {
+	SetShowMouseCursor(false);
 	FInputModeGameOnly InputMode;
 	SetInputMode(InputMode);
 
@@ -241,6 +242,7 @@ void AGSBPlayerController::SetInputMode_GameOnly()
 
 void AGSBPlayerController::SetInputMode_UIOnly()
 {
+	SetShowMouseCursor(true);
 	FInputModeUIOnly InputMode;
 	InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::LockInFullscreen);
 	SetInputMode(InputMode);
@@ -250,6 +252,7 @@ void AGSBPlayerController::SetInputMode_UIOnly()
 
 void AGSBPlayerController::SetInputMode_GameAndUI()
 {
+	SetShowMouseCursor(true);
 	FInputModeGameAndUI InputMode;
 	InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::LockInFullscreen);
 	InputMode.SetHideCursorDuringCapture(false);

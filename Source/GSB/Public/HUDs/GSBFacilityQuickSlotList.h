@@ -26,5 +26,5 @@ public:
 	TSubclassOf<UGSBFacilityQuickSlot> QuickSlotClass;
 
 	UPROPERTY(meta = (BindWidget))
-	class UVerticalBox* ConstructableFacilityQuickSlotList;
+	class UHorizontalBox* ConstructableFacilityQuickSlotList;
 };

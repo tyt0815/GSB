@@ -29,7 +29,7 @@ AGSBPlayer::AGSBPlayer()
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SprintArm"));
 	SpringArmComponent->SetupAttachment(GetRootComponent());
 	SpringArmComponent->bUsePawnControlRotation = true;		// 카메라 회전
-	SpringArmComponent->TargetArmLength = 500.0f;
+	SpringArmComponent->TargetArmLength = 600;
 	SpringArmComponent->SetRelativeLocation(FVector(0, 0, 100));
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
 	CameraComponent->SetupAttachment(SpringArmComponent);
@@ -139,13 +139,6 @@ void AGSBPlayer::BeginPlay()
 		TRACE_SCREEN_LOG(TEXT("UGSBGameInstance 캐스팅 실패"));
 	}
 
-	if (UWorld* World = GetWorld())
-	{
-		TopDownBuildPawn = World->SpawnActor<ATopDownBuildPawn>();
-		TopDownBuildPawn->SetOwningPlayer(this);
-		TopDownBuildPawn->SetFacilityBuilder(FacilityBuilder);
-	}
-
 	if (PlayerOverlayClass)
 	{
 		if (AGSBHUD* HUD = GetHUD())
@@ -160,6 +153,14 @@ void AGSBPlayer::BeginPlay()
 	else
 	{
 		TRACE_SCREEN_LOG(TEXT("PlayerOverlayClass 가 nullptr 입니다."));
+	}
+
+	if (UWorld* World = GetWorld())
+	{
+		TopDownBuildPawn = World->SpawnActor<ATopDownBuildPawn>();
+		TopDownBuildPawn->SetOwningPlayer(this);
+		TopDownBuildPawn->SetFacilityBuilder(FacilityBuilder);
+		TopDownBuildPawn->SetPlayerOverlay(PlayerOverlay);
 	}
 
 	SwitchToCombatMode();
@@ -395,7 +396,7 @@ bool AGSBPlayer::IsControlled() const
 	return GetPlayerController() != nullptr;
 }
 
-void AGSBPlayer::OnEnterCombatModeGameOnly()
+void AGSBPlayer::OnEnterCombatMode()
 {
 	FacilityBuilder->CancelPreview();
 
@@ -403,14 +404,20 @@ void AGSBPlayer::OnEnterCombatModeGameOnly()
 	{
 		PlayerOverlay->SwitchToCombatModeUI();
 	}
+}
+
+void AGSBPlayer::OnEnterCombatModeGameOnly()
+{
+	OnEnterCombatMode();
 	
 }
 
 void AGSBPlayer::OnEnterCombatModeGameAndUI()
 {
+	OnEnterCombatMode();
 }
 
-void AGSBPlayer::OnEnterBuildModeGameOnly()
+void AGSBPlayer::OnEnterBuildMode()
 {
 	if (IsValid(PlayerOverlay))
 	{
@@ -418,8 +425,14 @@ void AGSBPlayer::OnEnterBuildModeGameOnly()
 	}
 }
 
+void AGSBPlayer::OnEnterBuildModeGameOnly()
+{
+	OnEnterBuildMode();
+}
+
 void AGSBPlayer::OnEnterBuildModeGameAndUI()
 {
+	OnEnterBuildMode();
 }
 
 void AGSBPlayer::UpdateFacilityBuilderLocation()

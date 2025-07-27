@@ -52,6 +52,14 @@ void UGSBPlayerOverlay::SwitchToBuildModeUI()
 	}
 }
 
+void UGSBPlayerOverlay::SwitchToTopViewModeUI()
+{
+	if (UGSBPlayerOverlayPanel* PlayerOverlayPanel = GetPlayerOverlayPanel())
+	{
+		PlayerOverlayPanel->SwitchToTopViewModeUI();
+	}
+}
+
 UGSBPlayerOverlayPanel* UGSBPlayerOverlay::GetPlayerOverlayPanel() const
 {
 	if (UGSBPlayerOverlayPanel* PlayerOverlayPanel = Cast<UGSBPlayerOverlayPanel>(OverlayPanel))

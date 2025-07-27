@@ -49,6 +49,8 @@ private:
 
 	class AFacilityBuilder* FacilityBuilder;
 
+	class UGSBPlayerOverlay* PlayerOverlay;
+
 public:
 	FORCEINLINE void SetOwningPlayer(class AGSBPlayer* NewPlayer)
 	{
@@ -57,6 +59,10 @@ public:
 	FORCEINLINE void SetFacilityBuilder(class AFacilityBuilder* NewFacilityBuilder)
 	{
 		FacilityBuilder = NewFacilityBuilder;
+	}
+	FORCEINLINE void SetPlayerOverlay(class UGSBPlayerOverlay* NewPlayerOverlay)
+	{
+		PlayerOverlay = NewPlayerOverlay;
 	}
 
 };

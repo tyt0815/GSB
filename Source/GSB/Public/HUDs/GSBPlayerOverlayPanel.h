@@ -30,6 +30,8 @@ public:
 
 	void SwitchToCombatModeUI();
 
+	void SwitchToTopViewModeUI();
+
 protected:
 	UFUNCTION()
 	virtual void HandleOnWindowOpened(UGSBWindow* Window);
@@ -46,4 +48,10 @@ private:
 
 	UPROPERTY(meta = (BindWidget))
 	class UGSBPowerCapacity* PowerCapacity;
+
+	UPROPERTY(meta = (BindWidget))
+	class UWidgetSwitcher* ModeShortcutSwitcher;
+
+	UPROPERTY(meta = (BindWidget))
+	class UWidgetSwitcher* WindowShortcutSwitcher;
 };

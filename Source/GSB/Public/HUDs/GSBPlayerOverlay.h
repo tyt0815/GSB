@@ -26,5 +26,7 @@ public:
 
 	void SwitchToBuildModeUI();
 
+	void SwitchToTopViewModeUI();
+
 	class UGSBPlayerOverlayPanel* GetPlayerOverlayPanel() const;
 };

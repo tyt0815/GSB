@@ -95,6 +95,8 @@ protected:
 	// 전투 모드
 	///////////////////////////////////////////////////////////
 public:
+	void OnEnterCombatMode();
+
 	void OnEnterCombatModeGameOnly();
 
 	void OnEnterCombatModeGameAndUI();
@@ -103,6 +105,7 @@ public:
 	// 건설 모드
 	///////////////////////////////////////////////////////////
 public:
+	void OnEnterBuildMode();
 	void OnEnterBuildModeGameOnly();
 
 	void OnEnterBuildModeGameAndUI();

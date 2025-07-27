@@ -9,6 +9,7 @@
 #include "GameFramework/FloatingPawnMovement.h"
 #include "PlayerController/GSBPlayerController.h"
 #include "PlayerController/GSBPlayerInputActionSetDataAsset.h"
+#include "HUDs/GSBPlayerOverlay.h"
 #include "EnhancedInputComponent.h"
 #include "InputMappingContext.h"
 #include "DebugHeader.h"
@@ -72,6 +73,11 @@ void ATopDownBuildPawn::OnEnterTopDownBuildModeGameAndUI()
 	if (IsValid(OwningPlayer))
 	{
 		SetActorLocation(OwningPlayer->GetActorLocation() + FVector::ZAxisVector * 2000);
+	}
+	
+	if (IsValid(PlayerOverlay))
+	{
+		PlayerOverlay->SwitchToTopViewModeUI();
 	}
 }
 

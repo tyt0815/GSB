@@ -5,6 +5,7 @@
 #include "HUDs/GSBInteractionList.h"
 #include "HUDs/GSBPowerCapacity.h"
 #include "HUDs/GSBFacilityQuickSlotList.h"
+#include "Components/WidgetSwitcher.h"
 #include "PlayerController/GSBPlayerController.h"
 #include "Facility/CentralHub.h"
 #include "SubSystems/GSBFacilitySubsystem.h"
@@ -12,7 +13,7 @@
 void UGSBPlayerOverlayPanel::NativeConstruct()
 {
 	Super::NativeConstruct();
-
+	
 	OnWindowOpened.AddDynamic(this, &UGSBPlayerOverlayPanel::HandleOnWindowOpened);
 	OnWindowClosed.AddDynamic(this, &UGSBPlayerOverlayPanel::HandleOnWindowClosed);
 }
@@ -83,6 +84,16 @@ void UGSBPlayerOverlayPanel::SwitchToBuildModeUI()
 		ConstructableFacilityQuickSlotList->SyncronizeFacilityQuickSlots();
 		ConstructableFacilityQuickSlotList->SetVisibility(ESlateVisibility::Visible);
 	}
+
+	if (IsValid(ModeShortcutSwitcher))
+	{
+		ModeShortcutSwitcher->SetActiveWidgetIndex(1);
+	}
+
+	if (IsValid(WindowShortcutSwitcher))
+	{
+		WindowShortcutSwitcher->SetActiveWidgetIndex(1);
+	}
 }
 
 void UGSBPlayerOverlayPanel::SwitchToCombatModeUI()
@@ -90,6 +101,34 @@ void UGSBPlayerOverlayPanel::SwitchToCombatModeUI()
 	if (IsValid(ConstructableFacilityQuickSlotList))
 	{
 		ConstructableFacilityQuickSlotList->SetVisibility(ESlateVisibility::Hidden);
+	}
+
+	if (IsValid(ModeShortcutSwitcher))
+	{
+		ModeShortcutSwitcher->SetActiveWidgetIndex(0);
+	}
+
+	if (IsValid(WindowShortcutSwitcher))
+	{
+		WindowShortcutSwitcher->SetActiveWidgetIndex(0);
+	}
+}
+
+void UGSBPlayerOverlayPanel::SwitchToTopViewModeUI()
+{
+	if (IsValid(ConstructableFacilityQuickSlotList))
+	{
+		ConstructableFacilityQuickSlotList->SetVisibility(ESlateVisibility::Hidden);
+	}
+
+	if (IsValid(ModeShortcutSwitcher))
+	{
+		ModeShortcutSwitcher->SetActiveWidgetIndex(2);
+	}
+
+	if (IsValid(WindowShortcutSwitcher))
+	{
+		WindowShortcutSwitcher->SetActiveWidgetIndex(1);
 	}
 }
 
