@@ -26,6 +26,8 @@ public:
 
 	void UpdateInteractionList(const TArray<FString>& Descriptions);
 
+	void ShowConstructibleFacilityQuickSlotList();
+
 	void SwitchToBuildModeUI();
 
 	void SwitchToCombatModeUI();
@@ -54,4 +56,18 @@ private:
 
 	UPROPERTY(meta = (BindWidget))
 	class UWidgetSwitcher* WindowShortcutSwitcher;
+
+	class AGSBPlayer* GSBPlayer;
+
+	class AFacilityBuilder* FacilityBuilder;
+
+public:
+	FORCEINLINE void SetGSBPlayer(class AGSBPlayer* NewPlayer)
+	{
+		GSBPlayer = NewPlayer;
+	}
+	FORCEINLINE void SetFacilityBuilder(class AFacilityBuilder* NewFacilityBuilder)
+	{
+		FacilityBuilder = NewFacilityBuilder;
+	}
 };

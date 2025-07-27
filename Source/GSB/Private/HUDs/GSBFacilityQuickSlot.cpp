@@ -35,11 +35,8 @@ void UGSBFacilityQuickSlot::UpdateFacilityData(UGSBFacilityDataAsset* InFacility
 
 void UGSBFacilityQuickSlot::SetFacilityQuickSlot(UGSBFacilityDataAsset* InFacilityData)
 {
-	if (AGSBPlayer* Player = GetOwningPlayerPawn<AGSBPlayer>())
+	if (IsValid(FacilityBuilder))
 	{
-		if (AFacilityBuilder* FacilityBuilder = Player->GetFacilityBuilder())
-		{
-			FacilityBuilder->SetFacilityQuickSlot(InFacilityData, QuickSlotIndex);
-		}
+		FacilityBuilder->SetFacilityQuickSlot(InFacilityData, QuickSlotIndex);
 	}
 }

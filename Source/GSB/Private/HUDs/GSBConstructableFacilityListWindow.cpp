@@ -4,23 +4,22 @@
 #include "HUDs/GSBConstructableFacilityListWindow.h"
 #include "HUDs/GSBConstructableFacilitySlot.h"
 #include "BuildSystem/FacilityBuilder.h"
-#include "Characters/GSBPlayer.h"
 #include "Components/ScrollBox.h"
 #include "DebugHeader.h"
 
 void UGSBConstructableFacilityListWindow::NativeConstruct()
 {
 	Super::NativeConstruct();
+}
 
+void UGSBConstructableFacilityListWindow::UpdateList()
+{
 	ConstructableFacilityList->ClearChildren();
-	if (AGSBPlayer* Player = GetOwningPlayerPawn<AGSBPlayer>())
+	if (IsValid(FacilityBuilder))
 	{
-		if (AFacilityBuilder* FacilityBuilder = Player->GetFacilityBuilder())
-		{
-			AddConstructableFacilitySlot(FacilityBuilder->GetConveyorBeltForwardData());
-			AddConstructableFacilitySlots(FacilityBuilder->GetGeneralFacilityData());
-			AddConstructableFacilitySlot(FacilityBuilder->GetMiningFacilityData());
-		}
+		AddConstructableFacilitySlot(FacilityBuilder->GetConveyorBeltForwardData());
+		AddConstructableFacilitySlots(FacilityBuilder->GetGeneralFacilityData());
+		AddConstructableFacilitySlot(FacilityBuilder->GetMiningFacilityData());
 	}
 }
 
@@ -39,6 +38,7 @@ void UGSBConstructableFacilityListWindow::AddConstructableFacilitySlot(UGSBFacil
 		if (UGSBConstructableFacilitySlot* FacilitySlot = CreateWidget< UGSBConstructableFacilitySlot>(GetOwningPlayer(), ConstructableFacilitySlotClass))
 		{
 			ConstructableFacilityList->AddChild(FacilitySlot);
+			FacilitySlot->SetFacilityBuilder(FacilityBuilder);
 			FacilitySlot->UpdateFacilityData(FacilityData);
 		}
 	}

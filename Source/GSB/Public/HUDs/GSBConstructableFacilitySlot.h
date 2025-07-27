@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "GSBConstructableFacilitySlot.generated.h"
 
+class AFacilityBuilder;
 class UGSBFacilityDataAsset;
 
 UCLASS()
@@ -34,9 +35,15 @@ private:
 
 	UGSBFacilityDataAsset* FacilityData;
 
+	AFacilityBuilder* FacilityBuilder;
+
 public:
 	FORCEINLINE UGSBFacilityDataAsset* GetFacilityData() const
 	{
 		return FacilityData;
+	}
+	FORCEINLINE void SetFacilityBuilder(AFacilityBuilder* NewFacilityBuilder)
+	{
+		FacilityBuilder = NewFacilityBuilder;
 	}
 };

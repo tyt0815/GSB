@@ -20,6 +20,8 @@ void UGSBPlayerOverlayPanel::NativeConstruct()
 
 void UGSBPlayerOverlayPanel::InitializeOverlayPanel()
 {
+	Super::InitializeOverlayPanel();
+
 	HideInteractionList();
 
 	if (UWorld* World = GetWorld())
@@ -77,12 +79,18 @@ void UGSBPlayerOverlayPanel::UpdateInteractionList(const TArray<FString>& Descri
 	}
 }
 
+void UGSBPlayerOverlayPanel::ShowConstructibleFacilityQuickSlotList()
+{
+	ConstructableFacilityQuickSlotList->SetFacilityBuilder(FacilityBuilder);
+	ConstructableFacilityQuickSlotList->SyncronizeFacilityQuickSlots();
+	ConstructableFacilityQuickSlotList->SetVisibility(ESlateVisibility::Visible);
+}
+
 void UGSBPlayerOverlayPanel::SwitchToBuildModeUI()
 {
 	if (IsValid(ConstructableFacilityQuickSlotList))
 	{
-		ConstructableFacilityQuickSlotList->SyncronizeFacilityQuickSlots();
-		ConstructableFacilityQuickSlotList->SetVisibility(ESlateVisibility::Visible);
+		ShowConstructibleFacilityQuickSlotList();
 	}
 
 	if (IsValid(ModeShortcutSwitcher))
@@ -118,7 +126,7 @@ void UGSBPlayerOverlayPanel::SwitchToTopViewModeUI()
 {
 	if (IsValid(ConstructableFacilityQuickSlotList))
 	{
-		ConstructableFacilityQuickSlotList->SetVisibility(ESlateVisibility::Hidden);
+		ShowConstructibleFacilityQuickSlotList();
 	}
 
 	if (IsValid(ModeShortcutSwitcher))
@@ -146,6 +154,10 @@ void UGSBPlayerOverlayPanel::HandleOnWindowOpened(UGSBWindow* Window)
 			{
 				PC->SetGamePlayMode_PlayerBuildGameAndUI();
 			}
+			else if (PC->IsTopDownBuildPawnControlled())
+			{
+				PC->SetGamePlayMode_TopViewWindowHandle();
+			}
 		}
 	}
 }
@@ -163,6 +175,10 @@ void UGSBPlayerOverlayPanel::HandleOnWindowClosed(UGSBWindow* Window)
 			else if (PC->IsPlayerBuildMode())
 			{
 				PC->SetGamePlayMode_PlayerBuildGameOnly();
+			}
+			else if (PC->IsTopDownBuildPawnControlled())
+			{
+				PC->SetGamePlayMode_TopViewBuild();
 			}
 		}
 	}

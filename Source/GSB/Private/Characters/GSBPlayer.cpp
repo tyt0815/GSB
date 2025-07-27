@@ -20,7 +20,6 @@
 #include "HUDs/GSBInventory.h"
 #include "HUDs/GSBInventoryWindow.h"
 #include "HUDs/GSBItemSlot.h"
-#include "HUDs/GSBConstructableFacilityListWindow.h"
 #include "SubSystems/GSBWindowSubsystem.h"
 #include "DebugHeader.h"
 
@@ -144,7 +143,11 @@ void AGSBPlayer::BeginPlay()
 		if (AGSBHUD* HUD = GetHUD())
 		{
 			PlayerOverlay = Cast<UGSBPlayerOverlay>(HUD->AddOverlay(PlayerOverlayClass));
-			if (!IsValid(PlayerOverlay))
+			if (IsValid(PlayerOverlay))
+			{
+				PlayerOverlay->SetFacilityBuilder(FacilityBuilder);
+			}
+			else
 			{
 				TRACE_SCREEN_LOG(TEXT("UGSBPlayerOverlay 캐스팅 실패"));
 			}
@@ -287,9 +290,9 @@ void AGSBPlayer::CancelFacilityPreview()
 
 void AGSBPlayer::ToggleBuildableFacilityList()
 {
-	if (UGSBWindowSubsystem* WindowManager = UGSBWindowSubsystem::Get(this))
+	if (IsValid(FacilityBuilder))
 	{
-		WindowManager->ToggleWindow(ConstructableFacilityListWindow, TEXT("ConstructableFacilityListWindow"), TEXT("ConstructableFacilityListWindow"));
+		FacilityBuilder->ToggleBuildableFacilityList();
 	}
 }
 
@@ -360,11 +363,18 @@ void AGSBPlayer::ToggleCombatAndBuildMode()
 
 void AGSBPlayer::SwitchToTopDownBuildMode()
 {
+	if (UCharacterMovementComponent* Movement = GetCharacterMovement())
+	{
+		if (Movement->IsFalling())
+		{
+			return;
+		}
+	}
 	if (IsValid(TopDownBuildPawn))
 	{
 		if (AGSBPlayerController* PC = GetPlayerController())
 		{
-			PC->SwitchGamePlayMode_TopDownBuildGameAndUI(TopDownBuildPawn);
+			PC->SwitchGamePlayMode_TopViewBuild(TopDownBuildPawn);
 			GetCharacterMovement()->StopMovementImmediately();
 		}
 	}

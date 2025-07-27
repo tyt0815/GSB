@@ -152,8 +152,6 @@ protected:
 
 	UGSBInventoryWindow* InventoryWindow;
 
-	UGSBConstructableFacilityListWindow* ConstructableFacilityListWindow;
-
 public:
 	FORCEINLINE UInventoryComponent* GetInventoryComponent() const
 	{

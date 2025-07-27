@@ -26,7 +26,9 @@ protected:
 public:	
 	bool IsControlled() const;
 
-	void OnEnterTopDownBuildModeGameAndUI();
+	void OnEnterTopViewBuildMode();
+
+	void OnEnterTopViewWindowHandleMode();
 
 protected:
 	UPROPERTY(VisibleAnywhere)
@@ -42,10 +44,23 @@ private:
 	void Move(const FInputActionValue& Value);
 
 	void SwitchToThirdPersonBuildMode();
+	void ToggleBuildableFacilityList();
+
+	void RotatePreview();
+	void ConfirmFacilityPlacement();
+	void CancelFacilityPreview();
+	void PreviewFacility1();
+	void PreviewFacility2();
+	void PreviewFacility3();
+	void PreviewFacility4();
+	void PreviewFacility5();
+	void PreviewFacility6();
+	void PreviewFacility7();
+	void PreviewFacility8();
+	void PreviewFacility9();
+	void PreviewFacility0();
 
 	void GetMouseWorldPosition(FVector& WorldLocation, FVector& WorldDirection);
-
-	void TraceUnderMouseCursor();
 
 	void UpdateFacilityBuilderLocation();
 
@@ -53,9 +68,7 @@ private:
 
 	class AFacilityBuilder* FacilityBuilder;
 
-	class UGSBPlayerOverlay* PlayerOverlay;
-
-	FHitResult MouseDownTraceHit;
+	class UGSBPlayerOverlay* PlayerOverlay;	
 
 public:
 	FORCEINLINE void SetOwningPlayer(class AGSBPlayer* NewPlayer)

@@ -6,7 +6,6 @@
 #include "BuildSystem/FacilityBuilder.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Blueprint/WidgetTree.h"
-#include "Characters/GSBPlayer.h"
 #include "Components/TextBlock.h"
 #include "Components/Button.h"
 #include "Facility/GSBFacilityDataAsset.h"
@@ -60,14 +59,8 @@ void UGSBConstructableFacilitySlot::UpdateFacilityData(UGSBFacilityDataAsset* In
 
 void UGSBConstructableFacilitySlot::PreviewFacility()
 {
-	if (IsValid(FacilityData))
+	if (IsValid(FacilityData) && IsValid(FacilityBuilder))
 	{
-		if (AGSBPlayer* Player = GetOwningPlayerPawn<AGSBPlayer>())
-		{
-			if (AFacilityBuilder* FacilityBuilder = Player->GetFacilityBuilder())
-			{
-				FacilityBuilder->PreviewFacilityByFacilityData(FacilityData);
-			}
-		}
+		FacilityBuilder->PreviewFacilityByFacilityData(FacilityData);
 	}
 }

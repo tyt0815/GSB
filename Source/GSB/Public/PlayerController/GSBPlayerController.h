@@ -60,7 +60,9 @@ public:
 
 	void SwitchGamePlayMode_PlayerBuildGameAndUI(AGSBPlayer* GSBPlayer);
 
-	void SwitchGamePlayMode_TopDownBuildGameAndUI(ATopDownBuildPawn* TopDownBuildPawn);
+	void SwitchGamePlayMode_TopViewBuild(ATopDownBuildPawn* TopDownBuildPawn);
+
+	void SwitchGamePlayMode_TopViewWindowHandle(ATopDownBuildPawn* TopDownBuildPawn);
 
 	void SetGamePlayMode_PlayerCombatGameOnly();
 
@@ -70,7 +72,11 @@ public:
 
 	void SetGamePlayMode_PlayerBuildGameAndUI();
 
-	void SetGamePlayMode_TopDownBuildGameAndUI();
+	void SetGamePlayMode_TopViewBuild();
+
+	void SetGamePlayMode_TopViewWindowHandle();
+
+	
 
 	bool IsGSBPlayerControlled() const;
 

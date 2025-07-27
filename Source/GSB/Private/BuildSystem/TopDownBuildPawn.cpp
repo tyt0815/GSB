@@ -3,6 +3,8 @@
 
 #include "BuildSystem/TopDownBuildPawn.h"
 #include "BuildSystem/FacilityBuilder.h"
+#include "EnhancedInputComponent.h"
+#include "InputMappingContext.h"
 #include "Camera/CameraComponent.h"
 #include "Characters/GSBPlayer.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -10,9 +12,8 @@
 #include "PlayerController/GSBPlayerController.h"
 #include "PlayerController/GSBPlayerInputActionSetDataAsset.h"
 #include "HUDs/GSBPlayerOverlay.h"
-#include "EnhancedInputComponent.h"
-#include "InputMappingContext.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "SubSystems/GSBWindowSubsystem.h"
 #include "DebugHeader.h"
 
 ATopDownBuildPawn::ATopDownBuildPawn()
@@ -39,7 +40,6 @@ void ATopDownBuildPawn::Tick(float DeltaTime)
 
 	if (IsControlled())
 	{
-		TraceUnderMouseCursor();
 		UpdateFacilityBuilderLocation();
 	}
 }
@@ -56,6 +56,22 @@ void ATopDownBuildPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 			{
 				EnhancedInputComponent->BindAction(InputSet->IA_Move, ETriggerEvent::Triggered, this, &ATopDownBuildPawn::Move);
 				EnhancedInputComponent->BindAction(InputSet->IA_ToggleTopDownAndThirdPersonBuildMode, ETriggerEvent::Started, this, &ATopDownBuildPawn::SwitchToThirdPersonBuildMode);
+				EnhancedInputComponent->BindAction(InputSet->IA_ToggleConstructibleFacilityListWindow, ETriggerEvent::Started, this, &ATopDownBuildPawn::ToggleBuildableFacilityList);
+
+				EnhancedInputComponent->BindAction(InputSet->IA_RotatePreview, ETriggerEvent::Started, this, &ATopDownBuildPawn::RotatePreview);
+				EnhancedInputComponent->BindAction(InputSet->IA_ConfirmFacilityPlacement, ETriggerEvent::Started, this, &ATopDownBuildPawn::ConfirmFacilityPlacement);
+				EnhancedInputComponent->BindAction(InputSet->IA_CancelFacilityPreview, ETriggerEvent::Started, this, &ATopDownBuildPawn::CancelFacilityPreview);
+				EnhancedInputComponent->BindAction(InputSet->IA_PreviewFacility1, ETriggerEvent::Started, this, &ATopDownBuildPawn::PreviewFacility1);
+				EnhancedInputComponent->BindAction(InputSet->IA_PreviewFacility2, ETriggerEvent::Started, this, &ATopDownBuildPawn::PreviewFacility2);
+				EnhancedInputComponent->BindAction(InputSet->IA_PreviewFacility3, ETriggerEvent::Started, this, &ATopDownBuildPawn::PreviewFacility3);
+				EnhancedInputComponent->BindAction(InputSet->IA_PreviewFacility4, ETriggerEvent::Started, this, &ATopDownBuildPawn::PreviewFacility4);
+				EnhancedInputComponent->BindAction(InputSet->IA_PreviewFacility5, ETriggerEvent::Started, this, &ATopDownBuildPawn::PreviewFacility5);
+				EnhancedInputComponent->BindAction(InputSet->IA_PreviewFacility6, ETriggerEvent::Started, this, &ATopDownBuildPawn::PreviewFacility6);
+				EnhancedInputComponent->BindAction(InputSet->IA_PreviewFacility7, ETriggerEvent::Started, this, &ATopDownBuildPawn::PreviewFacility7);
+				EnhancedInputComponent->BindAction(InputSet->IA_PreviewFacility8, ETriggerEvent::Started, this, &ATopDownBuildPawn::PreviewFacility8);
+				EnhancedInputComponent->BindAction(InputSet->IA_PreviewFacility9, ETriggerEvent::Started, this, &ATopDownBuildPawn::PreviewFacility9);
+				EnhancedInputComponent->BindAction(InputSet->IA_PreviewFacility0, ETriggerEvent::Started, this, &ATopDownBuildPawn::PreviewFacility0);
+
 			}
 		}
 	}
@@ -72,7 +88,7 @@ bool ATopDownBuildPawn::IsControlled() const
 	return GetController<AGSBPlayerController>() != nullptr;
 }
 
-void ATopDownBuildPawn::OnEnterTopDownBuildModeGameAndUI()
+void ATopDownBuildPawn::OnEnterTopViewBuildMode()
 {
 	if (IsValid(OwningPlayer))
 	{
@@ -83,6 +99,10 @@ void ATopDownBuildPawn::OnEnterTopDownBuildModeGameAndUI()
 	{
 		PlayerOverlay->SwitchToTopViewModeUI();
 	}
+}
+
+void ATopDownBuildPawn::OnEnterTopViewWindowHandleMode()
+{
 }
 
 void ATopDownBuildPawn::Move(const FInputActionValue& Value)
@@ -104,6 +124,79 @@ void ATopDownBuildPawn::SwitchToThirdPersonBuildMode()
 	}
 }
 
+void ATopDownBuildPawn::ToggleBuildableFacilityList()
+{
+	if (IsValid(FacilityBuilder))
+	{
+		FacilityBuilder->ToggleBuildableFacilityList();
+	}
+}
+
+void ATopDownBuildPawn::RotatePreview()
+{
+	FacilityBuilder->RotatePreview();
+}
+
+void ATopDownBuildPawn::ConfirmFacilityPlacement()
+{
+	FacilityBuilder->ConfirmFacilityPlacement();
+}
+
+void ATopDownBuildPawn::CancelFacilityPreview()
+{
+	FacilityBuilder->CancelPreview();
+}
+
+void ATopDownBuildPawn::PreviewFacility1()
+{
+	FacilityBuilder->PreviewFacilityAt(1);
+}
+
+void ATopDownBuildPawn::PreviewFacility2()
+{
+	FacilityBuilder->PreviewFacilityAt(2);
+}
+
+void ATopDownBuildPawn::PreviewFacility3()
+{
+	FacilityBuilder->PreviewFacilityAt(3);
+}
+
+void ATopDownBuildPawn::PreviewFacility4()
+{
+	FacilityBuilder->PreviewFacilityAt(4);
+}
+
+void ATopDownBuildPawn::PreviewFacility5()
+{
+	FacilityBuilder->PreviewFacilityAt(5);
+}
+
+void ATopDownBuildPawn::PreviewFacility6()
+{
+	FacilityBuilder->PreviewFacilityAt(6);
+}
+
+void ATopDownBuildPawn::PreviewFacility7()
+{
+	FacilityBuilder->PreviewFacilityAt(7);
+}
+
+void ATopDownBuildPawn::PreviewFacility8()
+{
+	FacilityBuilder->PreviewFacilityAt(8);
+}
+
+void ATopDownBuildPawn::PreviewFacility9()
+{
+	FacilityBuilder->PreviewFacilityAt(9);
+}
+
+void ATopDownBuildPawn::PreviewFacility0()
+{
+	FacilityBuilder->PreviewFacilityAt(0);
+}
+
 void ATopDownBuildPawn::GetMouseWorldPosition(FVector& WorldLocation, FVector& WorldDirection)
 {
 	if (AGSBPlayerController* PC = GetController<AGSBPlayerController>())
@@ -112,31 +205,37 @@ void ATopDownBuildPawn::GetMouseWorldPosition(FVector& WorldLocation, FVector& W
 	}
 }
 
-void ATopDownBuildPawn::TraceUnderMouseCursor()
+void ATopDownBuildPawn::UpdateFacilityBuilderLocation()
 {
+	if (!IsValid(FacilityBuilder))
+	{
+		return;
+	}
+
 	FVector MouseWorldPosition;
 	FVector MouseWorldDirection;
 	GetMouseWorldPosition(MouseWorldPosition, MouseWorldDirection);
 
 	FVector LineTraceEnd = MouseWorldPosition + MouseWorldDirection * 10000.0f;
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldStatic));
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldDynamic));
 	TArray<AActor*> ActorsToIgnore;
 	ActorsToIgnore.Add(this);
 	ActorsToIgnore.Add(OwningPlayer);
 	ActorsToIgnore.Add(FacilityBuilder);
-	UKismetSystemLibrary::LineTraceSingle(
+	FHitResult OutHit;
+	UKismetSystemLibrary::LineTraceSingleForObjects(
 		this,
 		MouseWorldPosition,
 		LineTraceEnd,
-		UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_Visibility),
+		ObjectTypes,
 		false,
 		ActorsToIgnore,
 		EDrawDebugTrace::ForOneFrame,
-		MouseDownTraceHit,
+		OutHit,
 		true
 	);
-}
 
-void ATopDownBuildPawn::UpdateFacilityBuilderLocation()
-{
-
+	FacilityBuilder->SetActorLocation(OutHit.ImpactPoint);
 }

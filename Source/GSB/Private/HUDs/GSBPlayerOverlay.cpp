@@ -60,6 +60,15 @@ void UGSBPlayerOverlay::SwitchToTopViewModeUI()
 	}
 }
 
+void UGSBPlayerOverlay::SetFacilityBuilder(AFacilityBuilder* NewBuilder)
+{
+	FacilityBuilder = NewBuilder;
+	if (UGSBPlayerOverlayPanel* PlayerOverlayPanel = GetPlayerOverlayPanel())
+	{
+		PlayerOverlayPanel->SetFacilityBuilder(FacilityBuilder);
+	}
+}
+
 UGSBPlayerOverlayPanel* UGSBPlayerOverlay::GetPlayerOverlayPanel() const
 {
 	if (UGSBPlayerOverlayPanel* PlayerOverlayPanel = Cast<UGSBPlayerOverlayPanel>(OverlayPanel))

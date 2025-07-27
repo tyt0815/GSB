@@ -7,9 +7,8 @@
 #include "HUDs/GSBConstructableFacilitySlot.h"
 #include "GSBConstructableFacilityListWindow.generated.h"
 
-/**
- * 
- */
+class AFacilityBuilder;
+
 UCLASS()
 class GSB_API UGSBConstructableFacilityListWindow : public UGSBWindow
 {
@@ -18,6 +17,8 @@ public:
 	virtual void NativeConstruct() override;
 
 public:
+	void UpdateList();
+
 	void AddConstructableFacilitySlots(const TArray<class UGSBFacilityDataAsset*>& FacilityDatas);
 
 	void AddConstructableFacilitySlot(class UGSBFacilityDataAsset* FacilityData);
@@ -29,4 +30,12 @@ protected:
 private:
 	UPROPERTY(meta = (BindWidget))
 	class UScrollBox* ConstructableFacilityList;
+
+	AFacilityBuilder* FacilityBuilder;
+
+public:
+	FORCEINLINE void SetFacilityBuilder(AFacilityBuilder* NewFacilityBuilder)
+	{
+		FacilityBuilder = NewFacilityBuilder;
+	}
 };

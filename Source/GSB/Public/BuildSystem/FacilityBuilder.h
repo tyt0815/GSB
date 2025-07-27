@@ -45,6 +45,8 @@ public:
 
 	void SetFacilityQuickSlot(UGSBFacilityDataAsset* FacilityData, int32 Index);
 
+	void ToggleBuildableFacilityList();
+
 private:
 	void PreviewGeneralFacility(UGSBFacilityDataAsset* FacilityData);
 
@@ -100,6 +102,8 @@ private:
 	UGSBFacilityDataAsset* CurrentGeneralFacilityData;
 
 	AFacilityGhostActor* FacilityGhost;
+
+	class UGSBConstructableFacilityListWindow* ConstructableFacilityListWindow;;
 
 	TArray<AFacilityGhostActor*> ConveyorBeltGhosts;
 

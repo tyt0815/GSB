@@ -116,9 +116,9 @@ void AGSBPlayerController::SwitchGamePlayMode_PlayerBuildGameAndUI(AGSBPlayer* G
 	}
 }
 
-void AGSBPlayerController::SwitchGamePlayMode_TopDownBuildGameAndUI(ATopDownBuildPawn* TopDownBuildPawn)
+void AGSBPlayerController::SwitchGamePlayMode_TopViewBuild(ATopDownBuildPawn* TopDownBuildPawn)
 {
-	SetGamePlayMode_TopDownBuildGameAndUI();
+	SetGamePlayMode_TopViewBuild();
 
 	if (IsValid(TopDownBuildPawn))
 	{
@@ -126,7 +126,21 @@ void AGSBPlayerController::SwitchGamePlayMode_TopDownBuildGameAndUI(ATopDownBuil
 		{
 			Possess(TopDownBuildPawn);
 		}
-		TopDownBuildPawn->OnEnterTopDownBuildModeGameAndUI();
+		TopDownBuildPawn->OnEnterTopViewBuildMode();
+	}
+}
+
+void AGSBPlayerController::SwitchGamePlayMode_TopViewWindowHandle(ATopDownBuildPawn* TopDownBuildPawn)
+{
+	SetGamePlayMode_TopViewWindowHandle();
+
+	if (IsValid(TopDownBuildPawn))
+	{
+		if (GetPawn() != TopDownBuildPawn)
+		{
+			Possess(TopDownBuildPawn);
+		}
+		TopDownBuildPawn->OnEnterTopViewWindowHandleMode();
 	}
 }
 
@@ -197,7 +211,7 @@ void AGSBPlayerController::SetGamePlayMode_PlayerBuildGameAndUI()
 	SetInputMode_GameAndUI();
 }
 
-void AGSBPlayerController::SetGamePlayMode_TopDownBuildGameAndUI()
+void AGSBPlayerController::SetGamePlayMode_TopViewBuild()
 {
 	ClearAllInputMappingContext();
 
@@ -205,6 +219,18 @@ void AGSBPlayerController::SetGamePlayMode_TopDownBuildGameAndUI()
 	AddInputMappingContext(InputSet->IMC_BuildFacility);
 	AddInputMappingContext(InputSet->IMC_ToggleConstructibleFacilityListWindow);
 	AddInputMappingContext(InputSet->IMC_ToggleTopDownAndThirdPersonBuildMode);
+	AddInputMappingContext(InputSet->IMC_SystemUI);
+
+	ControlledPawnType = EControlledPawn::ECP_TopDownBuildPawn;
+	SetInputMode_GameAndUI();
+}
+
+void AGSBPlayerController::SetGamePlayMode_TopViewWindowHandle()
+{
+	ClearAllInputMappingContext();
+
+	AddInputMappingContext(InputSet->IMC_Move);
+	AddInputMappingContext(InputSet->IMC_ToggleConstructibleFacilityListWindow);
 	AddInputMappingContext(InputSet->IMC_SystemUI);
 
 	ControlledPawnType = EControlledPawn::ECP_TopDownBuildPawn;

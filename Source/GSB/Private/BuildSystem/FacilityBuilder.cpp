@@ -8,7 +8,9 @@
 #include "Facility/MiningFacility.h"
 #include "Facility/ConveyorBelt.h"
 #include "HUDs/GSBFacilityQuickSlotList.h"
+#include "HUDs/GSBConstructableFacilityListWindow.h"
 #include "SubSystems/GSBFacilitySubsystem.h"
+#include "SubSystems/GSBWindowSubsystem.h"
 #include "GSBDefines.h"
 #include "DebugHeader.h"
 
@@ -138,6 +140,19 @@ void AFacilityBuilder::SetFacilityQuickSlot(UGSBFacilityDataAsset* FacilityData,
 	if (IsValid(FacilityQuickSlotListWidget))
 	{
 		FacilityQuickSlotListWidget->UpdateFacilityQuickSlot(FacilityData, Index);
+	}
+}
+
+void AFacilityBuilder::ToggleBuildableFacilityList()
+{
+	if (UGSBWindowSubsystem* WindowManager = UGSBWindowSubsystem::Get(this))
+	{
+		WindowManager->ToggleWindow(ConstructableFacilityListWindow, TEXT("ConstructableFacilityListWindow"), TEXT("ConstructableFacilityListWindow"));
+		if (IsValid(ConstructableFacilityListWindow))
+		{
+			ConstructableFacilityListWindow->SetFacilityBuilder(this);
+			ConstructableFacilityListWindow->UpdateList();
+		}
 	}
 }
 

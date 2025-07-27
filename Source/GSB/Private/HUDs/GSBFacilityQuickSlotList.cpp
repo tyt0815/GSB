@@ -3,9 +3,9 @@
 
 #include "HUDs/GSBFacilityQuickSlotList.h"
 #include "Components/HorizontalBox.h"
-// #include "Components/HorizontalBoxSlot.h"
 #include "Characters/GSBPlayer.h"
 #include "BuildSystem/FacilityBuilder.h"
+#include "DebugHeader.h"
 
 void UGSBFacilityQuickSlotList::NativeConstruct()
 {
@@ -19,10 +19,6 @@ void UGSBFacilityQuickSlotList::NativeConstruct()
 			if (UGSBFacilityQuickSlot* QuickSlot = CreateWidget<UGSBFacilityQuickSlot>(GetOwningPlayer(), QuickSlotClass))
 			{
 				ConstructableFacilityQuickSlotList->AddChild(QuickSlot);
-				/*if (UHorizontalBoxSlot* HorizontalBoxSlot = Cast<UHorizontalBoxSlot>(ConstructableFacilityQuickSlotList->AddChild(QuickSlot)))
-				{
-					HorizontalBoxSlot->SetHorizontalAlignment(EHorizontalAlignment::HAlign_Fill);
-				}*/
 			}
 		}
 	}
@@ -30,16 +26,14 @@ void UGSBFacilityQuickSlotList::NativeConstruct()
 
 void UGSBFacilityQuickSlotList::SyncronizeFacilityQuickSlots()
 {
-	if (AGSBPlayer* Player = GetOwningPlayerPawn<AGSBPlayer>())
+	if (IsValid(FacilityBuilder))
 	{
-		if (AFacilityBuilder* FacilityBuilder = Player->GetFacilityBuilder())
+		TRACE_SCREEN_LOG(TEXT("sibal"));
+		FacilityBuilder->SetFacilityQuickSlotListWidget(this);
+		const auto& FacilityPreviewQuickSlots = FacilityBuilder->GetFacilityPreviewQuickSlot();
+		for (int32 i = 0; i < FacilityPreviewQuickSlots.Num(); ++i)
 		{
-			FacilityBuilder->SetFacilityQuickSlotListWidget(this);
-			const auto& FacilityPreviewQuickSlots = FacilityBuilder->GetFacilityPreviewQuickSlot();
-			for (int32 i = 0; i < FacilityPreviewQuickSlots.Num(); ++i)
-			{
-				UpdateFacilityQuickSlot(FacilityPreviewQuickSlots[i], i);
-			}
+			UpdateFacilityQuickSlot(FacilityPreviewQuickSlots[i], i);
 		}
 	}
 }
@@ -57,6 +51,7 @@ void UGSBFacilityQuickSlotList::UpdateFacilityQuickSlot(UGSBFacilityDataAsset* F
 {
 	if (UGSBFacilityQuickSlot* QuickSlot = GetFacilityQuickSlotAt(Index))
 	{
+		QuickSlot->SetFacilityBuilder(FacilityBuilder);
 		QuickSlot->UpdateFacilityData(FacilityData, Index);
 	}
 }

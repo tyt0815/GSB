@@ -27,5 +27,13 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* QuickSlotIndexText;
 
+	class AFacilityBuilder* FacilityBuilder;
+
 	int32 QuickSlotIndex;
+
+public:
+	FORCEINLINE void SetFacilityBuilder(class AFacilityBuilder* NewFacilityBuilder)
+	{
+		FacilityBuilder = NewFacilityBuilder;
+	}
 };

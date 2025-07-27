@@ -6,7 +6,7 @@
 #include "HUDs/GSBOverlay.h"
 #include "GSBPlayerOverlay.generated.h"
 
-
+class AFacilityBuilder;
 
 UCLASS()
 class GSB_API UGSBPlayerOverlay : public UGSBOverlay
@@ -28,5 +28,10 @@ public:
 
 	void SwitchToTopViewModeUI();
 
+	void SetFacilityBuilder(AFacilityBuilder* NewBuilder);
+
 	class UGSBPlayerOverlayPanel* GetPlayerOverlayPanel() const;
+
+private:
+	AFacilityBuilder* FacilityBuilder;
 };
