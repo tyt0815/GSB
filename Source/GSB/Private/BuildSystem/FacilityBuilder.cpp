@@ -74,6 +74,8 @@ void AFacilityBuilder::PreviewFacilityByFacilityData(UGSBFacilityDataAsset* Faci
 				PreviewGeneralFacility(FacilityData);
 			}
 		}
+
+		SetPowerInfluenceVisibilityByFacilityData(FacilityData, true);
 	}
 }
 
@@ -109,13 +111,7 @@ void AFacilityBuilder::CancelPreview()
 		FacilityGhost->Destroy();
 	}
 
-	if (UGameInstance* GameInst = GetGameInstance())
-	{
-		if (UGSBFacilitySubsystem* FacilityManager = GameInst->GetSubsystem<UGSBFacilitySubsystem>())
-		{
-			FacilityManager->SetPowerInfluenceVisibility(false);
-		}
-	}
+	SetPowerInfluenceVisibility(false);
 
 	DestroyAllConveyorBeltGhosts();
 
@@ -167,7 +163,7 @@ void AFacilityBuilder::PreviewGeneralFacility(UGSBFacilityDataAsset* FacilityDat
 		{
 			if (FacilityClass->IsChildOf<AConstructibleFacility>())
 			{
-				FacilityGhost = SpawnFacilityGhost(FacilityClass, true);
+				FacilityGhost = SpawnFacilityGhost(FacilityClass);
 				BuildMode = EBuildMode::EBT_GeneralFacility;
 			}
 			else
@@ -191,7 +187,7 @@ void AFacilityBuilder::PreviewMiningFacility()
 		{
 			if (FacilityClass->IsChildOf<AMiningFacility>())
 			{
-				FacilityGhost = SpawnFacilityGhost(FacilityClass, true);
+				FacilityGhost = SpawnFacilityGhost(FacilityClass);
 				BuildMode = EBuildMode::EBT_MiningFacility;
 			}
 			else
@@ -220,7 +216,7 @@ void AFacilityBuilder::PreviewConveyorBelt()
 		UClass* RightClass = ConveyorBeltRightData->FacilityClass;
 		if (ForwardClass->IsChildOf<AConveyorBelt>() && LeftClass->IsChildOf<AConveyorBelt>() && RightClass->IsChildOf<AConveyorBelt>())
 		{
-			FacilityGhost = SpawnFacilityGhost(ForwardClass, false);
+			FacilityGhost = SpawnFacilityGhost(ForwardClass);
 			BuildMode = EBuildMode::EBT_ConveyorBelt;
 		}
 		
@@ -310,7 +306,7 @@ void AFacilityBuilder::Tick_ConveyorBeltBuildMode(float DeltaSeconds)
 			case AFacilityBuilder::EChainRelativeDirection::ECRD_Forward:
 			case AFacilityBuilder::EChainRelativeDirection::ECRD_Backward:
 			{
-				AFacilityGhostActor* Ghost = SpawnFacilityGhost(*(ConveyorBeltForwardData->FacilityClass), false);
+				AFacilityGhostActor* Ghost = SpawnFacilityGhost(*(ConveyorBeltForwardData->FacilityClass));
 				ConveyorBeltGhosts.Add(Ghost);
 				Ghost->SetActorTransform(StartTransform);
 
@@ -318,7 +314,7 @@ void AFacilityBuilder::Tick_ConveyorBeltBuildMode(float DeltaSeconds)
 			}
 			case AFacilityBuilder::EChainRelativeDirection::ECRD_Right:
 			{
-				AFacilityGhostActor* Ghost = SpawnFacilityGhost(*(ConveyorBeltRightData->FacilityClass), false);
+				AFacilityGhostActor* Ghost = SpawnFacilityGhost(*(ConveyorBeltRightData->FacilityClass));
 				ConveyorBeltGhosts.Add(Ghost);
 				Ghost->SetActorTransform(StartTransform);
 
@@ -326,7 +322,7 @@ void AFacilityBuilder::Tick_ConveyorBeltBuildMode(float DeltaSeconds)
 			}
 			case AFacilityBuilder::EChainRelativeDirection::ECRD_Left:
 			{
-				AFacilityGhostActor* Ghost = SpawnFacilityGhost(*(ConveyorBeltLeftData->FacilityClass), false);
+				AFacilityGhostActor* Ghost = SpawnFacilityGhost(*(ConveyorBeltLeftData->FacilityClass));
 				ConveyorBeltGhosts.Add(Ghost);
 				Ghost->SetActorTransform(StartTransform);
 
@@ -373,7 +369,7 @@ void AFacilityBuilder::Tick_ConveyorBeltBuildMode(float DeltaSeconds)
 
 		for (int i = ConveyorBeltGhosts.Num(); i < GhostsNum; ++i)
 		{
-			AFacilityGhostActor* Ghost = SpawnFacilityGhost(*(ConveyorBeltForwardData->FacilityClass), false);
+			AFacilityGhostActor* Ghost = SpawnFacilityGhost(*(ConveyorBeltForwardData->FacilityClass));
 			Ghost->SetActorLocation(ConveyorBeltGhosts[i - 1]->GetActorLocation() + ChainConveyorBeltLocationOffset);
 			Ghost->SetActorRotation(ChainConveyorBeltsRotation);
 			ConveyorBeltGhosts.Add(Ghost);
@@ -399,9 +395,8 @@ void AFacilityBuilder::ConfirmPlacement_GeneralFacilityBuildMode()
 	if (FacilityGhost && IsValidGeneralFacilityPlace(FacilityGhost))
 	{
 		BuildFacility(*(CurrentPreviewFacilityData->FacilityClass), FacilityGhost->GetTransform());
+		SetPowerInfluenceVisibilityByFacilityData(CurrentPreviewFacilityData, true);
 	}
-
-	PreviewGeneralFacility(CurrentPreviewFacilityData);
 }
 
 void AFacilityBuilder::ConfirmPlacement_MiningFacilityBuildMode()
@@ -465,22 +460,53 @@ bool AFacilityBuilder::IsValidMiningFacilityPlace(AFacilityGhostActor* Ghost)
 	return false;
 }
 
-AFacilityGhostActor* AFacilityBuilder::SpawnFacilityGhost(const TSubclassOf<AConstructibleFacility>& FacilityClass, bool bVisiblePowerInfluenceArea)
+void AFacilityBuilder::SetPowerInfluenceVisibilityByFacilityData(UGSBFacilityDataAsset* FacilityData, bool bVisible)
+{
+	if (IsValid(FacilityData))
+	{
+		SetPowerInfluenceVisibilityByFacilityClass(FacilityData->FacilityClass, bVisible);
+	}
+	
+}
+
+void AFacilityBuilder::SetPowerInfluenceVisibilityByFacilityClass(UClass* FacilityClass, bool bVisible)
+{
+	if (IsValid(FacilityClass))
+	{
+		SetPowerInfluenceVisibilityByFacility(Cast<AFacility>(FacilityClass->GetDefaultObject()), bVisible);
+	}
+}
+
+void AFacilityBuilder::SetPowerInfluenceVisibilityByFacility(AFacility* Facility, bool bVisible)
+{
+	if (IsValid(Facility))
+	{
+		if (UGameInstance* GameInst = GetGameInstance())
+		{
+			if (UGSBFacilitySubsystem* FacilityManager = GameInst->GetSubsystem<UGSBFacilitySubsystem>())
+			{
+				FacilityManager->SetPowerInfluenceVisibilityByFacility(Facility, bVisible);
+			}
+		}
+	}
+}
+
+void AFacilityBuilder::SetPowerInfluenceVisibility(bool bVisible)
+{
+	if (UGameInstance* GameInst = GetGameInstance())
+	{
+		if (UGSBFacilitySubsystem* FacilityManager = GameInst->GetSubsystem<UGSBFacilitySubsystem>())
+		{
+			FacilityManager->SetPowerInfluenceVisibility(bVisible);
+		}
+	}
+}
+
+AFacilityGhostActor* AFacilityBuilder::SpawnFacilityGhost(const TSubclassOf<AConstructibleFacility>& FacilityClass)
 {
 	UWorld* World = GetWorld();
 	if (AConstructibleFacility* TempFacility = World->SpawnActor<AConstructibleFacility>(FacilityClass))
 	{
-		if (bVisiblePowerInfluenceArea)
-		{
-			if (UGameInstance* GameInst = GetGameInstance())
-			{
-				if (UGSBFacilitySubsystem* FacilityManager = GameInst->GetSubsystem<UGSBFacilitySubsystem>())
-				{
-					FacilityManager->SetPowerInfluenceVisibilityByFacility(TempFacility, true);
-				}
-			}
-		}
-
 		AFacilityGhostActor* Ghost = World->SpawnActor<AFacilityGhostActor>();
 
 		Ghost->BuildGhostPreview(TempFacility);

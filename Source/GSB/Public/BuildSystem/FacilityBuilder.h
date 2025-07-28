@@ -74,7 +74,15 @@ private:
 
 	bool IsValidMiningFacilityPlace(AFacilityGhostActor* Ghost);
 
-	AFacilityGhostActor* SpawnFacilityGhost(const TSubclassOf<AConstructibleFacility>& FacilityClass, bool bVisiblePowerInfluenceArea);
+	void SetPowerInfluenceVisibilityByFacilityData(UGSBFacilityDataAsset* FacilityData, bool bVisible);
+
+	void SetPowerInfluenceVisibilityByFacilityClass(UClass* FacilityClass, bool bVisible);
+
+	void SetPowerInfluenceVisibilityByFacility(AFacility* Facility, bool bVisible);
+
+	void SetPowerInfluenceVisibility(bool bVisible);
+
+	AFacilityGhostActor* SpawnFacilityGhost(const TSubclassOf<AConstructibleFacility>& FacilityClass);
 
 	void TraceBuildBlockerInGhostGridBounds(AFacilityGhostActor* Ghost, FHitResult& HitResult);
 

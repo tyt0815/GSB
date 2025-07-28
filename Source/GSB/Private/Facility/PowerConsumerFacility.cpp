@@ -110,33 +110,45 @@ void APowerConsumerFacility::OnLinkToPowerProvider_Implementation(AActor* PowerP
 						ActorsToIgnore,
 						EDrawDebugTrace::None,
 						OutHits,
-						true
+						true,
+						FLinearColor::Red,
+						FLinearColor::Green,
+						60
 					);
 
-					float ZoHitResult1 = -1;
-					float ZoHitResult2 = -1;
+					float ZoHitMax1 = -1;
+					float ZoHitMax2 = -1;
 					FVector ImpactPoint1 = PowerProviderTop;
 					FVector ImpactPoint2 = PowerProviderTop;
 					for (const FHitResult& HitResult : OutHits)
 					{
-						if (!HitResult.GetActor()->ActorHasTag(TEXT("Antenna")) || HitResult.GetActor() != PowerProviderActor)
+						if (!IsValid(HitResult.GetActor()))
+						{
+							continue;
+						}
+						if (!((HitResult.GetActor() == PowerProviderActor || HitResult.GetActor()->GetParentActor() == PowerProviderActor) && HitResult.GetActor()->ActorHasTag(TEXT("Antenna"))))
 						{
 							continue;
 						}
 						FVector UnitVector = HitResult.ImpactPoint - Start;
 						UnitVector.Normalize();
 						float ZoHitResult = FVector::ZAxisVector.Dot(UnitVector);
-						if (ZoHitResult > ZoHitResult1)
+						TRACE_SCREEN_LOG(FString::Printf(TEXT("sibal: %f"), ZoHitResult));
+						if (ZoHitResult > ZoHitMax1)
 						{
-							ZoHitResult2 = ZoHitResult1;
+							ZoHitMax2 = ZoHitMax1;
 							ImpactPoint2 = ImpactPoint1;
-							ZoHitResult1 = ZoHitResult;
+							ZoHitMax1 = ZoHitResult;
 							ImpactPoint1 = HitResult.ImpactPoint;
+							TRACE_SCREEN_LOG(ImpactPoint1.ToString());
+							DrawDebugPoint(GetWorld(), ImpactPoint1, 100, FColor::Magenta);
 						}
-						else if (ZoHitResult > ZoHitResult2)
+						else if (ZoHitResult > ZoHitMax2)
 						{
-							ZoHitResult2 = ZoHitResult;
+							ZoHitMax2 = ZoHitResult;
 							ImpactPoint2 = HitResult.ImpactPoint;
+							TRACE_SCREEN_LOG(ImpactPoint2.ToString());
+							DrawDebugPoint(GetWorld(), ImpactPoint2, 100, FColor::Cyan);
 						}
 					}
 					FVector End = (ImpactPoint1 + ImpactPoint2) / 2;
@@ -178,7 +190,6 @@ void APowerConsumerFacility::OnUnlinkFromPowerProvider_Implementation()
 
 	if (IsOn())
 	{
-		TRACE_SCREEN_LOG(FString::Printf(TEXT("%s: Sibal"), *GetFacilityName().ToString()));
 		TryLinkToNearByPowerProvider(PowerProviderToIgnore);
 	}
 

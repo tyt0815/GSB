@@ -41,9 +41,19 @@ void UGSBFacilitySubsystem::SetAllPowerDistributorsPowerInfluenceVisibility(bool
 	}
 }
 
+void UGSBFacilitySubsystem::SetAllPowerInfluenceVisibility(bool bVisibility)
+{
+	SetAllHubsPowerInfluenceVisibility(bVisibility);
+	SetAllPowerDistributorsPowerInfluenceVisibility(bVisibility);
+}
+
 void UGSBFacilitySubsystem::SetPowerInfluenceVisibilityByFacility(AFacility* Facility, bool bVisibility)
 {
-	if (Cast<AHubLinkedFacility>(Facility))
+	if (Cast<APowerDistributor>(Facility))
+	{
+		SetAllPowerInfluenceVisibility(bVisibility);
+	}
+	else if (Cast<AHubLinkedFacility>(Facility))
 	{
 		SetAllHubsPowerInfluenceVisibility(bVisibility);
 	}

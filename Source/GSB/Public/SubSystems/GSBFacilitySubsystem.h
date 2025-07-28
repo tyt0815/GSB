@@ -25,6 +25,8 @@ public:
 
 	void SetAllPowerDistributorsPowerInfluenceVisibility(bool bVisibility);
 
+	void SetAllPowerInfluenceVisibility(bool bVisibility);
+
 	void SetPowerInfluenceVisibilityByFacility(AFacility* Facility, bool bVisibility);
 
 	void SetPowerInfluenceVisibility(bool bVisibility);
