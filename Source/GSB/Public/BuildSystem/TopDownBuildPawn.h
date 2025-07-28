@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "Interfaces/InventoryInterface.h"
 #include "TopDownBuildPawn.generated.h"
 
 struct FInputActionValue;
 class AFacility;
 
 UCLASS()
-class GSB_API ATopDownBuildPawn : public APawn
+class GSB_API ATopDownBuildPawn : public APawn, public IInventoryInterface
 {
 	GENERATED_BODY()
 
@@ -20,6 +21,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	virtual UInventoryComponent* GetInventoryComponent() const override;
 
 protected:
 	virtual void BeginPlay() override;

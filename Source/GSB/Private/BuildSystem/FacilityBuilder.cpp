@@ -54,6 +54,7 @@ void AFacilityBuilder::PreviewFacilityByFacilityData(UGSBFacilityDataAsset* Faci
 {
 	if (IsValid(FacilityData))
 	{
+		CurrentPreviewFacilityData = FacilityData;
 		if (UClass* FacilityClass = FacilityData->FacilityClass)
 		{
 			if (!FacilityClass->IsChildOf<AConstructibleFacility>())
@@ -166,7 +167,6 @@ void AFacilityBuilder::PreviewGeneralFacility(UGSBFacilityDataAsset* FacilityDat
 		{
 			if (FacilityClass->IsChildOf<AConstructibleFacility>())
 			{
-				CurrentGeneralFacilityData = FacilityData;
 				FacilityGhost = SpawnFacilityGhost(FacilityClass, true);
 				BuildMode = EBuildMode::EBT_GeneralFacility;
 			}
@@ -398,8 +398,10 @@ void AFacilityBuilder::ConfirmPlacement_GeneralFacilityBuildMode()
 {
 	if (FacilityGhost && IsValidGeneralFacilityPlace(FacilityGhost))
 	{
-		BuildFacility(*(CurrentGeneralFacilityData->FacilityClass), FacilityGhost->GetTransform());
+		BuildFacility(*(CurrentPreviewFacilityData->FacilityClass), FacilityGhost->GetTransform());
 	}
+
+	PreviewGeneralFacility(CurrentPreviewFacilityData);
 }
 
 void AFacilityBuilder::ConfirmPlacement_MiningFacilityBuildMode()
@@ -443,7 +445,7 @@ void AFacilityBuilder::ConfirmPlacement_ConveyorBeltBuildMode()
 bool AFacilityBuilder::IsValidGeneralFacilityPlace(AFacilityGhostActor* Ghost)
 {
 	FHitResult HitResult;
-	TraceGridBoundsInGhostGridBounds(Ghost, HitResult);
+	TraceBuildBlockerInGhostGridBounds(Ghost, HitResult);
 
 	return !IsValid(HitResult.GetActor());
 }
@@ -451,7 +453,7 @@ bool AFacilityBuilder::IsValidGeneralFacilityPlace(AFacilityGhostActor* Ghost)
 bool AFacilityBuilder::IsValidMiningFacilityPlace(AFacilityGhostActor* Ghost)
 {
 	FHitResult HitResult;
-	TraceGridBoundsInGhostGridBounds(Ghost, HitResult);
+	TraceBuildBlockerInGhostGridBounds(Ghost, HitResult);
 
 	if (AMiningPoint* MiningPoint = Cast<AMiningPoint>(HitResult.GetActor()))
 	{
@@ -493,10 +495,11 @@ AFacilityGhostActor* AFacilityBuilder::SpawnFacilityGhost(const TSubclassOf<ACon
 	return nullptr;
 }
 
-void AFacilityBuilder::TraceGridBoundsInGhostGridBounds(AFacilityGhostActor* Ghost, FHitResult& HitResult)
+void AFacilityBuilder::TraceBuildBlockerInGhostGridBounds(AFacilityGhostActor* Ghost, FHitResult& HitResult)
 {
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_GameTraceChannel1));
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
 	TArray<AActor*> ActorsToIgnore;
 	ActorsToIgnore.Add(Ghost);
 	Ghost->BoxTraceSingleFromGridBoundsForObjects(ObjectTypes, ActorsToIgnore, HitResult, 25);

@@ -6,6 +6,7 @@
 #include "Characters/GSBCharacter.h"
 #include "Interfaces/InteractableActor.h"
 #include "Interfaces/ItemPickupActor.h"
+#include "Interfaces/InventoryInterface.h"
 #include "HUDs/GSBPlayerOverlay.h"
 #include "GSBPlayer.generated.h"
 
@@ -25,7 +26,7 @@ class AFacilityBuilder;
 struct FInputActionValue;
 
 UCLASS()
-class GSB_API AGSBPlayer : public AGSBCharacter, public IItemPickupActor
+class GSB_API AGSBPlayer : public AGSBCharacter, public IItemPickupActor, public IInventoryInterface
 {
 	GENERATED_BODY()
 public:
@@ -153,7 +154,7 @@ protected:
 	UGSBInventoryWindow* InventoryWindow;
 
 public:
-	FORCEINLINE UInventoryComponent* GetInventoryComponent() const
+	FORCEINLINE virtual UInventoryComponent* GetInventoryComponent() const override
 	{
 		return InventoryComponent;
 	}

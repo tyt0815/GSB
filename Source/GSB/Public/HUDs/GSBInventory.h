@@ -14,6 +14,8 @@ class GSB_API UGSBInventory : public UGSBStorage
 {
 	GENERATED_BODY()
 public:
+
+public:
 	void SetWeight(int32 CurrentWeight, int32 MaxWeight);
 
 	void LinkInventoryComponent(class UInventoryComponent* InventoryComponent);

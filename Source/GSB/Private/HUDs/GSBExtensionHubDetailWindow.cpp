@@ -4,8 +4,8 @@
 #include "HUDs/GSBExtensionHubDetailWindow.h"
 #include "HUDs/GSBHubDetail.h"
 #include "Facility/Facility.h"
-#include "Characters/GSBPlayer.h"
 #include "Interfaces/HubFacility.h"
+#include "Interfaces/InventoryInterface.h"
 #include "DebugHeader.h"
 
 void UGSBExtensionHubDetailWindow::OnLinkedToFacility(AFacility* Facility)
@@ -19,8 +19,8 @@ void UGSBExtensionHubDetailWindow::OnLinkedToFacility(AFacility* Facility)
 		TRACE_SCREEN_LOG(TEXT("IHubFacility를 상속한 클래스가 아닙니다."));
 	}
 
-	if (AGSBPlayer* Player = Cast<AGSBPlayer>(GetOwningPlayerPawn()))
+	if (IInventoryInterface* InventoryInterface = Cast<IInventoryInterface>(GetOwningPlayerPawn()))
 	{
-		HubDetail->LinkInventoryComponent(Player->GetInventoryComponent());
+		HubDetail->LinkInventoryComponent(InventoryInterface->GetInventoryComponent());
 	}
 }

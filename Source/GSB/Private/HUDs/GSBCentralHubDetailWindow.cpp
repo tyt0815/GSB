@@ -4,8 +4,8 @@
 #include "HUDs/GSBCentralHubDetailWindow.h"
 #include "HUDs/GSBHubDetail.h"
 #include "Facility/CentralHub.h"
-#include "Characters/GSBPlayer.h"
 #include "Interfaces/HubFacility.h"
+#include "Interfaces/InventoryInterface.h"
 #include "DebugHeader.h"
 
 void UGSBCentralHubDetailWindow::OnLinkedToFacility(AFacility* Facility)
@@ -21,12 +21,12 @@ void UGSBCentralHubDetailWindow::OnLinkedToFacility(AFacility* Facility)
 		TRACE_SCREEN_LOG(TEXT("ACentralHub 캐스팅 실패"));
 	}
 
-	if (AGSBPlayer* Player = Cast<AGSBPlayer>(GetOwningPlayerPawn()))
+	if (IInventoryInterface* InventoryInterface = Cast<IInventoryInterface>(GetOwningPlayerPawn()))
 	{
-		HubDetail->LinkInventoryComponent(Player->GetInventoryComponent());
+		HubDetail->LinkInventoryComponent(InventoryInterface->GetInventoryComponent());
 	}
 	else
 	{
-		TRACE_SCREEN_LOG(TEXT("AGSBPlayer캐스팅 실패"));
+		TRACE_SCREEN_LOG(TEXT("IInventoryInterface캐스팅 실패"));
 	}
 }

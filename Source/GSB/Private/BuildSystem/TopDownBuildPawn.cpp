@@ -86,6 +86,15 @@ void ATopDownBuildPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	}
 }
 
+UInventoryComponent* ATopDownBuildPawn::GetInventoryComponent() const
+{
+	if (IsValid(OwningPlayer))
+	{
+		return OwningPlayer->GetInventoryComponent();
+	}
+	return nullptr;
+}
+
 void ATopDownBuildPawn::BeginPlay()
 {
 	Super::BeginPlay();
@@ -142,6 +151,7 @@ void ATopDownBuildPawn::ToggleBuildableFacilityList()
 {
 	if (IsValid(FacilityBuilder))
 	{
+		CancelFacilityPreview();
 		FacilityBuilder->ToggleBuildableFacilityList();
 	}
 }

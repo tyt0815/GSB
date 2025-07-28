@@ -76,7 +76,7 @@ private:
 
 	AFacilityGhostActor* SpawnFacilityGhost(const TSubclassOf<AConstructibleFacility>& FacilityClass, bool bVisiblePowerInfluenceArea);
 
-	void TraceGridBoundsInGhostGridBounds(AFacilityGhostActor* Ghost, FHitResult& HitResult);
+	void TraceBuildBlockerInGhostGridBounds(AFacilityGhostActor* Ghost, FHitResult& HitResult);
 
 	void DestroyAllConveyorBeltGhosts();
 
@@ -99,7 +99,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "GSB|FacilityBuilder")
 	UGSBFacilityDataAsset* ConveyorBeltLeftData;
 
-	UGSBFacilityDataAsset* CurrentGeneralFacilityData;
+	UGSBFacilityDataAsset* CurrentPreviewFacilityData;
 
 	AFacilityGhostActor* FacilityGhost;
 
