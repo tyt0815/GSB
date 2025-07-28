@@ -18,6 +18,10 @@ public:
 
 	class ADroppedItem* ConvertToDroppedItem();
 
+	void ShowHoveredItemNameWidgetIfCan(class AGSBPlayer* GSBPlayer);
+
+	void HideHoveredItemNameWidget();
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -44,10 +48,6 @@ private	:
 
 	UFUNCTION()
 	void OnWidgetShowBoundsEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
-	void ShowHoveredItemNameWidget();
-
-	void HideHoveredItemNameWidget();
 
 public:
 	FORCEINLINE UItemDataAsset* GetItemData() const

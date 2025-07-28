@@ -4,6 +4,7 @@
 #include "Characters/GSBPlayer.h"
 #include "EnhancedInputComponent.h"
 #include "InputMappingContext.h"
+#include "Items/ItemCrate.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
@@ -167,6 +168,11 @@ void AGSBPlayer::BeginPlay()
 	}
 
 	SwitchToCombatMode();
+}
+
+bool AGSBPlayer::IsControlled() const
+{
+	return GetPlayerController() != nullptr;
 }
 
 void AGSBPlayer::Move(const FInputActionValue& Value)
@@ -377,6 +383,16 @@ void AGSBPlayer::SwitchToTopDownBuildMode()
 			CancelFacilityPreview();
 			GetCharacterMovement()->StopMovementImmediately();
 			PC->SwitchGamePlayMode_TopViewExplore(TopDownBuildPawn);
+
+			TArray<AActor*> OverlappingActors;
+			GetCapsuleComponent()->GetOverlappingActors(OverlappingActors);
+			for (AActor* Actor : OverlappingActors)
+			{
+				if (AItemCrate* ItemCrate = Cast<AItemCrate>(Actor))
+				{
+					ItemCrate->HideHoveredItemNameWidget();
+				}
+			}
 		}
 	}
 }
@@ -400,11 +416,6 @@ void AGSBPlayer::SwitchToBuildMode()
 AGSBPlayerController* AGSBPlayer::GetPlayerController() const
 {
 	return GetController<AGSBPlayerController>();
-}
-
-bool AGSBPlayer::IsControlled() const
-{
-	return GetPlayerController() != nullptr;
 }
 
 void AGSBPlayer::OnEnterCombatMode()
@@ -439,6 +450,16 @@ void AGSBPlayer::OnEnterBuildMode()
 void AGSBPlayer::OnEnterBuildModeGameOnly()
 {
 	OnEnterBuildMode();
+
+	TArray<AActor*> OverlappingActors;
+	GetCapsuleComponent()->GetOverlappingActors(OverlappingActors);
+	for (AActor* Actor : OverlappingActors)
+	{
+		if (AItemCrate* ItemCrate = Cast<AItemCrate>(Actor))
+		{
+			ItemCrate->ShowHoveredItemNameWidgetIfCan(this);
+		}
+	}
 }
 
 void AGSBPlayer::OnEnterBuildModeGameAndUI()
@@ -502,7 +523,7 @@ void AGSBPlayer::UpdateFacilityBuilderLocation()
 
 void AGSBPlayer::UpdateInteractableActor(AActor* Candidate)
 {
-	if (IsValid(InteractableActor.GetObject()))
+	if (IsValid(InteractableActor.GetObject()) && InteractableActor)
 	{
 		if (InteractableActor.GetObject() == Candidate && InteractableActor->IsInteractable() && !InteractableActor->IsInteractionListDirty())
 		{

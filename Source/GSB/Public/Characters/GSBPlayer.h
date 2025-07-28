@@ -44,6 +44,9 @@ protected:
 	///////////////////////////////////////////////////////////
 	// Inputs
 	///////////////////////////////////////////////////////////
+public:
+	bool IsControlled() const;
+
 protected:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
@@ -77,7 +80,7 @@ protected:
 
 	AGSBPlayerController* GetPlayerController() const;
 
-	bool IsControlled() const;
+	
 
 	///////////////////////////////////////////////////////////
 	// Components

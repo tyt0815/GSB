@@ -7,6 +7,7 @@
 #include "Components/WidgetComponent.h"
 #include "Components/SphereComponent.h"
 #include "Characters/GSBPlayer.h"
+#include "PlayerController/GSBPlayerController.h"
 
 // Sets default values
 AItemCrate::AItemCrate()
@@ -32,6 +33,25 @@ ADroppedItem* AItemCrate::ConvertToDroppedItem()
 	return DroppedItem;
 }
 
+void AItemCrate::ShowHoveredItemNameWidgetIfCan(AGSBPlayer* GSBPlayer)
+{
+	if (!IsValid(GSBPlayer))
+	{
+		return;
+	}
+
+	if (GSBPlayer->IsControlled())
+	{
+		HoveredItemNameWidgetComponent->SetVisibility(true, true);
+	}
+}
+
+void AItemCrate::HideHoveredItemNameWidget()
+{
+	HoveredItemNameWidgetComponent->SetVisibility(false, true);
+}
+
+
 void AItemCrate::BeginPlay()
 {
 	Super::BeginPlay();
@@ -43,9 +63,9 @@ void AItemCrate::BeginPlay()
 	WidgetShowBounds->GetOverlappingActors(OverlappedActors);
 	for (AActor* Actor : OverlappedActors)
 	{
-		if (Actor->GetClass()->IsChildOf<AGSBPlayer>())
+		if (AGSBPlayer* GSBPlayer = Cast<AGSBPlayer>(Actor))
 		{
-			ShowHoveredItemNameWidget();
+			ShowHoveredItemNameWidgetIfCan(GSBPlayer);
 			break;
 		}
 	}
@@ -70,9 +90,9 @@ void AItemCrate::OnWidgetShowBoundsBeginOverlap(UPrimitiveComponent* OverlappedC
 	{
 		return;
 	}
-	if (OtherActor->GetClass()->IsChildOf<AGSBPlayer>())
+	if (AGSBPlayer* GSBPlayer = Cast<AGSBPlayer>(OtherActor))
 	{
-		ShowHoveredItemNameWidget();
+		ShowHoveredItemNameWidgetIfCan(GSBPlayer);
 	}
 }
 
@@ -86,14 +106,4 @@ void AItemCrate::OnWidgetShowBoundsEndOverlap(UPrimitiveComponent* OverlappedCom
 	{
 		HideHoveredItemNameWidget();
 	}
-}
-
-void AItemCrate::ShowHoveredItemNameWidget()
-{
-	HoveredItemNameWidgetComponent->SetVisibility(true, true);
-}
-
-void AItemCrate::HideHoveredItemNameWidget()
-{
-	HoveredItemNameWidgetComponent->SetVisibility(false, true);
 }
