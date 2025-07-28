@@ -5,16 +5,18 @@
 #include "CoreMinimal.h"
 #include "Facility/ConstructibleFacility.h"
 #include "Interfaces/PowerProviderFacility.h"
+#include "Interfaces/PowerWireConnection.h"
 #include "PowerConsumerFacility.generated.h"
 
 class UGSBFacilityPowerSwitch;
 
 
 UCLASS()
-class GSB_API APowerConsumerFacility : public AConstructibleFacility
+class GSB_API APowerConsumerFacility : public AConstructibleFacility, public IPowerWireConnection
 {
 	GENERATED_BODY()
 public:
+	APowerConsumerFacility();
 
 	virtual bool IsOperating() const override;
 
@@ -26,6 +28,8 @@ protected:
 	virtual void CompleteConstruction_Implementation() override;
 
 	virtual void OnShowDetailInteraction(AActor* Interactor) override;
+
+	virtual FVector GetPowerWireConnectionPoint() const final;
 
 public:
 	bool IsLinkedToPowerProvider() const;
@@ -56,6 +60,9 @@ protected:
 	void TraceMultiPowerInfluenceArea(TArray<FHitResult>& HitResults);
 
 	bool IsValidPowerProviderScriptInterface(const TScriptInterface<IPowerProviderFacility>& PowerProvider) const;
+
+	UPROPERTY(VisibleAnywhere)
+	UBoxComponent* PowerWireConnectionBoundsComponent;
 
 	UPROPERTY(VisibleAnywhere)
 	TScriptInterface<IPowerProviderFacility> LinkedPowerProvider = nullptr;

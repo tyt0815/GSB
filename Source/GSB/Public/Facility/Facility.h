@@ -61,7 +61,7 @@ protected:
 	virtual void OnShowDetailInteraction(AActor* Interactor);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	UStaticMeshComponent* StaticMeshComponent;
+	UChildActorComponent* MeshComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	UInteractionComponent* InteractionComponent;

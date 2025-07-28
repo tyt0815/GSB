@@ -8,6 +8,7 @@
 #include "Interfaces/HubFacility.h"
 #include "Interfaces/InputPortHandler.h"
 #include "Interfaces/OutputPortHandler.h"
+#include "Interfaces/PowerWireConnection.h"
 #include "CentralHub.generated.h"
 
 class ACentralHub;
@@ -24,12 +25,15 @@ class GSB_API ACentralHub :
 	public IPowerProviderFacility,
 	public IHubFacility,
 	public IInputPortHandler,
-	public IOutputPortHandler
+	public IOutputPortHandler,
+	public IPowerWireConnection
 {
 	GENERATED_BODY()
 	
 public:
 	ACentralHub();
+
+	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
 
 	virtual void PostInitializeComponents() override;
 
@@ -49,6 +53,8 @@ public:
 
 	virtual UItemStorageComponent* GetHubStorageComponent() override;
 
+	virtual FVector GetPowerWireConnectionPoint() const override;
+
 protected:
 
 	virtual void BeginPlay() override;
@@ -61,6 +67,9 @@ public:
 	FOnUpdatePowerCapacity OnUpdatePowerCapacity;
 
 protected:
+	UPROPERTY(VisibleAnywhere)
+	UBoxComponent* PowerWireConnectionBoundsComponent;
+
 	UPROPERTY(VisibleAnywhere)
 	UPowerProviderComponent* PowerProviderComponent;
 

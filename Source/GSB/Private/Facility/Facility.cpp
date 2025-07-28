@@ -12,10 +12,9 @@
 AFacility::AFacility()
 {
 	GetRootComponent()->Mobility = EComponentMobility::Static;
-
-	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
-	StaticMeshComponent->SetupAttachment(GetRootComponent());
-	StaticMeshComponent->SetCollisionProfileName(TEXT("FacilityMesh"));
+	MeshComponent = CreateDefaultSubobject<UChildActorComponent>(TEXT("Mesh"));
+	MeshComponent->SetupAttachment(GetRootComponent());
+	MeshComponent->Mobility = EComponentMobility::Static;
 
 	InteractionComponent = CreateDefaultSubobject<UInteractionComponent>(TEXT("InteractionRange"));
 	InteractionComponent->SetupAttachment(GetRootComponent());

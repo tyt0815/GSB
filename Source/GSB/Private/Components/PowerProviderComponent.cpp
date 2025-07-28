@@ -33,9 +33,9 @@ bool UPowerProviderComponent::TryLinkPowerConsumerFacility(APowerConsumerFacilit
 
 void UPowerProviderComponent::UnlinkPowerConsumerFacility(APowerConsumerFacility* PowerConsumerFacility)
 {
-	if (LinkedPowerConsumerFacilities.Contains(PowerConsumerFacility))
+	LinkedPowerConsumerFacilities.Remove(PowerConsumerFacility);
+	if (IsValid(PowerConsumerFacility))
 	{
-		LinkedPowerConsumerFacilities.Remove(PowerConsumerFacility);
 		PowerConsumerFacility->OnUnlinkFromPowerProvider();
 	}
 }
@@ -43,7 +43,7 @@ void UPowerProviderComponent::UnlinkPowerConsumerFacility(APowerConsumerFacility
 void UPowerProviderComponent::LinkFacilitiesInPowerInfluenceArea()
 {
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_GameTraceChannel2)); // FacilityMesh
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_GameTraceChannel1)); // FacilityMesh
 	TArray<AActor*> ActorsToIgnore;
 	TArray<FHitResult> HitResults;
 	BoxTraceMultiFromGridBoundsForObjects(ObjectTypes, ActorsToIgnore, HitResults);

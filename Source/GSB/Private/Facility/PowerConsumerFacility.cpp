@@ -11,6 +11,14 @@
 #include "GSBGameInstance.h"
 #include "DebugHeader.h"
 
+APowerConsumerFacility::APowerConsumerFacility()
+{
+	PowerWireConnectionBoundsComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("PowerWireConnectionBounds"));
+	PowerWireConnectionBoundsComponent->SetupAttachment(GetRootComponent());
+	PowerWireConnectionBoundsComponent->SetCollisionProfileName(TEXT("PowerWireConnectionBounds"));
+	PowerWireConnectionBoundsComponent->Mobility = EComponentMobility::Static;
+}
+
 bool APowerConsumerFacility::IsOperating() const
 {
 	return Super::IsOperating() && IsOn() && IsLinkedToPowerProvider() && LinkedPowerProvider->CanProvidePower();
@@ -18,7 +26,7 @@ bool APowerConsumerFacility::IsOperating() const
 
 void APowerConsumerFacility::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	UnlinkFromPowerProvider();
+	TurnOff();
 
 	Super::EndPlay(EndPlayReason);
 }
@@ -49,6 +57,11 @@ void APowerConsumerFacility::OnShowDetailInteraction(AActor* Interactor)
 	}
 }
 
+FVector APowerConsumerFacility::GetPowerWireConnectionPoint() const
+{
+	return PowerWireConnectionBoundsComponent->GetComponentLocation();
+}
+
 bool APowerConsumerFacility::IsLinkedToPowerProvider() const
 {
 	return IsValidPowerProviderScriptInterface(LinkedPowerProvider);
@@ -71,7 +84,7 @@ bool APowerConsumerFacility::CanLinkToPowerProvider(IPowerProviderFacility* Powe
 void APowerConsumerFacility::OnLinkToPowerProvider_Implementation(AActor* PowerProviderActor)
 {
 	// PowerWire 연결
-	if (AFacility* PowerProviderFacility = Cast<AFacility>(PowerProviderActor))
+	if (IPowerWireConnection* PowerWireConnectionInterface = Cast<IPowerWireConnection>(PowerProviderActor))
 	{
 		if (UClass* PowerWireClass = UGSBGameInstance::GetActorClass(this, (TEXT("PowerWire"))))
 		{
@@ -83,9 +96,8 @@ void APowerConsumerFacility::OnLinkToPowerProvider_Implementation(AActor* PowerP
 				}
 				if (PowerWire)
 				{
-					FVector Offset = FVector(0, 0, -2);
-					FVector Start = GetLocationOnTopXYPlane() + Offset;
-					FVector PowerProviderTop = PowerProviderFacility->GetLocationOnTopXYPlane();
+					FVector Start = GetPowerWireConnectionPoint();
+					FVector PowerProviderTop = PowerWireConnectionInterface->GetPowerWireConnectionPoint();
 					FVector WireForward = PowerProviderTop - Start;
 					WireForward.Normalize();
 					FVector	WireRight = FVector::ZAxisVector.Cross(WireForward);
@@ -96,7 +108,7 @@ void APowerConsumerFacility::OnLinkToPowerProvider_Implementation(AActor* PowerP
 					FVector TraceStart = TraceEnd + WireUp * 500;
 
 					TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-					ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_GameTraceChannel2));
+					ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_GameTraceChannel8));
 					TArray<AActor*> ActorsToIgnore;
 					TArray<FHitResult> OutHits;
 					UKismetSystemLibrary::BoxTraceMultiForObjects(
@@ -116,42 +128,30 @@ void APowerConsumerFacility::OnLinkToPowerProvider_Implementation(AActor* PowerP
 						60
 					);
 
-					float ZoHitMax1 = -1;
-					float ZoHitMax2 = -1;
-					FVector ImpactPoint1 = PowerProviderTop;
-					FVector ImpactPoint2 = PowerProviderTop;
+
+					FVector End = PowerProviderTop;
+					float ZoHitMax = -1;
 					for (const FHitResult& HitResult : OutHits)
 					{
 						if (!IsValid(HitResult.GetActor()))
 						{
 							continue;
 						}
-						if (!((HitResult.GetActor() == PowerProviderActor || HitResult.GetActor()->GetParentActor() == PowerProviderActor) && HitResult.GetActor()->ActorHasTag(TEXT("Antenna"))))
+
+						if (HitResult.GetActor() != PowerProviderActor && HitResult.GetActor()->GetParentActor() != PowerProviderActor)
 						{
 							continue;
 						}
+						
 						FVector UnitVector = HitResult.ImpactPoint - Start;
 						UnitVector.Normalize();
 						float ZoHitResult = FVector::ZAxisVector.Dot(UnitVector);
-						TRACE_SCREEN_LOG(FString::Printf(TEXT("sibal: %f"), ZoHitResult));
-						if (ZoHitResult > ZoHitMax1)
+						if (ZoHitResult > ZoHitMax)
 						{
-							ZoHitMax2 = ZoHitMax1;
-							ImpactPoint2 = ImpactPoint1;
-							ZoHitMax1 = ZoHitResult;
-							ImpactPoint1 = HitResult.ImpactPoint;
-							TRACE_SCREEN_LOG(ImpactPoint1.ToString());
-							DrawDebugPoint(GetWorld(), ImpactPoint1, 100, FColor::Magenta);
-						}
-						else if (ZoHitResult > ZoHitMax2)
-						{
-							ZoHitMax2 = ZoHitResult;
-							ImpactPoint2 = HitResult.ImpactPoint;
-							TRACE_SCREEN_LOG(ImpactPoint2.ToString());
-							DrawDebugPoint(GetWorld(), ImpactPoint2, 100, FColor::Cyan);
+							ZoHitMax = ZoHitResult;
+							End = HitResult.ImpactPoint;
 						}
 					}
-					FVector End = (ImpactPoint1 + ImpactPoint2) / 2;
 
 					PowerWire->Link(Start, End);
 				}

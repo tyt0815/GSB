@@ -16,6 +16,11 @@
 
 ACentralHub::ACentralHub()
 {
+	PowerWireConnectionBoundsComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("PowerWireConnectionBounds"));
+	PowerWireConnectionBoundsComponent->SetupAttachment(GetRootComponent());
+	PowerWireConnectionBoundsComponent->SetCollisionProfileName(TEXT("PowerWireConnectionBounds"));
+	PowerWireConnectionBoundsComponent->Mobility = EComponentMobility::Static;
+
 	PowerProviderComponent = CreateDefaultSubobject<UPowerProviderComponent>(TEXT("PowerProvider"));
 	PowerProviderComponent->SetupAttachment(GetRootComponent());
 	PowerProviderComponent->SetCollisionProfileName(TEXT("PowerInfluenceArea"));
@@ -27,6 +32,12 @@ ACentralHub::ACentralHub()
 	StorageComponent = CreateDefaultSubobject<UItemStorageComponent>(TEXT("Storage"));
 	InputPortHandler = CreateDefaultSubobject<URetryPrioritizedActorRequestHandlerComponent>(TEXT("InputPortHandler"));
 	OutputPortHandler = CreateDefaultSubobject<URetryPrioritizedActorRequestHandlerComponent>(TEXT("OutputPortHandler"));
+}
+
+void ACentralHub::EndPlay(EEndPlayReason::Type EndPlayReason)
+{
+	PowerProviderComponent->UnlinkAllPowerConsumerFacility();
+	Super::EndPlay(EndPlayReason);
 }
 
 void ACentralHub::PostInitializeComponents()
@@ -83,6 +94,11 @@ void ACentralHub::RegisterOutputPort(AOutputPort* OutputPort)
 UItemStorageComponent* ACentralHub::GetHubStorageComponent()
 {
 	return StorageComponent;
+}
+
+FVector ACentralHub::GetPowerWireConnectionPoint() const
+{
+	return PowerWireConnectionBoundsComponent->GetComponentLocation();
 }
 
 void ACentralHub::BeginPlay()

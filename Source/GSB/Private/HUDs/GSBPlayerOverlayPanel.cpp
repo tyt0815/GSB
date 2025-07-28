@@ -136,7 +136,7 @@ void UGSBPlayerOverlayPanel::SwitchToTopViewModeUI()
 
 	if (IsValid(WindowShortcutSwitcher))
 	{
-		WindowShortcutSwitcher->SetActiveWidgetIndex(1);
+		WindowShortcutSwitcher->SetActiveWidgetIndex(2);
 	}
 }
 
