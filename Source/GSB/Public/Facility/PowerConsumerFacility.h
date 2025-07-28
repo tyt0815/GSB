@@ -75,14 +75,14 @@ protected:
 
 	virtual void TurnOn();
 
+	UPROPERTY(EditAnywhere, Category = "GSB|PowerConsumerFacility")
+	int32 PowerConsumption = 0;
+
 private:
 	class AWire* PowerWire;
 
 	UFUNCTION()
 	void HandleOnPowerSwitchClicked();
-
-	UPROPERTY(EditAnywhere, Category = "APowerConsumerFacility|Link to PowerProvider")
-	int32 PowerConsumption = 10;
 
 	class UGSBFacilityPowerStatus* PowerStatusWidget;
 
