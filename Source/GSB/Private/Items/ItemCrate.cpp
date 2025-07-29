@@ -6,6 +6,7 @@
 #include "Items/HoveredItemName.h"
 #include "Components/WidgetComponent.h"
 #include "Components/SphereComponent.h"
+#include "Components/BoxComponent.h"
 #include "Characters/GSBPlayer.h"
 #include "PlayerController/GSBPlayerController.h"
 
@@ -29,6 +30,12 @@ AItemCrate::AItemCrate()
 ADroppedItem* AItemCrate::ConvertToDroppedItem()
 {
 	ADroppedItem* DroppedItem = ADroppedItem::CreateDroppedItem(this, ItemData, GetActorLocation());
+	float ZOffset = 0;
+	if (UBoxComponent* BoxCollision = Cast<UBoxComponent>(DroppedItem->GetRootComponent()))
+	{
+		ZOffset = BoxCollision->GetScaledBoxExtent().Z + 10;
+	}
+	DroppedItem->SetActorLocation(GetActorLocation() + FVector::ZAxisVector * ZOffset);
 	Destroy();
 	return DroppedItem;
 }

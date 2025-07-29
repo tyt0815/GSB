@@ -21,6 +21,9 @@ AConveyorBelt::AConveyorBelt()
 
     ItemReceiveComponent = CreateDefaultSubobject<UItemReceiveComponent>(TEXT("ItemReceive"));
     ItemSendComponent = CreateDefaultSubobject<UItemSendComponent>(TEXT("ItemSend"));
+
+    ConstructionTime = 0;
+    DeconstructionTime = ConstructionTime;
 }
 
 void AConveyorBelt::Tick_OnOperating(float DeltaTime)

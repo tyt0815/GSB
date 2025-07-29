@@ -6,7 +6,7 @@
 #include "HUDs/GSBItemSlot.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
-#include "Characters/GSBPlayer.h"
+#include "Interfaces/InventoryInterface.h"
 #include "Facility/ProductionFacility.h"
 
 void UGSBProductionFacilityDetailWindow::NativeConstruct()
@@ -39,9 +39,9 @@ void UGSBProductionFacilityDetailWindow::OnLinkedToFacility(AFacility* Facility)
 		OutputStorage->LinkStorageComponent(ProductionFacility->GetOutputStorageComponent());
 	}
 
-	if (AGSBPlayer* Player = Cast<AGSBPlayer>(GetOwningPlayerPawn()))
+	if (IInventoryInterface* InventoryInterface = Cast<IInventoryInterface>(GetOwningPlayerPawn()))
 	{
-		Inventory->LinkInventoryComponent(Player->GetInventoryComponent());
+		Inventory->LinkInventoryComponent(InventoryInterface->GetInventoryComponent());
 	}
 }
 

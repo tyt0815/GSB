@@ -6,7 +6,7 @@
 #include "HUDs/GSBItemSlot.h"
 #include "Components/TextBlock.h"
 #include "Components/ProgressBar.h"
-#include "Characters/GSBPlayer.h"
+#include "Interfaces/InventoryInterface.h"
 #include "Facility/PowerGenerator.h"
 #include "Items/ItemDataAsset.h"
 
@@ -39,9 +39,9 @@ void UGSBPowerGeneratorDetailWindow::OnLinkedToFacility(AFacility* Facility)
 		ConsumingItemStorage->LinkStorageComponent(PowerGenerator->ItemStorageComponent);
 	}
 
-	if (AGSBPlayer* Player = Cast<AGSBPlayer>(GetOwningPlayerPawn()))
+	if (IInventoryInterface* InventoryInterface = Cast<IInventoryInterface>(GetOwningPlayerPawn()))
 	{
-		Inventory->LinkInventoryComponent(Player->GetInventoryComponent());
+		Inventory->LinkInventoryComponent(InventoryInterface->GetInventoryComponent());
 	}
 }
 

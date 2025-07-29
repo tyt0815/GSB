@@ -71,11 +71,6 @@ bool APowerRelayFacility::CanProvidePower()
 	return IsLinkedToPowerProvider() && LinkedPowerProvider->CanProvidePower() && IsOperating();
 }
 
-bool APowerRelayFacility::CanLinkPower()
-{
-	return IsOn();
-}
-
 void APowerRelayFacility::SetPowerInfluenceAreaVisibility(bool bVisibilty)
 {
 	PowerProviderComponent->SetPowerInfluenceAreaVisibility(bVisibilty);

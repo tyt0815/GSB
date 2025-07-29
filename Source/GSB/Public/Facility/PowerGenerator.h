@@ -58,7 +58,7 @@ private:
 	AInputPort* ConnectedInputPort;
 
 	UPROPERTY(EditAnywhere, Category = "GSB")
-	float GeneratingTime = 10;
+	float GeneratingTime = 9;
 
 	FTimerHandle GeneratingTimerHandle;
 

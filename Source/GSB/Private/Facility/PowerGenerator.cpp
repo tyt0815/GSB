@@ -45,7 +45,7 @@ float APowerGenerator::GetRemainingPowerTimeProgress() const
 
 bool APowerGenerator::TryBeginGeneraingPower()
 {
-	if (IsOperating())
+	if (IsLinkedToPowerProvider())
 	{
 		if (ItemStorageComponent->GetItemStack(ConsumingItemData).Stack > 0 && !IsGeneratingPower())
 		{
@@ -63,8 +63,10 @@ bool APowerGenerator::TryBeginGeneraingPower()
 void APowerGenerator::EndGeneratingPower()
 {
 	GetWorldTimerManager().ClearTimer(GeneratingTimerHandle);
-	SubtractPowerToCentralHub();
-	TryBeginGeneraingPower();
+	if (!TryBeginGeneraingPower())
+	{
+		SubtractPowerToCentralHub();
+	}
 }
 
 ACentralHub* APowerGenerator::GetCentralHub() const

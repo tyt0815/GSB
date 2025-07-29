@@ -40,7 +40,7 @@ public:
 
 	virtual bool CanProvidePower() override;
 
-	virtual bool CanLinkPower() override;
+	// virtual bool CanLinkPower() override { return IsOn(); };
 
 	virtual void SetPowerInfluenceAreaVisibility(bool bVisibilty) override;
 

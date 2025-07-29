@@ -76,6 +76,12 @@ private:
 		FHitResult& OutHit
 	);
 
+	void LineTraceMultiToMouseDown(
+		const TArray<TEnumAsByte<EObjectTypeQuery>>& ObjectTypes,
+		const TArray<AActor*>& ActorsToIgnore,
+		TArray<FHitResult>& OutHits
+	);
+
 	void OpenFacilityInteractionContextMenu(AFacility* Facility);
 
 	UFUNCTION()

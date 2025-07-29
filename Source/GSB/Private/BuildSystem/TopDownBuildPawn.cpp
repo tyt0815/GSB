@@ -239,12 +239,17 @@ void ATopDownBuildPawn::SelectFacility()
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_GameTraceChannel1));
 	TArray<AActor*> ActorsToIgnore;
-	FHitResult OutHit;
-	LineTraceSingleToMouseDown(ObjectTypes, ActorsToIgnore, OutHit);
+	TArray<FHitResult> OutHits;
+	LineTraceMultiToMouseDown(ObjectTypes, ActorsToIgnore, OutHits);
 
-	if (AFacility* Facility = Cast<AFacility>(OutHit.GetActor()))
+	
+	for (const FHitResult& HitResult : OutHits)
 	{
-		OpenFacilityInteractionContextMenu(Facility);
+		if (AFacility* Facility = Cast<AFacility>(HitResult.GetActor()))
+		{
+			OpenFacilityInteractionContextMenu(Facility);
+			break;
+		}
 	}
 }
 
@@ -276,7 +281,33 @@ void ATopDownBuildPawn::LineTraceSingleToMouseDown(
 		ActorsToIgnore,
 		EDrawDebugTrace::None,
 		OutHit,
-		true
+		true,
+		FLinearColor::Red,
+		FLinearColor::Green,
+		16
+	);
+}
+
+void ATopDownBuildPawn::LineTraceMultiToMouseDown(const TArray<TEnumAsByte<EObjectTypeQuery>>& ObjectTypes, const TArray<AActor*>& ActorsToIgnore, TArray<FHitResult>& OutHits)
+{
+	FVector MouseWorldPosition;
+	FVector MouseWorldDirection;
+	GetMouseWorldPosition(MouseWorldPosition, MouseWorldDirection);
+
+	FVector LineTraceEnd = MouseWorldPosition + MouseWorldDirection * TOP_DOWN_BUILD_PAWN_HEIGHT * 10;
+	UKismetSystemLibrary::LineTraceMultiForObjects(
+		this,
+		MouseWorldPosition,
+		LineTraceEnd,
+		ObjectTypes,
+		false,
+		ActorsToIgnore,
+		EDrawDebugTrace::None,
+		OutHits,
+		true,
+		FLinearColor::Red,
+		FLinearColor::Green,
+		16
 	);
 }
 
