@@ -80,14 +80,18 @@ void APowerGenerator::OnReceiveItem(AActor* Item, AInputPort* InputPort)
 
 bool APowerGenerator::TryBeginGeneraingPower()
 {
-	if (ItemStorageComponent->GetItemStack(ConsumingItemData).Stack > 0 && !IsGeneratingPower())
+	if (IsOperating())
 	{
-		ItemStorageComponent->UnstoreItem({ ConsumingItemData, 1 });
-		AddPowerToCentralHub();
-		FTimerDelegate EndGeneratingPowerDelegate;
-		EndGeneratingPowerDelegate.BindUFunction(this, TEXT("EndGeneratingPower"));
-		GetWorldTimerManager().SetTimer(GeneratingTimerHandle, EndGeneratingPowerDelegate, GeneratingTime, false);
+		if (ItemStorageComponent->GetItemStack(ConsumingItemData).Stack > 0 && !IsGeneratingPower())
+		{
+			ItemStorageComponent->UnstoreItem({ ConsumingItemData, 1 });
+			AddPowerToCentralHub();
+			FTimerDelegate EndGeneratingPowerDelegate;
+			EndGeneratingPowerDelegate.BindUFunction(this, TEXT("EndGeneratingPower"));
+			GetWorldTimerManager().SetTimer(GeneratingTimerHandle, EndGeneratingPowerDelegate, GeneratingTime, false);
+		}
 	}
+	
 	return false;
 }
 
