@@ -27,6 +27,8 @@ class GSB_API IPowerProviderFacility
 public:
 	virtual bool CanProvidePower() = 0;
 
+	virtual bool CanLinkPower() = 0;
+
 	virtual bool TryLinkPowerConsumerFacility(APowerConsumerFacility* PowerConsumerFacility) = 0;
 
 	virtual void UnlinkPowerConsumerFacility(APowerConsumerFacility* PowerConsumerFacility) = 0;

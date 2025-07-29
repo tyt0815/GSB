@@ -24,6 +24,10 @@ public:
 public:
 	float GetRemainingPowerTimeProgress() const;
 
+	bool TryBeginGeneraingPower();
+
+	void PauseGeneratingPower();
+
 protected:
 	class ACentralHub* GetCentralHub() const;
 
@@ -44,12 +48,8 @@ private:
 	UFUNCTION()
 	void OnReceiveItem(AActor* Item, class AInputPort* InputPort);
 
-	bool TryBeginGeneraingPower();
-
 	UFUNCTION()
 	void EndGeneratingPower();
-
-	void PauseGeneratingPower();
 
 	bool TryResumeGeneratingPower();
 

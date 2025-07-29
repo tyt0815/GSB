@@ -43,6 +43,30 @@ float APowerGenerator::GetRemainingPowerTimeProgress() const
 	return GetWorldTimerManager().GetTimerRemaining(GeneratingTimerHandle) / GeneratingTime;
 }
 
+bool APowerGenerator::TryBeginGeneraingPower()
+{
+	if (IsOperating())
+	{
+		if (ItemStorageComponent->GetItemStack(ConsumingItemData).Stack > 0 && !IsGeneratingPower())
+		{
+			ItemStorageComponent->UnstoreItem({ ConsumingItemData, 1 });
+			AddPowerToCentralHub();
+			FTimerDelegate EndGeneratingPowerDelegate;
+			EndGeneratingPowerDelegate.BindUFunction(this, TEXT("EndGeneratingPower"));
+			GetWorldTimerManager().SetTimer(GeneratingTimerHandle, EndGeneratingPowerDelegate, GeneratingTime, false);
+		}
+	}
+
+	return false;
+}
+
+void APowerGenerator::EndGeneratingPower()
+{
+	GetWorldTimerManager().ClearTimer(GeneratingTimerHandle);
+	SubtractPowerToCentralHub();
+	TryBeginGeneraingPower();
+}
+
 ACentralHub* APowerGenerator::GetCentralHub() const
 {
 	return UGSBFacilitySubsystem::Get(this)->GetCentralHub();
@@ -75,30 +99,6 @@ void APowerGenerator::OnReceiveItem(AActor* Item, AInputPort* InputPort)
 {
 	Item->Destroy();
 	ItemStorageComponent->StoreItem({ ConsumingItemData, 1 });
-	TryBeginGeneraingPower();
-}
-
-bool APowerGenerator::TryBeginGeneraingPower()
-{
-	if (IsOperating())
-	{
-		if (ItemStorageComponent->GetItemStack(ConsumingItemData).Stack > 0 && !IsGeneratingPower())
-		{
-			ItemStorageComponent->UnstoreItem({ ConsumingItemData, 1 });
-			AddPowerToCentralHub();
-			FTimerDelegate EndGeneratingPowerDelegate;
-			EndGeneratingPowerDelegate.BindUFunction(this, TEXT("EndGeneratingPower"));
-			GetWorldTimerManager().SetTimer(GeneratingTimerHandle, EndGeneratingPowerDelegate, GeneratingTime, false);
-		}
-	}
-	
-	return false;
-}
-
-void APowerGenerator::EndGeneratingPower()
-{
-	GetWorldTimerManager().ClearTimer(GeneratingTimerHandle);
-	SubtractPowerToCentralHub();
 	TryBeginGeneraingPower();
 }
 

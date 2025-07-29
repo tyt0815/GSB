@@ -72,6 +72,7 @@ void UGSBPowerGeneratorDetailWindow::HandleOnInventoryItemSlotLeftClicked(UGSBIt
 		if (ItemSlot->GetItemData() == PowerGenerator->ConsumingItemData)
 		{
 			Inventory->MoveAllItemTo(ConsumingItemStorage, PowerGenerator->ConsumingItemData);
+			PowerGenerator->TryBeginGeneraingPower();
 		}
 	}
 }

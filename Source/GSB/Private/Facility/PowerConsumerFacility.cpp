@@ -78,7 +78,7 @@ bool APowerConsumerFacility::TryLinkToPowerProvider(IPowerProviderFacility* Powe
 
 bool APowerConsumerFacility::CanLinkToPowerProvider(IPowerProviderFacility* PowerProvider)
 {
-	return PowerProvider != nullptr && IsOn() && PowerProvider->CanProvidePower();
+	return PowerProvider != nullptr && IsOn() && PowerProvider->CanLinkPower();
 }
 
 void APowerConsumerFacility::OnLinkToPowerProvider_Implementation(AActor* PowerProviderActor)
