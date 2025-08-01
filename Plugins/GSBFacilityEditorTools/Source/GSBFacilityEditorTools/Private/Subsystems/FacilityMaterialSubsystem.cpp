@@ -306,7 +306,13 @@ void UFacilityMaterialSubsystem::CreateOrUpdateDissolveMaterialFunctionNode(UMat
 		MatExpr->Texture = Params.Pattern;
 	}
 
+	Material->PreEditChange(nullptr);
 	Material->PostEditChange();
+	if (GEditor)
+	{
+		GEditor->OnSceneMaterialsModified();
+	}
+	UMaterialEditingLibrary::RecompileMaterial(Material);
 }
 
 FAssetData UFacilityMaterialSubsystem::FindOrCreateAssetWithSuffix(const FAssetData& AssetData, FString Suffix)

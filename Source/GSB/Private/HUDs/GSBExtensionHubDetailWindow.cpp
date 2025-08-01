@@ -10,6 +10,7 @@
 
 void UGSBExtensionHubDetailWindow::OnLinkedToFacility(AFacility* Facility)
 {
+	Super::OnLinkedToFacility(Facility);
 	if (IHubFacility* Hub = Cast<IHubFacility>(Facility))
 	{
 		HubDetail->LinkHubStorageComponent(Hub->GetHubStorageComponent());
