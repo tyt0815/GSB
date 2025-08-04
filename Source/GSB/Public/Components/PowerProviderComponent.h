@@ -15,11 +15,6 @@ class GSB_API UPowerProviderComponent : public UGridSizeBoxComponent
 
 public:
 	UPowerProviderComponent();
-
-	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-
-protected:
-	virtual void BeginPlay() override;
 	
 public:
 	bool TryLinkPowerConsumerFacility(APowerConsumerFacility* PowerConsumerFacility);
@@ -30,9 +25,9 @@ public:
 
 	void UnlinkAllPowerConsumerFacility();
 
-	bool IsLinkedPowerConsumerFacility(APowerConsumerFacility* PowerConsumerFacility);
-
 	void SetPowerInfluenceAreaVisibility(bool bVisibility, bool bPropagateToChildren = false);
+
+	bool IsLinked(APowerConsumerFacility* PowerConsumerFacility);
 
 private:
 	UPROPERTY(VisibleAnywhere)

@@ -19,10 +19,10 @@ protected:
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "GSB|Wire")
-	void Link(const FVector& WorldStart, const FVector& WorldEnd);
+	void Connect(const FVector& WorldStart, const FVector& WorldEnd);
 
 	UFUNCTION(BlueprintCallable, Category = "GSB|Wire")
-	void Unlink();
+	void Disconnect();
 
 protected:
 	UFUNCTION(BlueprintCallable, Category = "GSB|Wire")
@@ -32,10 +32,10 @@ protected:
 	class USplineMeshComponent* SplineMesh;
 
 	UPROPERTY(VisibleAnywhere)
-	class UTimelineComponent* LinkTimeline;
+	class UTimelineComponent* ConnectingTimeline;
 
 	UPROPERTY(VisibleAnywhere)
-	class UTimelineComponent* UnlinkTimeline;
+	class UTimelineComponent* DisconnectingTimeline;
 
 	UPROPERTY(EditAnywhere, Category = "GSB|Wire")
 	float DissolveTime = 2;
@@ -56,4 +56,16 @@ private:
 	void InitializeUnlinkTimeline();
 
 	void DissolveSplineMesh(float Amount);
+
+	UFUNCTION()
+	void OnConnecting(float Time);
+
+	UFUNCTION()
+	void EndConnecting();
+
+	UFUNCTION()
+	void OnDisconnecting(float Time);
+
+	UFUNCTION()
+	void EndDisconnecting();
 };

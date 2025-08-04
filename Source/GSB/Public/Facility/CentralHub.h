@@ -39,8 +39,6 @@ public:
 
 	virtual bool CanProvidePower() override;
 
-	// virtual bool CanLinkPower() override { return true; };
-
 	virtual bool TryLinkPowerConsumerFacility(APowerConsumerFacility* PowerConsumerFacility) override;
 
 	virtual void UnlinkPowerConsumerFacility(APowerConsumerFacility* PowerConsumerFacility) override;

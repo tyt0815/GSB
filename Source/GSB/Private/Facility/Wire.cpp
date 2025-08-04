@@ -11,15 +11,15 @@
 AWire::AWire()
 {
 	PrimaryActorTick.bCanEverTick = false;
-
+	
 	SplineMesh = CreateDefaultSubobject<USplineMeshComponent>(TEXT("SplineMesh"));
 	SetRootComponent(SplineMesh);
-	LinkTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("LinkTimeline"));
-	LinkTimeline->SetLooping(false);
-	LinkTimeline->SetTimelineLengthMode(ETimelineLengthMode::TL_TimelineLength);
-	UnlinkTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("UnlinkTimeline"));
-	UnlinkTimeline->SetLooping(false);
-	UnlinkTimeline->SetTimelineLengthMode(ETimelineLengthMode::TL_TimelineLength);
+	ConnectingTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("ConnectingTimeline"));
+	ConnectingTimeline->SetLooping(false);
+	ConnectingTimeline->SetTimelineLengthMode(ETimelineLengthMode::TL_TimelineLength);
+	DisconnectingTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("DisconnectingTimeline"));
+	DisconnectingTimeline->SetLooping(false);
+	DisconnectingTimeline->SetTimelineLengthMode(ETimelineLengthMode::TL_TimelineLength);
 }
 
 void AWire::BeginPlay()
@@ -39,18 +39,18 @@ void AWire::BeginPlay()
 	InitializeUnlinkTimeline();
 }
 
-void AWire::Link(const FVector& WorldStart, const FVector& WorldEnd)
+void AWire::Connect(const FVector& WorldStart, const FVector& WorldEnd)
 {
 	SetStartAndEndPosition(WorldStart, WorldEnd);
 
-	UnlinkTimeline->Stop();
-	LinkTimeline->PlayFromStart();
+	DisconnectingTimeline->Stop();
+	ConnectingTimeline->PlayFromStart();
 }
 
-void AWire::Unlink()
+void AWire::Disconnect()
 {
-	LinkTimeline->Stop();
-	UnlinkTimeline->PlayFromStart();
+	ConnectingTimeline->Stop();
+	DisconnectingTimeline->PlayFromStart();
 }
 
 void AWire::SetStartAndEndPosition(const FVector& WorldStart, const FVector& WorldEnd)
@@ -70,53 +70,33 @@ FVector AWire::ConvertWorldToLocalPosition(const FVector& WorldPosition)
 
 void AWire::InitializeLinkTimeline()
 {
+
 	FOnTimelineFloatStatic OnTimelineFloatStatic;
-	OnTimelineFloatStatic.BindLambda(
-		[this](float Time)
-		{
-			DissolveSplineMesh(LinkDissolveOffset + Time);
-		}
-	);
 	FOnTimelineEventStatic OnTimelineFinished;
-	OnTimelineFinished.BindLambda(
-		[this]()
-		{
-			DissolveSplineMesh(1);
-		}
-	);
+	OnTimelineFloatStatic.BindUFunction(this, TEXT("OnConnecting"));
+	OnTimelineFinished.BindUFunction(this, TEXT("EndConnecting"));
 
 	if (UCurveFloat* LinearCurveFloat = UGSBGameInstance::GetCurveFloat(this, TEXT("LinearZeroToOne")))
 	{
-		LinkTimeline->SetTimelineLength(1);
-		LinkTimeline->SetPlayRate(1.f / FMath::Max(0.00000001, DissolveTime));
-		LinkTimeline->AddInterpFloat(LinearCurveFloat, OnTimelineFloatStatic);
-		LinkTimeline->SetTimelineFinishedFunc(OnTimelineFinished);
+		ConnectingTimeline->SetTimelineLength(1);
+		ConnectingTimeline->SetPlayRate(1.f / FMath::Max(0.00000001, DissolveTime));
+		ConnectingTimeline->AddInterpFloat(LinearCurveFloat, OnTimelineFloatStatic);
+		ConnectingTimeline->SetTimelineFinishedFunc(OnTimelineFinished);
 	}
 }
 
 void AWire::InitializeUnlinkTimeline()
 {
 	FOnTimelineFloatStatic OnTimelineFloatStatic;
-	OnTimelineFloatStatic.BindLambda(
-		[this](float Time)
-		{
-			DissolveSplineMesh(1 - (Time + UnlinkDissolveOffset));
-		}
-	);
+	OnTimelineFloatStatic.BindUFunction(this, TEXT("OnDisconnecting"));
 	FOnTimelineEventStatic OnTimelineFinished;
-	OnTimelineFinished.BindLambda(
-		[this]()
-		{
-			Destroy();
-		}
-	);
-
+	OnTimelineFinished.BindUFunction(this, TEXT("EndDisconnecting"));
 	if (UCurveFloat* LinearCurveFloat = UGSBGameInstance::GetCurveFloat(this, TEXT("LinearZeroToOne")))
 	{
-		UnlinkTimeline->SetTimelineLength(1);
-		UnlinkTimeline->SetPlayRate(1.f / FMath::Max(0.00000001, DissolveTime));
-		UnlinkTimeline->AddInterpFloat(LinearCurveFloat, OnTimelineFloatStatic);
-		UnlinkTimeline->SetTimelineFinishedFunc(OnTimelineFinished);
+		DisconnectingTimeline->SetTimelineLength(1);
+		DisconnectingTimeline->SetPlayRate(1.f / FMath::Max(0.00000001, DissolveTime));
+		DisconnectingTimeline->AddInterpFloat(LinearCurveFloat, OnTimelineFloatStatic);
+		DisconnectingTimeline->SetTimelineFinishedFunc(OnTimelineFinished);
 	}
 }
 
@@ -129,4 +109,24 @@ void AWire::DissolveSplineMesh(float Amount)
 			Material->SetScalarParameterValue(TEXT("DissolveEffect_Amount"), Amount);
 		}
 	}
+}
+
+void AWire::OnConnecting(float Time)
+{
+	DissolveSplineMesh(LinkDissolveOffset + Time);
+}
+
+void AWire::EndConnecting()
+{
+	DissolveSplineMesh(1);
+}
+
+void AWire::OnDisconnecting(float Time)
+{
+	DissolveSplineMesh(1 - (Time + UnlinkDissolveOffset));
+}
+
+void AWire::EndDisconnecting()
+{
+	Destroy();
 }

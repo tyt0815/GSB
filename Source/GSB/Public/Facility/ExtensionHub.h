@@ -22,7 +22,7 @@ class GSB_API AExtensionHub : public APowerRelayFacility,
 public:
 	AExtensionHub();
 
-	virtual bool TryLinkPowerConsumerFacility(APowerConsumerFacility* PowerConsumerFacility) override;
+	virtual bool CanLinkPowerConsumerFacility(APowerConsumerFacility* PowerConsumer);
 
 	virtual bool CanLinkToPowerProvider(IPowerProviderFacility* PowerProvider) override;
 

@@ -26,22 +26,24 @@ void APowerRelayFacility::BeginConstruction_Implementation()
 void APowerRelayFacility::OnLinkToPowerProvider_Implementation(AActor* PowerProviderActor)
 {
 	Super::OnLinkToPowerProvider_Implementation(PowerProviderActor);
-	if (LinkedPowerProvider)
-	{
-		LinkedPowerProvider->UpdatePowerUsage(PowerProviderComponent->GetCurrentPowerUsage());
-	}
+	check(IsLinkedToPowerProvider())
+	LinkedPowerProviderInterface->UpdatePowerUsage(PowerProviderComponent->GetCurrentPowerUsage());
 	PowerProviderComponent->LinkFacilitiesInPowerInfluenceArea();
 }
 
 void APowerRelayFacility::OnUnlinkFromPowerProvider_Implementation()
 {
+	check(IsLinkedToPowerProvider());
+	LinkedPowerProviderInterface->UpdatePowerUsage(-PowerProviderComponent->GetCurrentPowerUsage());
+
 	Super::OnUnlinkFromPowerProvider_Implementation();
+}
 
-	if (LinkedPowerProvider)
-	{
-		LinkedPowerProvider->UpdatePowerUsage(-PowerProviderComponent->GetCurrentPowerUsage());
-	}
+void APowerRelayFacility::PostUnlinkFromPowerProvider_Implementation()
+{
+	PowerProviderComponent->UnlinkAllPowerConsumerFacility();
 
+	Super::PostUnlinkFromPowerProvider_Implementation();
 }
 
 int32 APowerRelayFacility::GetTotalPowerUsage() const
@@ -49,18 +51,12 @@ int32 APowerRelayFacility::GetTotalPowerUsage() const
 	return Super::GetTotalPowerUsage() + PowerProviderComponent->GetCurrentPowerUsage();
 }
 
-void APowerRelayFacility::TurnOff()
-{
-	PowerProviderComponent->UnlinkAllPowerConsumerFacility();
-	Super::TurnOff();
-}
-
 void APowerRelayFacility::UpdatePowerUsage(int32 Addition)
 {
 	PowerProviderComponent->UpdatePowerUsage(Addition);
 	if (IsLinkedToPowerProvider())
 	{
-		LinkedPowerProvider->UpdatePowerUsage(Addition);
+		LinkedPowerProviderInterface->UpdatePowerUsage(Addition);
 	}
 	UpdatePowerWidgets();
 }
@@ -68,7 +64,7 @@ void APowerRelayFacility::UpdatePowerUsage(int32 Addition)
 
 bool APowerRelayFacility::CanProvidePower()
 {
-	return IsLinkedToPowerProvider() && LinkedPowerProvider->CanProvidePower() && IsOperating();
+	return IsLinkedToPowerProvider() && LinkedPowerProviderInterface->CanProvidePower() && IsOperating();
 }
 
 void APowerRelayFacility::SetPowerInfluenceAreaVisibility(bool bVisibilty)
@@ -84,15 +80,35 @@ void APowerRelayFacility::BeginPlay()
 	SetPowerInfluenceAreaVisibility(false);
 }
 
-void APowerRelayFacility::TurnOn()
+void APowerRelayFacility::PreTurnOn_Implementation()
 {
-	Super::TurnOn();
+	Super::PreTurnOn_Implementation();
+}
+
+void APowerRelayFacility::PostTurnOn_Implementation()
+{
+	Super::PostTurnOn_Implementation();
 	PowerProviderComponent->LinkFacilitiesInPowerInfluenceArea();
+}
+
+void APowerRelayFacility::PreTurnOff_Implementation()
+{
+	Super::PreTurnOff_Implementation();
+}
+
+void APowerRelayFacility::PostTurnOff_Implementation()
+{
+	Super::PostTurnOff_Implementation();
+}
+
+bool APowerRelayFacility::CanLinkPowerConsumerFacility(APowerConsumerFacility* PowerConsumer)
+{
+	return IsLinkedToPowerProvider() && !PowerProviderComponent->IsLinked(PowerConsumer) && PowerConsumer != this;
 }
 
 bool APowerRelayFacility::TryLinkPowerConsumerFacility(APowerConsumerFacility* PowerConsumer)
 {
-	if (!PowerProviderComponent->IsLinkedPowerConsumerFacility(PowerConsumer) && PowerConsumer != this)
+	if (CanLinkPowerConsumerFacility(PowerConsumer))
 	{
 		return PowerProviderComponent->TryLinkPowerConsumerFacility(PowerConsumer);
 	}

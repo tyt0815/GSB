@@ -10,22 +10,14 @@ UPowerProviderComponent::UPowerProviderComponent()
 	SetCollisionProfileName(TEXT("PowerInfluenceArea"));
 }
 
-void UPowerProviderComponent::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
-{
-	Super::PostEditChangeProperty(PropertyChangedEvent);
-}
-
-void UPowerProviderComponent::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
 bool UPowerProviderComponent::TryLinkPowerConsumerFacility(APowerConsumerFacility* PowerConsumerFacility)
 {
-	if (!IsLinkedPowerConsumerFacility(PowerConsumerFacility))
+	if (!IsLinked(PowerConsumerFacility))
 	{
+		PowerConsumerFacility->PreLinkToPowerProvider();
 		LinkedPowerConsumerFacilities.AddUnique(PowerConsumerFacility);
 		PowerConsumerFacility->OnLinkToPowerProvider(GetOwner());
+		PowerConsumerFacility->PostLinkToPowerProvider();
 		return true;
 	}
 	return false;
@@ -33,11 +25,20 @@ bool UPowerProviderComponent::TryLinkPowerConsumerFacility(APowerConsumerFacilit
 
 void UPowerProviderComponent::UnlinkPowerConsumerFacility(APowerConsumerFacility* PowerConsumerFacility)
 {
-	LinkedPowerConsumerFacilities.Remove(PowerConsumerFacility);
-	if (IsValid(PowerConsumerFacility))
+	if (LinkedPowerConsumerFacilities.Contains(PowerConsumerFacility))
 	{
-		PowerConsumerFacility->OnUnlinkFromPowerProvider();
-	}
+		if (IsValid(PowerConsumerFacility))
+		{
+			PowerConsumerFacility->PreUnlinkFromPowerProvider();
+			LinkedPowerConsumerFacilities.Remove(PowerConsumerFacility);
+			PowerConsumerFacility->OnUnlinkFromPowerProvider();
+			PowerConsumerFacility->PostUnlinkFromPowerProvider();
+		}
+		else
+		{
+			LinkedPowerConsumerFacilities.Remove(PowerConsumerFacility);
+		}
+	}	
 }
 
 void UPowerProviderComponent::LinkFacilitiesInPowerInfluenceArea()
@@ -68,15 +69,15 @@ void UPowerProviderComponent::UnlinkAllPowerConsumerFacility()
 	}
 }
 
-bool UPowerProviderComponent::IsLinkedPowerConsumerFacility(APowerConsumerFacility* PowerConsumerFacility)
-{
-	return IsValid(PowerConsumerFacility) && LinkedPowerConsumerFacilities.Contains(PowerConsumerFacility);
-}
-
 void UPowerProviderComponent::SetPowerInfluenceAreaVisibility(bool bVisibility, bool bPropagateToChildren)
 {
 	if (IsValid(PowerInfluenceAreaMeshComponent))
 	{
 		PowerInfluenceAreaMeshComponent->SetVisibility(bVisibility, bPropagateToChildren);
 	}
+}
+
+bool UPowerProviderComponent::IsLinked(APowerConsumerFacility* PowerConsumerFacility)
+{
+	return IsValid(PowerConsumerFacility) && LinkedPowerConsumerFacilities.Contains(PowerConsumerFacility);
 }

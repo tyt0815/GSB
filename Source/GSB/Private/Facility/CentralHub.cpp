@@ -54,11 +54,6 @@ void ACentralHub::PostInitializeComponents()
 	}
 }
 
-bool ACentralHub::CanProvidePower()
-{
-	return PowerCapacity >= PowerProviderComponent->GetCurrentPowerUsage();
-}
-
 bool ACentralHub::TryLinkPowerConsumerFacility(APowerConsumerFacility* PowerConsumerFacility)
 {
 	return PowerProviderComponent->TryLinkPowerConsumerFacility(PowerConsumerFacility);
@@ -120,6 +115,11 @@ void ACentralHub::UpdatePowerCapacity(int32 Addition)
 {
 	PowerCapacity += Addition;
 	OnUpdatePowerCapacity.Broadcast(PowerCapacity);
+}
+
+bool ACentralHub::CanProvidePower()
+{
+	return PowerCapacity >= PowerProviderComponent->GetCurrentPowerUsage();
 }
 
 bool ACentralHub::TryReceiveItemFromInputPort(AActor* Actor)

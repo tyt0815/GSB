@@ -18,15 +18,9 @@ AExtensionHub::AExtensionHub()
 	OutputPortHandler = CreateDefaultSubobject<URetryPrioritizedActorRequestHandlerComponent>(TEXT("OutputPortHandler"));
 }
 
-bool AExtensionHub::TryLinkPowerConsumerFacility(APowerConsumerFacility* PowerConsumerFacility)
+bool AExtensionHub::CanLinkPowerConsumerFacility(APowerConsumerFacility* PowerConsumer)
 {
-	AHubLinkedFacility* HubLinkedFacility = Cast<AHubLinkedFacility>(PowerConsumerFacility);
-	
-	if (IsValid(HubLinkedFacility))
-	{
-		return Super::TryLinkPowerConsumerFacility(PowerConsumerFacility);
-	}
-	return false;
+	return Super::CanLinkPowerConsumerFacility(PowerConsumer) && Cast<AHubLinkedFacility>(PowerConsumer) != nullptr;
 }
 
 bool AExtensionHub::CanLinkToPowerProvider(IPowerProviderFacility* PowerProvider)

@@ -21,7 +21,7 @@ APowerConsumerFacility::APowerConsumerFacility()
 
 bool APowerConsumerFacility::IsOperating() const
 {
-	return Super::IsOperating() && IsOn() && IsLinkedToPowerProvider() && LinkedPowerProvider->CanProvidePower();
+	return Super::IsOperating() && IsOn() && IsLinkedToPowerProvider() && LinkedPowerProviderInterface->CanProvidePower();
 }
 
 void APowerConsumerFacility::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -40,7 +40,8 @@ void APowerConsumerFacility::BeginConstruction_Implementation()
 void APowerConsumerFacility::CompleteConstruction_Implementation()
 {
 	Super::CompleteConstruction_Implementation();
-	TurnOn();
+	check(IsConstructed());
+	TryTurnOn();
 }
 
 void APowerConsumerFacility::OnShowDetailInteraction(AActor* Interactor)
@@ -64,7 +65,7 @@ FVector APowerConsumerFacility::GetPowerWireConnectionPoint() const
 
 bool APowerConsumerFacility::IsLinkedToPowerProvider() const
 {
-	return IsValidPowerProviderScriptInterface(LinkedPowerProvider);
+	return IsValid(LinkedPowerProvider);
 }
 
 bool APowerConsumerFacility::TryLinkToPowerProvider(IPowerProviderFacility* PowerProvider)
@@ -76,15 +77,9 @@ bool APowerConsumerFacility::TryLinkToPowerProvider(IPowerProviderFacility* Powe
 	return false;
 }
 
-bool APowerConsumerFacility::CanLinkToPowerProvider(IPowerProviderFacility* PowerProvider)
+bool APowerConsumerFacility::TryConnectPowerWire(AActor* Actor)
 {
-	return PowerProvider != nullptr && IsOn() && PowerProvider->CanProvidePower();
-}
-
-void APowerConsumerFacility::OnLinkToPowerProvider_Implementation(AActor* PowerProviderActor)
-{
-	// PowerWire 연결
-	if (IPowerWireConnection* PowerWireConnectionInterface = Cast<IPowerWireConnection>(PowerProviderActor))
+	if (IPowerWireConnection* PowerWireConnectionInterface = Cast<IPowerWireConnection>(Actor))
 	{
 		if (UClass* PowerWireClass = UGSBGameInstance::GetActorClass(this, (TEXT("PowerWire"))))
 		{
@@ -138,11 +133,11 @@ void APowerConsumerFacility::OnLinkToPowerProvider_Implementation(AActor* PowerP
 							continue;
 						}
 
-						if (HitResult.GetActor() != PowerProviderActor && HitResult.GetActor()->GetParentActor() != PowerProviderActor)
+						if (HitResult.GetActor() != Actor && HitResult.GetActor()->GetParentActor() != Actor)
 						{
 							continue;
 						}
-						
+
 						FVector UnitVector = HitResult.ImpactPoint - Start;
 						UnitVector.Normalize();
 						float ZoHitResult = FVector::ZAxisVector.Dot(UnitVector);
@@ -153,50 +148,80 @@ void APowerConsumerFacility::OnLinkToPowerProvider_Implementation(AActor* PowerP
 						}
 					}
 
-					PowerWire->Link(Start, End);
+					PowerWire->Connect(Start, End);
+					return true;
 				}
 			}
 		}
 	}
-	
+	return false;
+}
 
-	LinkedPowerProvider = TScriptInterface<IPowerProviderFacility>(PowerProviderActor);
-	if (LinkedPowerProvider)
+void APowerConsumerFacility::DisconnectPowerWire()
+{
+	if (IsValid(PowerWire))
 	{
-		LinkedPowerProvider->UpdatePowerUsage(PowerConsumption);
+		PowerWire->Disconnect();
 	}
+	PowerWire = nullptr;
+}
+
+bool APowerConsumerFacility::CanLinkToPowerProvider(IPowerProviderFacility* PowerProvider)
+{
+	return PowerProvider != nullptr && IsOn();
+}
+
+void APowerConsumerFacility::PreLinkToPowerProvider_Implementation()
+{
+}
+
+void APowerConsumerFacility::OnLinkToPowerProvider_Implementation(AActor* PowerProviderActor)
+{
+	LinkedPowerProvider = PowerProviderActor;
+	LinkedPowerProviderInterface = Cast<IPowerProviderFacility>(LinkedPowerProvider);
+	check(LinkedPowerProviderInterface);
+	LinkedPowerProviderInterface->UpdatePowerUsage(PowerConsumption);
 	for (AFacilityAddon* Addon : ConnectedAddons)
 	{
 		Addon->OnFacilityLinkedToPowerProvider();
 	}
 	UpdatePowerWidgets();
+
+	// PowerWire 연결
+	TryConnectPowerWire(PowerProviderActor);
+}
+
+void APowerConsumerFacility::PostLinkToPowerProvider_Implementation()
+{
+}
+
+void APowerConsumerFacility::PreUnlinkFromPowerProvider_Implementation()
+{
 }
 
 void APowerConsumerFacility::OnUnlinkFromPowerProvider_Implementation()
 {
-	if (IsValid(PowerWire))
-	{
-		PowerWire->Unlink();
-	}
-	PowerWire = nullptr;
+	DisconnectPowerWire();
 
-	TArray<IPowerProviderFacility*> PowerProviderToIgnore;
 	if (LinkedPowerProvider)
 	{
-		PowerProviderToIgnore.Add(LinkedPowerProvider.GetInterface());
-		LinkedPowerProvider->UpdatePowerUsage(-PowerConsumption);
+		LinkedPowerProviderInterface->UpdatePowerUsage(-PowerConsumption);
 	}
 	LinkedPowerProvider = nullptr;
 
 	if (IsOn())
 	{
-		TryLinkToNearByPowerProvider(PowerProviderToIgnore);
+		TryLinkToNearByPowerProvider();
 	}
 
 	UpdatePowerWidgets();
 }
 
-bool APowerConsumerFacility::TryLinkToNearByPowerProvider(const TArray<IPowerProviderFacility*> PowerProvidersToIgnore)
+void APowerConsumerFacility::PostUnlinkFromPowerProvider_Implementation()
+{
+}
+
+bool APowerConsumerFacility::TryLinkToNearByPowerProvider()
 {
 	if (IsLinkedToPowerProvider())
 	{
@@ -214,10 +239,6 @@ bool APowerConsumerFacility::TryLinkToNearByPowerProvider(const TArray<IPowerPro
 	for (const FHitResult& HitResult : HitResults)
 	{
 		IPowerProviderFacility* PowerProvider = Cast<IPowerProviderFacility>(HitResult.GetActor());
-		if (PowerProvidersToIgnore.Contains(PowerProvider))
-		{
-			continue;
-		}
 		if (TryLinkToPowerProvider(PowerProvider))
 		{
 			return true;
@@ -231,7 +252,7 @@ void APowerConsumerFacility::UnlinkFromPowerProvider()
 {
 	if (IsLinkedToPowerProvider())
 	{
-		LinkedPowerProvider->UnlinkPowerConsumerFacility(this);
+		LinkedPowerProviderInterface->UnlinkPowerConsumerFacility(this);
 	}
 }
 
@@ -239,7 +260,9 @@ bool APowerConsumerFacility::TryTurnOn()
 {
 	if (IsConstructed())
 	{
-		TurnOn();
+		PreTurnOn();
+		bOn = true;
+		PostTurnOn();
 		return true;
 	}
 	return false;
@@ -247,9 +270,9 @@ bool APowerConsumerFacility::TryTurnOn()
 
 void APowerConsumerFacility::TurnOff()
 {
+	PreTurnOff();
 	bOn = false;
-	UnlinkFromPowerProvider();
-	UpdatePowerWidgets();
+	PostTurnOff();
 }
 
 int32 APowerConsumerFacility::GetTotalPowerUsage() const
@@ -279,11 +302,6 @@ void APowerConsumerFacility::TraceMultiPowerInfluenceArea(TArray<FHitResult>& Hi
 	{
 		HitResults.RemoveAt(IndicesToRemove[i]);
 	}
-}
-
-bool APowerConsumerFacility::IsValidPowerProviderScriptInterface(const TScriptInterface<IPowerProviderFacility>& PowerProvider) const
-{
-	return IsValid(PowerProvider.GetObject()) && PowerProvider.GetInterface();
 }
 
 void APowerConsumerFacility::UpdatePowerWidgets()
@@ -325,10 +343,23 @@ void APowerConsumerFacility::UpdatePowerConsumptionWidget()
 	}
 }
 
-void APowerConsumerFacility::TurnOn()
+void APowerConsumerFacility::PreTurnOn_Implementation()
 {
-	bOn = true;
-	TryLinkToNearByPowerProvider({});
+}
+
+void APowerConsumerFacility::PostTurnOn_Implementation()
+{
+	TryLinkToNearByPowerProvider();
+	UpdatePowerWidgets();
+}
+
+void APowerConsumerFacility::PreTurnOff_Implementation()
+{
+}
+
+void APowerConsumerFacility::PostTurnOff_Implementation()
+{
+	UnlinkFromPowerProvider();
 	UpdatePowerWidgets();
 }
 

@@ -36,36 +36,55 @@ public:
 
 	bool TryLinkToPowerProvider(IPowerProviderFacility* PowerProvider);
 
+	bool TryConnectPowerWire(AActor* Actor);
+
+	void DisconnectPowerWire();
+
 	virtual bool CanLinkToPowerProvider(IPowerProviderFacility* PowerProvider);
 
-	UFUNCTION(BlueprintNativeEvent, Category = "APowerConsumerFacility|LinkToPowerProvider")
+	UFUNCTION(BlueprintNativeEvent, Category = "GSB|PowerConsumerFacility")
+	void PreLinkToPowerProvider();
+	virtual void PreLinkToPowerProvider_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, Category = "GSB|PowerConsumerFacility")
 	void OnLinkToPowerProvider(AActor* PowerProviderActor);
 	virtual void OnLinkToPowerProvider_Implementation(AActor* PowerProviderActor);
 
-	UFUNCTION(BlueprintNativeEvent, Category = "APowerConsumerFacility|LinkToPowerProvider")
+	UFUNCTION(BlueprintNativeEvent, Category = "GSB|PowerConsumerFacility")
+	void PostLinkToPowerProvider();
+	virtual void PostLinkToPowerProvider_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, Category = "GSB|PowerConsumerFacility")
+	void PreUnlinkFromPowerProvider();
+	virtual void PreUnlinkFromPowerProvider_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, Category = "GSB|PowerConsumerFacility")
 	void OnUnlinkFromPowerProvider();
 	virtual void OnUnlinkFromPowerProvider_Implementation();
 
-	bool TryLinkToNearByPowerProvider(const TArray<IPowerProviderFacility*> PowerProvidersToIgnore);
+	UFUNCTION(BlueprintNativeEvent, Category = "GSB|PowerConsumerFacility")
+	void PostUnlinkFromPowerProvider();
+	virtual void PostUnlinkFromPowerProvider_Implementation();
+
+	bool TryLinkToNearByPowerProvider();
 
 	void UnlinkFromPowerProvider();
 
 	bool TryTurnOn();
 	
-	virtual void TurnOff();
+	void TurnOff();
 
 	virtual int32 GetTotalPowerUsage() const;
 
 protected:
 	void TraceMultiPowerInfluenceArea(TArray<FHitResult>& HitResults);
 
-	bool IsValidPowerProviderScriptInterface(const TScriptInterface<IPowerProviderFacility>& PowerProvider) const;
-
 	UPROPERTY(VisibleAnywhere)
 	UBoxComponent* PowerWireConnectionBoundsComponent;
 
 	UPROPERTY(VisibleAnywhere)
-	TScriptInterface<IPowerProviderFacility> LinkedPowerProvider = nullptr;
+	AActor* LinkedPowerProvider = nullptr;
+	IPowerProviderFacility* LinkedPowerProviderInterface = nullptr;
 
 	void UpdatePowerWidgets();
 
@@ -73,7 +92,21 @@ protected:
 
 	void UpdatePowerConsumptionWidget();
 
-	virtual void TurnOn();
+	UFUNCTION(BlueprintNativeEvent, Category = "GSB|PowerConsumerFacility")
+	void PreTurnOn();
+	virtual void PreTurnOn_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, Category = "GSB|PowerConsumerFacility")
+	void PostTurnOn();
+	virtual void PostTurnOn_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, Category = "GSB|PowerConsumerFacility")
+	void PreTurnOff();
+	virtual void PreTurnOff_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, Category = "GSB|PowerConsumerFacility")
+	void PostTurnOff();
+	virtual void PostTurnOff_Implementation();
 
 	UPROPERTY(EditAnywhere, Category = "GSB|PowerConsumerFacility")
 	int32 PowerConsumption = 0;

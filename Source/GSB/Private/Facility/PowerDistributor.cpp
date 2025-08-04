@@ -10,14 +10,9 @@ APowerDistributor::APowerDistributor()
 {
 }
 
-bool APowerDistributor::TryLinkPowerConsumerFacility(APowerConsumerFacility* PowerConsumerFacility)
+bool APowerDistributor::CanLinkPowerConsumerFacility(APowerConsumerFacility* PowerConsumer)
 {
-	APowerDistributorLinkedFacility* PowerDistributorLinkedFacility = Cast<APowerDistributorLinkedFacility>(PowerConsumerFacility);
-	if (PowerDistributorLinkedFacility)
-	{
-		return Super::TryLinkPowerConsumerFacility(PowerConsumerFacility);
-	}
-	return false;
+	return Super::CanLinkPowerConsumerFacility(PowerConsumer) && Cast<APowerDistributorLinkedFacility>(PowerConsumer) != nullptr;
 }
 
 void APowerDistributor::BeginPlay()

@@ -24,9 +24,9 @@ public:
 
 	virtual void OnUnlinkFromPowerProvider_Implementation() override;
 
-	virtual int32 GetTotalPowerUsage() const override;
+	virtual void PostUnlinkFromPowerProvider_Implementation() override;
 
-	virtual void TurnOff() override;
+	virtual int32 GetTotalPowerUsage() const override;
 
 	/////////////////////////////////////////////////////
 	// IPowerProviderFacility Functions
@@ -34,13 +34,11 @@ public:
 
 	virtual void UpdatePowerUsage(int32 Addition) override;
 
-	virtual bool TryLinkPowerConsumerFacility(APowerConsumerFacility* PowerConsumerFacility) override;
+	virtual bool TryLinkPowerConsumerFacility(APowerConsumerFacility* PowerConsumerFacility) override final;
 
 	virtual void UnlinkPowerConsumerFacility(APowerConsumerFacility* PowerConsumer) override;
 
 	virtual bool CanProvidePower() override;
-
-	// virtual bool CanLinkPower() override { return IsOn(); };
 
 	virtual void SetPowerInfluenceAreaVisibility(bool bVisibilty) override;
 
@@ -48,7 +46,15 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	virtual void TurnOn() override;
+	virtual void PreTurnOn_Implementation() override;
+
+	virtual void PostTurnOn_Implementation() override;
+
+	virtual void PreTurnOff_Implementation() override;
+
+	virtual void PostTurnOff_Implementation() override;
+
+	virtual bool CanLinkPowerConsumerFacility(APowerConsumerFacility* PowerConsumer);
 
 protected:
 	UPROPERTY(VisibleAnywhere)
