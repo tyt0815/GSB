@@ -8,6 +8,7 @@
 #include "Components/TextBlock.h"
 #include "Interfaces/InventoryInterface.h"
 #include "Facility/ProductionFacility.h"
+#include "DebugHeader.h"
 
 void UGSBProductionFacilityDetailWindow::NativeConstruct()
 {
@@ -53,6 +54,10 @@ void UGSBProductionFacilityDetailWindow::HandleOnInventoryItemSlotAdded(UGSBStor
 void UGSBProductionFacilityDetailWindow::HandleOnInventoryItemSlotLeftClicked(UGSBItemSlot* ItemSlotWidget)
 {
 	Inventory->MoveAllItemTo(InputStorage, ItemSlotWidget->GetItemData());
+	if (AProductionFacility* ProductionFacility = Cast<AProductionFacility>(LinkedFacility))
+	{
+		ProductionFacility->TryStartProduction();
+	}
 }
 
 void UGSBProductionFacilityDetailWindow::HandleOnInputStorageItemSlotAdded(UGSBStorage* StorageBody, UGSBItemList* ItemList, UGSBItemSlot* ItemSlot)
@@ -63,6 +68,7 @@ void UGSBProductionFacilityDetailWindow::HandleOnInputStorageItemSlotAdded(UGSBS
 void UGSBProductionFacilityDetailWindow::HandleOnInputStorageItemSlotLeftClicked(UGSBItemSlot* ItemSlotWidget)
 {
 	InputStorage->MoveAllItemTo(Inventory, ItemSlotWidget->GetItemData());
+	
 }
 
 void UGSBProductionFacilityDetailWindow::HandleOnOutputStorageItemSlotAdded(UGSBStorage* StorageBody, UGSBItemList* ItemList, UGSBItemSlot* ItemSlot)
